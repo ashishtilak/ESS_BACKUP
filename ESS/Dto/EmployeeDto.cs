@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+using ESS.Models;
+
+namespace ESS.Dto
+{
+    public class EmployeeDto
+    {
+        public string EmpUnqId { get; set; }
+        public string EmpName { get; set; }
+        public string FatherName { get; set; }
+        public bool Active { get; set; }
+        public string Pass { get; set; }
+
+        public string CompCode { get; set; }
+        public string WrkGrp { get; set; }
+        public string UnitCode { get; set; }
+        public string DeptCode { get; set; }
+        public string StatCode { get; set; }
+        public string SecCode { get; set; }
+        public string CatCode { get; set; }
+        public string EmpTypeCode { get; set; }
+        public string GradeCode { get; set; }
+        public string DesgCode { get; set; }
+
+        public bool IsReleaser { get; set; }
+        public bool IsHrUser { get; set; }
+        public bool IsHod { get; set; }
+
+        public string CompName { get; set; }
+        public string WrkGrpDesc { get; set; }
+        public string UnitName { get; set; }
+        public string DeptName { get; set; }
+        public string StatName { get; set; }
+        public string SecName { get; set; }
+        public string CatName { get; set; }
+        public string EmpTypeName { get; set; }
+        public string GradeName { get; set; }
+        public string DesgName { get; set; }
+
+
+        //public CompanyDto Company { get; set; }
+        //public WorkGroupDto WorkGroup { get; set; }
+        //public UnitDto Units { get; set; }
+        //public DepartmentDto Departments { get; set; }
+        //public StationDto Stations { get; set; }
+
+        //public CategoryDto Categories { get; set; }
+        //public EmpTypeDto EmpTypes { get; set; }
+
+        //public GradeDto Grades { get; set; }
+        //public DesignationDto Designations { get; set; }
+    }
+}
