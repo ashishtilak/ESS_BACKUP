@@ -273,6 +273,10 @@
     <Compile Include="Migrations\201801240517020_AddedCancellationInLeaveAppDtl.Designer.cs">
       <DependentUpon>201801240517020_AddedCancellationInLeaveAppDtl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802080535515_RemovedCatFromRelease.cs" />
+    <Compile Include="Migrations\201802080535515_RemovedCatFromRelease.Designer.cs">
+      <DependentUpon>201802080535515_RemovedCatFromRelease.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -424,6 +428,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801240517020_AddedCancellationInLeaveAppDtl.resx">
       <DependentUpon>201801240517020_AddedCancellationInLeaveAppDtl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802080535515_RemovedCatFromRelease.resx">
+      <DependentUpon>201802080535515_RemovedCatFromRelease.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

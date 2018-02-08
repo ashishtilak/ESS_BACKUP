@@ -85,7 +85,7 @@ namespace ESS.Controllers.Api
                                 r.DeptCode == leaveCancelDto.DeptCode &&
                                 r.StatCode == leaveCancelDto.StatCode &&
                                 r.SecCode == leaveCancelDto.SecCode &&
-                                r.CatCode == leaveCancelDto.CatCode &&
+                                //r.CatCode == leaveCancelDto.CatCode &&
                                 r.IsHod == leaveCancelDto.IsHod &&
                                 r.Active == true
                         );

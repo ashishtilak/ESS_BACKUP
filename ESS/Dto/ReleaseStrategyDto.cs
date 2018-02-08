@@ -21,7 +21,7 @@ namespace ESS.Dto
         public string DeptCode { get; set; }
         public string StatCode { get; set; }
         public string SecCode { get; set; }
-        public string CatCode { get; set; }
+        //        public string CatCode { get; set; }
 
         public ReleaseGroupDto ReleaseGroup { get; set; }
         public CompanyDto Company { get; set; }
@@ -30,7 +30,7 @@ namespace ESS.Dto
         public DepartmentDto Department { get; set; }
         public StationDto Stations { get; set; }
         public SectionDto Sections { get; set; }
-        public CategoryDto Category { get; set; }
+        //        public CategoryDto Category { get; set; }
         public bool IsHod { get; set; }
 
         public List<ReleaseStrategyLevelDto> ReleaseStrategyLevels;

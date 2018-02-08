@@ -57,11 +57,11 @@ namespace ESS.Models
         [ForeignKey("CompCode, WrkGrp, UnitCode, DeptCode, StatCode, SecCode")]
         public Sections Sections { get; set; }
 
-        [StringLength(3)]
-        public string CatCode { get; set; }
+        //[StringLength(3)]
+        //public string CatCode { get; set; }
 
-        [ForeignKey("CompCode, WrkGrp, CatCode")]
-        public Categories Category { get; set; }
+        //[ForeignKey("CompCode, WrkGrp, CatCode")]
+        //public Categories Category { get; set; }
 
         public bool IsHod { get; set; }
 

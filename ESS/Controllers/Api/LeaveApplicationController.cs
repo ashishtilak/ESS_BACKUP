@@ -209,7 +209,7 @@ namespace ESS.Controllers.Api
                         r.DeptCode == leaveApplicationDto.DeptCode &&
                         r.StatCode == leaveApplicationDto.StatCode &&
                         r.SecCode == leaveApplicationDto.SecCode &&
-                        r.CatCode == leaveApplicationDto.CatCode &&
+                        //r.CatCode == leaveApplicationDto.CatCode &&
                         r.IsHod == leaveApplicationDto.IsHod &&
                         r.Active == true
                 );

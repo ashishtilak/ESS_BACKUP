@@ -40,7 +40,7 @@ namespace ESS.Controllers.Api
                     r.DeptCode == deptCode &&
                     r.StatCode == statCode &&
                     r.SecCode == secCode &&
-                    r.CatCode == catCode &&
+                    //r.CatCode == catCode &&
                     r.IsHod == isHod &&
                     r.ReleaseGroupCode == releaseGroup
                 )
