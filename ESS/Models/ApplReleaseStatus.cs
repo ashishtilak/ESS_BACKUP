@@ -26,7 +26,7 @@ namespace ESS.Models
         public int ReleaseStrategyLevel { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(20)]
         public string ReleaseCode { get; set; }
 
         [Required]

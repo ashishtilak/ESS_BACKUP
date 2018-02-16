@@ -12,7 +12,9 @@ namespace ESS.Helpers
     public class CustomHelper
     {
         private const string RemoteServer = "Data Source=172.16.12.47;Initial Catalog=ATTENDANCE;Integrated Security=False; User Id=sa; Password=testomonials";
-        private const string ThisServer = "Data Source=172.16.12.14;Initial Catalog=Ash_ESS;Integrated Security=False; User Id=sa; Password=testomonials@123";
+
+        //private const string ThisServer = "Data Source=172.16.12.14;Initial Catalog=Ash_ESS;Integrated Security=False; User Id=sa; Password=testomonials@123";
+        private static string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
         /// <summary>
         /// Get list of Holidays
@@ -587,7 +589,7 @@ namespace ESS.Helpers
 
                         //bulk copy done, now use MERGE
 
-                        sql = "merge into Stations as target " +
+                        sql = "merge into Sections as target " +
                               "using #tmpSec as Source " +
                               "on " +
                               "Target.CompCode = Source.CompCode and " +

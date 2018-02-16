@@ -9,12 +9,13 @@ namespace ESS.Models
 {
     public class ReleaseAuth
     {
-        [Key, Column(Order=1)]
+        [Key, Column(Order = 1)]
         [Required]
-        [StringLength(10)]
+        [StringLength(20)]
         public string ReleaseCode { get; set; }
 
-
+        [Key, Column(Order = 2)]
+        [Required]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
 

@@ -20,6 +20,8 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
+
+        [HttpGet]
         public IHttpActionResult GetReleaseStrategy(
             string compCode,
             string wrkGrp,
@@ -40,12 +42,12 @@ namespace ESS.Controllers.Api
                     r.DeptCode == deptCode &&
                     r.StatCode == statCode &&
                     r.SecCode == secCode &&
-                    //r.CatCode == catCode &&
+                        //r.CatCode == catCode &&
                     r.IsHod == isHod &&
                     r.ReleaseGroupCode == releaseGroup
                 )
                 .Select(Mapper.Map<ReleaseStrategies, ReleaseStrategyDto>)
-                .Single();
+                .FirstOrDefault();
 
 
             if (releaseStrDto == null)
@@ -64,7 +66,7 @@ namespace ESS.Controllers.Api
             {
                 var relCode = levelDto.ReleaseCode;
                 var releser = _context.ReleaseAuth
-                    .Single(r => r.ReleaseCode == relCode);
+                    .FirstOrDefault(r => r.ReleaseCode == relCode);
 
                 if (releser == null)
                     return BadRequest("No one is authorized to release!");

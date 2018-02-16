@@ -200,7 +200,7 @@ namespace ESS.Controllers.Api
 
             //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
             var relStrat = _context.ReleaseStrategy
-                .Single(
+                .FirstOrDefault(
                     r =>
                         r.ReleaseGroupCode == leaveApplicationDto.ReleaseGroupCode &&
                         r.CompCode == leaveApplicationDto.CompCode &&
@@ -240,7 +240,7 @@ namespace ESS.Controllers.Api
             {
                 //get releaser ID from ReleaseAuth model
                 var relAuth = _context.ReleaseAuth
-                    .Single(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
+                    .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
 
 
                 ApplReleaseStatus appRelStat = new ApplReleaseStatus

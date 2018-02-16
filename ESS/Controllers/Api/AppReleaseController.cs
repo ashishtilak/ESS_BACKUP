@@ -27,8 +27,15 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetApplReleaseStatus(string empUnqId)
         {
             //TODO: Remove magic string "I"
+
+            var relAuth = _context.ReleaseAuth
+                .Where(r => r.EmpUnqId == empUnqId)
+                .Select(r => r.ReleaseCode)
+                .ToArray();
+
+
             var app = _context.ApplReleaseStatus
-                .Where(l => l.ReleaseAuth == empUnqId && l.ReleaseStatusCode == "I")
+                .Where(l => relAuth.Contains(l.ReleaseCode) && l.ReleaseStatusCode == "I")
                 .ToList();
 
             var appIds = app.Select(a => a.ApplicationId).ToArray();

@@ -277,6 +277,22 @@
     <Compile Include="Migrations\201802080535515_RemovedCatFromRelease.Designer.cs">
       <DependentUpon>201802080535515_RemovedCatFromRelease.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802160458595_ChangeLengthOfRelCode.cs" />
+    <Compile Include="Migrations\201802160458595_ChangeLengthOfRelCode.Designer.cs">
+      <DependentUpon>201802160458595_ChangeLengthOfRelCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802160500231_ChangeLengthOfRelCodeInAuth.cs" />
+    <Compile Include="Migrations\201802160500231_ChangeLengthOfRelCodeInAuth.Designer.cs">
+      <DependentUpon>201802160500231_ChangeLengthOfRelCodeInAuth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802160503215_AddedEmpCodeAsKeyInAuth.cs" />
+    <Compile Include="Migrations\201802160503215_AddedEmpCodeAsKeyInAuth.Designer.cs">
+      <DependentUpon>201802160503215_AddedEmpCodeAsKeyInAuth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161009065_ChangeRelCodeLenInAPpRel.cs" />
+    <Compile Include="Migrations\201802161009065_ChangeRelCodeLenInAPpRel.Designer.cs">
+      <DependentUpon>201802161009065_ChangeRelCodeLenInAPpRel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -338,7 +354,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -431,6 +449,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802080535515_RemovedCatFromRelease.resx">
       <DependentUpon>201802080535515_RemovedCatFromRelease.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802160458595_ChangeLengthOfRelCode.resx">
+      <DependentUpon>201802160458595_ChangeLengthOfRelCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802160500231_ChangeLengthOfRelCodeInAuth.resx">
+      <DependentUpon>201802160500231_ChangeLengthOfRelCodeInAuth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802160503215_AddedEmpCodeAsKeyInAuth.resx">
+      <DependentUpon>201802160503215_AddedEmpCodeAsKeyInAuth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161009065_ChangeRelCodeLenInAPpRel.resx">
+      <DependentUpon>201802161009065_ChangeRelCodeLenInAPpRel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
