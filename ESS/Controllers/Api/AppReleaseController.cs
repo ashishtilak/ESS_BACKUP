@@ -133,6 +133,7 @@ namespace ESS.Controllers.Api
                 .Single(
                         r =>
                         r.ReleaseCode == applicationDetail.ReleaseCode &&
+                        r.EmpUnqId == applicationDetail.ReleaseAuth &&
                         r.Active &&
                         today >= r.ValidFrom &&
                         today <= r.ValidTo

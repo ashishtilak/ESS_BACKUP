@@ -187,6 +187,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Api\AppReleaseController.cs" />
+    <Compile Include="Controllers\Api\AutoMailController.cs" />
+    <Compile Include="Controllers\Api\ChangeReleaseController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\HolidayController.cs" />
     <Compile Include="Controllers\Api\LeaveApplicationController.cs" />

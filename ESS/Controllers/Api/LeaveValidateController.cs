@@ -43,10 +43,10 @@ namespace ESS.Controllers.Api
             int year = _context.OpenMonth.Select(t => t.OpenYear).Single();
 
             var monthFirst = DateTime.Parse("01/" + yearMonth.ToString().Substring(4, 2) + "/" +
-                                            yearMonth.ToString().Substring(0, 4));
+                                            yearMonth.ToString().Substring(0, 4)).AddMonths(-1);
 
             var monthLast = DateTime.Parse("01/" + yearMonth.ToString().Substring(4, 2) + "/" +
-                                           yearMonth.ToString().Substring(0, 4)).AddMonths(2).AddDays(-1);
+                                           yearMonth.ToString().Substring(0, 4)).AddMonths(4).AddDays(-1);
 
 
             // Reject if any leave is pending for release

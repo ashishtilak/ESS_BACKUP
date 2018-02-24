@@ -36,7 +36,7 @@ namespace ESS.Controllers.Api
                         Active = e.Active,
                         Pass = e.Pass,
 
-                        CompCode = e.CatCode,
+                        CompCode = e.CompCode,
                         WrkGrp = e.WrkGrp,
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
@@ -82,7 +82,7 @@ namespace ESS.Controllers.Api
                         Active = e.Active,
                         Pass = e.Pass,
 
-                        CompCode = e.CatCode,
+                        CompCode = e.CompCode,
                         WrkGrp = e.WrkGrp,
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
