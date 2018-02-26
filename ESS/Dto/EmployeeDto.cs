@@ -29,6 +29,7 @@ namespace ESS.Dto
         public bool IsReleaser { get; set; }
         public bool IsHrUser { get; set; }
         public bool IsHod { get; set; }
+        public string Email { get; set; }
 
         public string CompName { get; set; }
         public string WrkGrpDesc { get; set; }

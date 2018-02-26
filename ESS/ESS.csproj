@@ -295,6 +295,10 @@
     <Compile Include="Migrations\201802161009065_ChangeRelCodeLenInAPpRel.Designer.cs">
       <DependentUpon>201802161009065_ChangeRelCodeLenInAPpRel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802260401171_AddedEmailtoEmployeeModel.cs" />
+    <Compile Include="Migrations\201802260401171_AddedEmailtoEmployeeModel.Designer.cs">
+      <DependentUpon>201802260401171_AddedEmailtoEmployeeModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -463,6 +467,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802161009065_ChangeRelCodeLenInAPpRel.resx">
       <DependentUpon>201802161009065_ChangeRelCodeLenInAPpRel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802260401171_AddedEmailtoEmployeeModel.resx">
+      <DependentUpon>201802260401171_AddedEmailtoEmployeeModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
