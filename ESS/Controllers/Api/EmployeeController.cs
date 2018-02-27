@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 
 namespace ESS.Controllers.Api
 {
+
     public class EmployeeController : ApiController
     {
         private ApplicationDbContext _context;
@@ -132,6 +133,7 @@ namespace ESS.Controllers.Api
 
 
         [HttpPost]
+        [ActionName("changepassword")]
         public IHttpActionResult ChangePassword([FromBody] object requestData)
         {
             var userPassword = JsonConvert.DeserializeObject<UserPassword>(requestData.ToString());
@@ -143,6 +145,22 @@ namespace ESS.Controllers.Api
                 return BadRequest("Invalid employee unique Id.");
 
             employee.Pass = userPassword.Pass;
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [ActionName("updateemail")]
+        public IHttpActionResult UpdateEmail(string empUnqId, string email)
+        {
+            var emp = _context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            if (emp == null)
+                return BadRequest("Invalid employee code");
+
+            emp.Email = email;
             _context.SaveChanges();
 
             return Ok();

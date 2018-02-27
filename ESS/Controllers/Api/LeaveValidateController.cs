@@ -148,23 +148,6 @@ namespace ESS.Controllers.Api
                     details.TotalDays < 3)
                     error.Add("EL cannot be less than 3 days");
 
-                //check leave balance
-                LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
-                float bal = lb.Opening - lb.Availed - lb.Encashed;
-
-                if (bal < details.TotalDays)
-                    error.Add("Insufficient balance of " + details.LeaveTypeCode + ". Current Balance is: " + bal);
-
-                if (details.LeaveTypeCode == LeaveTypes.OptionalLeave)
-                {
-                    if (details.TotalDays > 1)
-                        error.Add("Only one OH is allowed.");
-
-                    if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt))
-                        error.Add("Invalid Optional holiday. Pl verify date.");
-
-                }
-
                 // Get weekly offs between the selected range
                 List<DateTime> weekOffs =
                     ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, lDto.EmpUnqId);
@@ -187,6 +170,24 @@ namespace ESS.Controllers.Api
                     error.Add("You cannot take " + details.LeaveTypeCode + " on a holiday.");
 
                 offDays += holidays.Count;
+
+                //check leave balance
+                LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
+                float bal = lb.Opening - lb.Availed - lb.Encashed;
+
+                if (bal < details.TotalDays)
+                    error.Add("Insufficient balance of " + details.LeaveTypeCode + ". Current Balance is: " + bal);
+
+                if (details.LeaveTypeCode == LeaveTypes.OptionalLeave)
+                {
+                    if (details.TotalDays > 1)
+                        error.Add("Only one OH is allowed.");
+
+                    if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt))
+                        error.Add("Invalid Optional holiday. Pl verify date.");
+
+                }
+
 
                 //Checks involving previous days leaves.
                 //Get previous 5 days data in dictionary

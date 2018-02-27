@@ -36,7 +36,7 @@ namespace ESS.Controllers.Api
                 .Include(rs => rs.RelStrategy)
                 .Include(l => l.LeaveApplicationDetails)
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
-                .FirstOrDefault();
+                .FirstOrDefault(a => a.LeaveAppId == id);
 
             if (leaveAppDto == null)
                 return BadRequest("Invalid leave application parameters.");

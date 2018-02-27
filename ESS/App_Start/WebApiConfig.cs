@@ -23,6 +23,14 @@ namespace ESS
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            //controller with actions
+            // '/api/employee/updateemail'
+
+            config.Routes.MapHttpRoute(
+                name: "ControllerAndAction",
+                routeTemplate: "api/{controller}/{action}"
+            );
         }
     }
 }
