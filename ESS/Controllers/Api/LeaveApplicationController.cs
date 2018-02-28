@@ -236,6 +236,9 @@ namespace ESS.Controllers.Api
 
             //Now for each release strategy details record create ApplReleaseStatus record
 
+            //create a temp collection to be added to leaveapplicationdto later on
+            List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+
             foreach (var relStratReleaseStrategyLevel in relStrat.ReleaseStrategyLevels)
             {
                 //get releaser ID from ReleaseAuth model
@@ -260,6 +263,9 @@ namespace ESS.Controllers.Api
                     IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
                 };
 
+                //add to collection
+                apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
+
                 _context.ApplReleaseStatus.Add(appRelStat);
             }
 
@@ -267,9 +273,11 @@ namespace ESS.Controllers.Api
 
             _context.LeaveApplications.Add(Mapper.Map<LeaveApplicationDto, LeaveApplications>(leaveApplicationDto));
 
-
-
             _context.SaveChanges();
+
+            //Create app release status object and add all app release lines
+            leaveApplicationDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+            leaveApplicationDto.ApplReleaseStatus.AddRange(apps);
 
             return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveApplicationDto.LeaveAppId), leaveApplicationDto);
         }
