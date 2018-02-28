@@ -87,5 +87,73 @@ namespace ESS.Controllers.Api
 
             return Ok(releaseStrDto);
         }
+
+
+
+        [HttpGet]
+        public IHttpActionResult GetReleaseStrategy(string empUnqId)
+        {
+            //get employee details
+            var emp = _context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            if (emp == null)
+                return BadRequest("Invalid employee code.");
+
+            //return if employee is not a releaser
+            if (!emp.IsReleaser)
+                return BadRequest("Employee is not authorized to release (check flag).");
+
+            //if he's a releaser, get his release code
+            //and based on the code, get all his release strategy levels
+
+            var relCode = _context.ReleaseAuth.Where(r => r.EmpUnqId == emp.EmpUnqId).ToList();
+
+            //create blank employee list for output
+            List<EmployeeDto> employees = new List<EmployeeDto>();
+
+
+            //loop through all release codes found (ideally it should be only one)
+            foreach (var releaseAuth in relCode)
+            {
+                //find all release strategies to which this code belongs
+                var relStrategyLevel = _context.ReleaseStrategyLevels
+                    .Include(r => r.ReleaseStrategies)
+                    .Where(r => r.ReleaseCode == releaseAuth.ReleaseCode)
+                    .ToList();
+
+
+                var relStrategy = relStrategyLevel.Select(level => level.ReleaseStrategies).ToList();
+
+                //and for each strategy we found above,
+                //search for employee who match the release criteria
+                foreach (var strategy in relStrategy)
+                {
+                    var relEmployee = _context.Employees
+                        .Where(
+                            e =>
+                                e.CompCode == strategy.CompCode &&
+                                e.WrkGrp == strategy.WrkGrp &&
+                                e.UnitCode == strategy.UnitCode &&
+                                e.DeptCode == strategy.DeptCode &&
+                                e.StatCode == strategy.StatCode &&
+                                e.SecCode == strategy.SecCode &&
+                                e.IsHod == strategy.IsHod &&
+                                strategy.Active
+                        )
+                        .Select(Mapper.Map<Employees, EmployeeDto>)
+                        .ToList();
+
+                    //add all above employees to our output list
+                    employees.AddRange(relEmployee);
+                }
+            }
+
+            //if there're any employee, return them
+            if (employees.Count == 0)
+                return BadRequest("No employee found...");
+
+            return Ok(employees);
+
+        }
+
     }
 }

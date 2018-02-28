@@ -62,7 +62,8 @@ namespace ESS.Controllers.Api
 
                         IsHod = e.IsHod,
                         IsHrUser = e.IsHrUser,
-                        IsReleaser = e.IsReleaser
+                        IsReleaser = e.IsReleaser,
+                        Email = e.Email
                     }
                 )
                 .ToList()
@@ -108,7 +109,8 @@ namespace ESS.Controllers.Api
 
                         IsHod = e.IsHod,
                         IsHrUser = e.IsHrUser,
-                        IsReleaser = e.IsReleaser
+                        IsReleaser = e.IsReleaser,
+                        Email = e.Email
                     }
                 )
                 .Where(e => e.EmpUnqId == empUnqId)
