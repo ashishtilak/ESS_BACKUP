@@ -139,7 +139,44 @@ namespace ESS.Controllers.Api
                                 e.IsHod == strategy.IsHod &&
                                 strategy.Active
                         )
-                        .Select(Mapper.Map<Employees, EmployeeDto>)
+                        .Select(
+                            e => new EmployeeDto
+                            {
+                                EmpUnqId = e.EmpUnqId,
+                                EmpName = e.EmpName,
+                                FatherName = e.FatherName,
+                                Active = e.Active,
+                                Pass = e.Pass,
+
+                                CompCode = e.CompCode,
+                                WrkGrp = e.WrkGrp,
+                                UnitCode = e.UnitCode,
+                                DeptCode = e.DeptCode,
+                                StatCode = e.StatCode,
+                                SecCode = e.SecCode,
+                                CatCode = e.CatCode,
+                                EmpTypeCode = e.EmpTypeCode,
+                                GradeCode = e.GradeCode,
+                                DesgCode = e.DesgCode,
+
+
+                                CompName = e.Company.CompName,
+                                WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                                UnitName = e.Units.UnitName,
+                                DeptName = e.Departments.DeptName,
+                                StatName = e.Stations.StatName,
+                                SecName = e.Sections.SecName,
+                                CatName = e.Categories.CatName,
+                                EmpTypeName = e.EmpTypes.EmpTypeName,
+                                GradeName = e.Grades.GradeName,
+                                DesgName = e.Designations.DesgName,
+
+                                IsHod = e.IsHod,
+                                IsHrUser = e.IsHrUser,
+                                IsReleaser = e.IsReleaser,
+                                Email = e.Email
+                            }
+                        )
                         .ToList();
 
                     //add all above employees to our output list
