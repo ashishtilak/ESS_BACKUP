@@ -70,6 +70,7 @@ namespace ESS.Controllers.Api
 
                 foreach (var applReleaseStatusDto in appl)
                 {
+                    applReleaseStatusDto.ReleaseAuth = empUnqId;
                     dto.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
 
