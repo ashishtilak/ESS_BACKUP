@@ -70,7 +70,16 @@ namespace ESS.Controllers.Api
 
                 foreach (var applReleaseStatusDto in appl)
                 {
-                    applReleaseStatusDto.ReleaseAuth = empUnqId;
+                    var relCode = _context.ReleaseAuth
+                        .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                        .ToList();
+
+                    foreach (var auth in relCode)
+                    {
+                        if (auth.EmpUnqId == empUnqId)
+                            applReleaseStatusDto.ReleaseAuth = empUnqId;
+                    }
+
                     dto.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
 
