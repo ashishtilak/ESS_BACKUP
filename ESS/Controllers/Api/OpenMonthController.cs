@@ -31,8 +31,14 @@ namespace ESS.Controllers.Api
 
             currentMonth.PrevMonth = int.Parse(prevMonth.Year.ToString() + prevMonth.Month.ToString("00"));
             currentMonth.YearMonth = yearMonth;
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
+            string sql = "UPDATE OpenMonths " +
+                         "Set YearMonth = " + currentMonth.YearMonth + ", " +
+                         "OpenYear = " + currentMonth.OpenYear + ", " +
+                         "PrevMonth = " + currentMonth.PrevMonth;
+
+            _context.Database.ExecuteSqlCommand(sql);
 
             return Ok();
         }

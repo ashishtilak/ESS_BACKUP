@@ -1017,6 +1017,11 @@ namespace ESS.Helpers
         }
 
 
+        public static void UpdateOpenMonth()
+        {
+
+        }
+
         /// <summary>
         /// Get Leaves from Attendance Server
         /// </summary>
