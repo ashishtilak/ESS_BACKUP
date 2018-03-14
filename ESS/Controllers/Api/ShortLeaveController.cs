@@ -72,6 +72,17 @@ namespace ESS.Controllers.Api
                     }
 
 
+                    //update cancelled leave Id in ParentId field of parent leave
+
+                    var parentleave = _context.LeaveApplications
+                        .Where(l => l.LeaveAppId == leaveCancelDto.LeaveAppId)
+                        .ToList();
+
+                    foreach (var parentLeaveDtl in parentleave)
+                    {
+                        parentLeaveDtl.ParentId = leaveCancelDto.LeaveAppId;
+                    }
+
                     //add code for application release status table
 
                     //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code

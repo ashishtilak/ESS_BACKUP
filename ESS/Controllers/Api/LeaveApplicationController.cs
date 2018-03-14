@@ -133,6 +133,8 @@ namespace ESS.Controllers.Api
                 .Where(lv =>
                     lv.EmpUnqId == empUnqId &&
                     lv.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                    lv.ParentId == 0 &&
+                    lv.Cancelled == false &&
                     lv.LeaveApplicationDetails.Any(la => la.ToDt >= reqDate))
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
                 .ToList();

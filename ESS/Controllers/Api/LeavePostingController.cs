@@ -22,7 +22,7 @@ namespace ESS.Controllers.Api
         }
 
         //this will give pending leaves for posting
-        public IHttpActionResult GetLeaves()
+        public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt, bool flag)
         {
             var leaveAppDto = _context.LeaveApplications
                 .Include(e => e.Employee)
@@ -37,11 +37,13 @@ namespace ESS.Controllers.Api
                 .Include(l => l.LeaveApplicationDetails)
                 .Where(
                     l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                        (l.AddDt >= fromDt && l.AddDt <= toDt) &&
                         l.LeaveApplicationDetails.Any(ld =>
-                            (
-                            ld.IsPosted == LeaveApplicationDetails.NotPosted ||
-                            ld.IsPosted == LeaveApplicationDetails.PartiallyPosted
-                            ))
+                                (
+                                    ld.IsPosted == LeaveApplicationDetails.NotPosted ||
+                                    ld.IsPosted == LeaveApplicationDetails.PartiallyPosted
+                                )
+                            )
                         )
                 .ToList()
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>);
