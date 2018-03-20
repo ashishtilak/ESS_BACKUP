@@ -75,7 +75,7 @@ namespace ESS.Controllers.Api
                     //update cancelled leave Id in ParentId field of parent leave
 
                     var parentleave = _context.LeaveApplications
-                        .Where(l => l.LeaveAppId == leaveCancelDto.LeaveAppId)
+                        .Where(l => l.LeaveAppId == leaveCancelDto.ParentId)
                         .ToList();
 
                     foreach (var parentLeaveDtl in parentleave)
@@ -90,14 +90,15 @@ namespace ESS.Controllers.Api
                         .Single(
                             r =>
                                 r.ReleaseGroupCode == leaveCancelDto.ReleaseGroupCode &&     //Get the same as LeaveApplication
-                                r.CompCode == leaveCancelDto.CompCode &&
-                                r.WrkGrp == leaveCancelDto.WrkGrp &&
-                                r.UnitCode == leaveCancelDto.UnitCode &&
-                                r.DeptCode == leaveCancelDto.DeptCode &&
-                                r.StatCode == leaveCancelDto.StatCode &&
-                                r.SecCode == leaveCancelDto.SecCode &&
-                                //r.CatCode == leaveCancelDto.CatCode &&
-                                r.IsHod == leaveCancelDto.IsHod &&
+                                r.ReleaseStrategy == leaveCancelDto.EmpUnqId &&
+                                //r.CompCode == leaveCancelDto.CompCode &&
+                                //r.WrkGrp == leaveCancelDto.WrkGrp &&
+                                //r.UnitCode == leaveCancelDto.UnitCode &&
+                                //r.DeptCode == leaveCancelDto.DeptCode &&
+                                //r.StatCode == leaveCancelDto.StatCode &&
+                                //r.SecCode == leaveCancelDto.SecCode &&
+                                ////r.CatCode == leaveCancelDto.CatCode &&
+                                //r.IsHod == leaveCancelDto.IsHod &&
                                 r.Active == true
                         );
 

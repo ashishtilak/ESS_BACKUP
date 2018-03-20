@@ -205,14 +205,15 @@ namespace ESS.Controllers.Api
                 .FirstOrDefault(
                     r =>
                         r.ReleaseGroupCode == leaveApplicationDto.ReleaseGroupCode &&
-                        r.CompCode == leaveApplicationDto.CompCode &&
-                        r.WrkGrp == leaveApplicationDto.WrkGrp &&
-                        r.UnitCode == leaveApplicationDto.UnitCode &&
-                        r.DeptCode == leaveApplicationDto.DeptCode &&
-                        r.StatCode == leaveApplicationDto.StatCode &&
-                        r.SecCode == leaveApplicationDto.SecCode &&
-                        //r.CatCode == leaveApplicationDto.CatCode &&
-                        r.IsHod == leaveApplicationDto.IsHod &&
+                        r.ReleaseStrategy == leaveApplicationDto.EmpUnqId &&
+                        //r.CompCode == leaveApplicationDto.CompCode &&
+                        //r.WrkGrp == leaveApplicationDto.WrkGrp &&
+                        //r.UnitCode == leaveApplicationDto.UnitCode &&
+                        //r.DeptCode == leaveApplicationDto.DeptCode &&
+                        //r.StatCode == leaveApplicationDto.StatCode &&
+                        //r.SecCode == leaveApplicationDto.SecCode &&
+                        ////r.CatCode == leaveApplicationDto.CatCode &&
+                        //r.IsHod == leaveApplicationDto.IsHod &&
                         r.Active == true
                 );
 

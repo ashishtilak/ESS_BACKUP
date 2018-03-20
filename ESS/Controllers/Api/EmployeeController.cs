@@ -197,11 +197,7 @@ namespace ESS.Controllers.Api
 
                 var relStr = _context.ReleaseStrategy
                     .SingleOrDefault(r =>
-                        r.WrkGrp == e.WrkGrp &&
-                        r.UnitCode == e.UnitCode &&
-                        r.DeptCode == e.DeptCode &&
-                        r.StatCode == e.StatCode &&
-                        r.SecCode == e.SecCode
+                        r.ReleaseStrategy == e.EmpUnqId
                     );
 
                 if (relStr == null)

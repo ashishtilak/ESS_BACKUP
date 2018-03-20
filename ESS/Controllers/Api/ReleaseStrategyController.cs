@@ -31,19 +31,21 @@ namespace ESS.Controllers.Api
             string secCode,
             string catCode,
             bool isHod,
-            string releaseGroup
+            string releaseGroup,
+            string empUnqId
             )
         {
             var releaseStrDto = _context.ReleaseStrategy
                 .Where(r =>
-                    r.CompCode == compCode &&
-                    r.WrkGrp == wrkGrp &&
-                    r.UnitCode == unitCode &&
-                    r.DeptCode == deptCode &&
-                    r.StatCode == statCode &&
-                    r.SecCode == secCode &&
-                        //r.CatCode == catCode &&
-                    r.IsHod == isHod &&
+                    //r.CompCode == compCode &&
+                    //r.WrkGrp == wrkGrp &&
+                    //r.UnitCode == unitCode &&
+                    //r.DeptCode == deptCode &&
+                    //r.StatCode == statCode &&
+                    //r.SecCode == secCode &&
+                    //    //r.CatCode == catCode &&
+                    //r.IsHod == isHod &&
+                    r.ReleaseStrategy == empUnqId &&
                     r.ReleaseGroupCode == releaseGroup
                 )
                 .Select(Mapper.Map<ReleaseStrategies, ReleaseStrategyDto>)
@@ -130,13 +132,14 @@ namespace ESS.Controllers.Api
                     var relEmployee = _context.Employees
                         .Where(
                             e =>
-                                e.CompCode == strategy.CompCode &&
-                                e.WrkGrp == strategy.WrkGrp &&
-                                e.UnitCode == strategy.UnitCode &&
-                                e.DeptCode == strategy.DeptCode &&
-                                e.StatCode == strategy.StatCode &&
-                                e.SecCode == strategy.SecCode &&
-                                e.IsHod == strategy.IsHod &&
+                                //e.CompCode == strategy.CompCode &&
+                                //e.WrkGrp == strategy.WrkGrp &&
+                                //e.UnitCode == strategy.UnitCode &&
+                                //e.DeptCode == strategy.DeptCode &&
+                                //e.StatCode == strategy.StatCode &&
+                                //e.SecCode == strategy.SecCode &&
+                                //e.IsHod == strategy.IsHod &&
+                                e.EmpUnqId == strategy.ReleaseStrategy &&
                                 strategy.Active
                         )
                         .Select(
