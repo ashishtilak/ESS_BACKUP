@@ -138,27 +138,6 @@ namespace ESS.Controllers.Api
                 if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
                     continue;
 
-                // CL can't be more than 3 days
-                if (details.LeaveTypeCode == LeaveTypes.CasualLeave &&
-                    details.TotalDays > 3)
-                    error.Add("CL cannot be more than 3 days");
-
-                // EL Must be at least 3 days
-                if (details.LeaveTypeCode == LeaveTypes.PaidLeave &&
-                    details.TotalDays < 3)
-                    error.Add("EL cannot be less than 3 days");
-
-                // Get weekly offs between the selected range
-                List<DateTime> weekOffs =
-                    ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, lDto.EmpUnqId);
-
-                details.TotalDays -= weekOffs.Count;
-
-                if (details.TotalDays == 0)
-                    error.Add("You cannot take " + details.LeaveTypeCode + " on weekly off day.");
-
-                offDays += weekOffs.Count;
-
 
                 //now get holidays between from/to date and add them to off days
                 List<DateTime> holidays =
@@ -170,6 +149,39 @@ namespace ESS.Controllers.Api
                     error.Add("You cannot take " + details.LeaveTypeCode + " on a holiday.");
 
                 offDays += holidays.Count;
+
+
+                // Get weekly offs between the selected range
+                List<DateTime> weekOffs =
+                    ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, lDto.EmpUnqId);
+
+                if (holidays.Count > 0)
+                {
+                    weekOffs.RemoveAll(w => holidays.Any(h => h == w));
+                }
+
+                details.TotalDays -= weekOffs.Count;
+
+                if (details.TotalDays == 0)
+                    error.Add("You cannot take " + details.LeaveTypeCode + " on weekly off day.");
+
+                offDays += weekOffs.Count;
+
+
+
+
+
+                // CL can't be more than 3 days
+                if (details.LeaveTypeCode == LeaveTypes.CasualLeave &&
+                    details.TotalDays > 3)
+                    error.Add("CL cannot be more than 3 days");
+
+                // EL Must be at least 3 days
+                if (details.LeaveTypeCode == LeaveTypes.PaidLeave &&
+                    details.TotalDays < 3)
+                    error.Add("EL cannot be less than 3 days");
+
+
 
                 //check leave balance
                 LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
