@@ -155,6 +155,8 @@ namespace ESS.Controllers.Api
                 List<DateTime> weekOffs =
                     ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, lDto.EmpUnqId);
 
+
+                //Check if weekoff is on holiday. If it is, then remove it.
                 if (holidays.Count > 0)
                 {
                     weekOffs.RemoveAll(w => holidays.Any(h => h == w));

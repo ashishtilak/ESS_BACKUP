@@ -29,6 +29,7 @@ namespace ESS.Controllers.Api
 
 
         [HttpPost]
+        [ActionName("CreateShortLeave")]
         public IHttpActionResult CreateShortLeave([FromBody] object requestData)
         {
             var leaveCancelDto = JsonConvert.DeserializeObject<LeaveApplicationDto>(requestData.ToString());
@@ -57,14 +58,14 @@ namespace ESS.Controllers.Api
                 using (var transaction = _context.Database.BeginTransaction())
                 {
                     //set this if not already:
-                    leaveCancelDto.Cancelled = true;
+                    //leaveCancelDto.Cancelled = true;
 
                     foreach (var leaveApplicationDetailDto in leaveCancelDto.LeaveApplicationDetails)
                     {
                         leaveApplicationDetailDto.LeaveAppId = leaveCancelDto.LeaveAppId;
 
                         //this is necessory to cancel the leave:
-                        leaveApplicationDetailDto.Cancelled = true;
+                        //leaveApplicationDetailDto.Cancelled = true;
                         leaveApplicationDetailDto.ParentId = leaveCancelDto.ParentId;
 
                         //posting status to "N"
@@ -73,15 +74,24 @@ namespace ESS.Controllers.Api
 
 
                     //update cancelled leave Id in ParentId field of parent leave
+                    //and set cancelled flag for details too
 
                     var parentleave = _context.LeaveApplications
                         .Where(l => l.LeaveAppId == leaveCancelDto.ParentId)
                         .ToList();
 
-                    foreach (var parentLeaveDtl in parentleave)
+                    foreach (var dtl in parentleave)
                     {
-                        parentLeaveDtl.ParentId = leaveCancelDto.LeaveAppId;
+                        dtl.ParentId = leaveCancelDto.LeaveAppId;
+                        dtl.Cancelled = true;
+
+                        foreach (var parentLeaveDtl in dtl.LeaveApplicationDetails)
+                        {
+                            parentLeaveDtl.ParentId = leaveCancelDto.LeaveAppId;
+                            parentLeaveDtl.Cancelled = true;
+                        }
                     }
+
 
                     //add code for application release status table
 
@@ -166,6 +176,29 @@ namespace ESS.Controllers.Api
                 return BadRequest(e.ToString());
             }
             return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveCancelDto.LeaveAppId), leaveCancelDto);
+        }
+
+
+        [HttpPost]
+        [ActionName("CancelLeave")]
+        public IHttpActionResult CancelLeave(string releaseGroupCode, int leaveAppId)
+        {
+            var leaveApp = _context.LeaveApplications
+                .SingleOrDefault(l => l.ReleaseGroupCode == releaseGroupCode && l.LeaveAppId == leaveAppId);
+
+            if (leaveApp == null)
+                return BadRequest("Invalid Leave application code.");
+
+            leaveApp.Cancelled = true;
+
+            foreach (var detail in leaveApp.LeaveApplicationDetails)
+            {
+                detail.Cancelled = true;
+            }
+
+            _context.SaveChanges();
+
+            return Ok();
         }
     }
 }
