@@ -58,6 +58,7 @@ namespace ESS.Models
         public bool? Cancelled { get; set; }
         public int ParentId { get; set; }
 
+        public bool? IsCancellationPosted { get; set; }
 
         public static readonly string NotPosted = "N";
         public static readonly string FullyPosted = "F";

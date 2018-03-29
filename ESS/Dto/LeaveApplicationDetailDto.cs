@@ -29,6 +29,8 @@ namespace ESS.Dto
         public bool Cancelled { get; set; }
         public int ParentId { get; set; }
 
+        public bool IsCancellationPosted { get; set; }
+
         public LeaveTypeDto LeaveType { get; set; }
     }
 }

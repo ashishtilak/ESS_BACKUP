@@ -24,6 +24,7 @@ namespace ESS.Controllers.Api
         [HttpGet]
         public IHttpActionResult SendMail(string releaseGroupCode, int id, string releaseAuth)
         {
+            //get the leave application object
             var leaveAppDto = _context.LeaveApplications
                 .Include(e => e.Employee)
                 .Include(c => c.Company)
@@ -42,32 +43,37 @@ namespace ESS.Controllers.Api
                 return BadRequest("Invalid leave application parameters.");
 
 
+            // get all App Release lines
             var app = _context.ApplReleaseStatus
                 .Where(l =>
                     l.YearMonth == leaveAppDto.YearMonth &&
                     l.ReleaseGroupCode == leaveAppDto.ReleaseGroupCode &&
-                    l.ApplicationId == leaveAppDto.LeaveAppId &&
-                    l.ReleaseAuth == releaseAuth                        //Get from parameter
+                    l.ApplicationId == leaveAppDto.LeaveAppId
                     )
                 .ToList()
                 .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
             foreach (var applReleaseStatusDto in app)
             {
-                leaveAppDto.ApplReleaseStatus.Add(applReleaseStatusDto);
+                // Check for release code for supplied releaser 
+                var relAuth = _context.ReleaseAuth
+                    .SingleOrDefault(r =>
+                        r.ReleaseCode == applReleaseStatusDto.ReleaseCode &&
+                        r.EmpUnqId == releaseAuth);
+
+                // when release code is matched, add corresponding app rel line to leave dto
+                if (relAuth != null)
+                    leaveAppDto.ApplReleaseStatus.Add(applReleaseStatusDto);
             }
+
+
+            // if no app release lines are found, there's no line for this employee to release
+            if (leaveAppDto.ApplReleaseStatus.Count == 0)
+                return BadRequest("Releaser is invalid! No app release line found.");
 
             var empCode = leaveAppDto.EmpUnqId;
             var empName = leaveAppDto.Employee.EmpName;
             var deptstat = leaveAppDto.Stations.StatName;
-            var releaser = _context.Employees.FirstOrDefault(e => e.EmpUnqId == releaseAuth);
-
-            if (releaser == null)
-                return BadRequest("Invalid releaser information.");
-
-            if (string.IsNullOrEmpty(releaser.Email))
-                return BadRequest("Email not maintained for releaser " + releaser.EmpUnqId + " - " + releaser.EmpName);
-
 
             const string header = @"
                 <html lang=""en"">
@@ -105,6 +111,9 @@ namespace ESS.Controllers.Api
                 "Dept/Station: " + deptstat + " <br/><br/>";
 
             body = header + body;
+
+            if (leaveAppDto.Cancelled)
+                body += "<br /><p style='Color:Red'>Please note that this is a leave cancellation. </p> <br /><br />";
 
             string bodyTable = "<table> " +
                                "<thead>" +
@@ -160,8 +169,35 @@ namespace ESS.Controllers.Api
 
             };
 
-            mail.To.Add(new MailAddress(releaser.Email));
-            smtpClient.Send(mail);
+
+            //now loop through all app release lines -- there'll be only one line, but anyway...
+            foreach (var dto in leaveAppDto.ApplReleaseStatus)
+            {
+                //find the releaser from the releasecode
+                var releasers = _context.ReleaseAuth
+                    .Where(r => r.ReleaseCode == dto.ReleaseCode).ToList();
+
+
+                //in case of multiple releasers for single release code,
+                foreach (var r in releasers)
+                {
+                    // get releaser employee object
+                    var releaser = _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId);
+
+                    if (releaser == null)
+                        continue;
+
+                    if (string.IsNullOrEmpty(releaser.Email))
+                        continue;
+
+                    //return BadRequest("Email not maintained for releaser " + releaser.EmpUnqId + " - " + releaser.EmpName);
+
+                    mail.To.Add(new MailAddress(releaser.Email));
+                    smtpClient.Send(mail);
+                    mail.To.Remove(new MailAddress(releaser.Email));
+                }
+
+            }
 
             return Ok();
         }

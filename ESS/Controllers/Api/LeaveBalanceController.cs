@@ -34,7 +34,10 @@ namespace ESS.Controllers.Api
                 .Where(l =>
                     l.EmpUnqId == empUnqId &&
                     l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
-                    l.LeaveApplicationDetails.Any(d => d.IsPosted == LeaveApplicationDetails.NotPosted)
+                    l.LeaveApplicationDetails.Any(d =>
+                            d.IsPosted == LeaveApplicationDetails.NotPosted ||
+                            d.Cancelled == true
+                        )
                 )
                 .Include(l => l.LeaveApplicationDetails)
                 .ToList();
@@ -50,7 +53,13 @@ namespace ESS.Controllers.Api
                         var l = leaveBalDto.Single(x => x.LeaveTypeCode == details.LeaveTypeCode);
 
                         if (l != null)
-                            l.Availed += details.TotalDays;
+                        {
+                            if (details.Cancelled == true &&
+                                (details.IsCancellationPosted == null || details.IsCancellationPosted == false))
+                                l.Availed -= details.TotalDays;
+                            else
+                                l.Availed += details.TotalDays;
+                        }
                     }
                     catch
                     {

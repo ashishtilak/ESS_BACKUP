@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Infrastructure;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -84,5 +90,63 @@ namespace ESS.Models
             base.OnModelCreating(modelBuilder);
             modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
         }
+
+
+        //Changes for Auditing... 
+        public override int SaveChanges()
+        {
+            List<string> listChanges = new List<string>();
+            //List<string> listTable = new List<string>();
+
+            //var objectStateManager = ((IObjectContextAdapter)this).ObjectContext.ObjectStateManager;
+            //IEnumerable<ObjectStateEntry> changes =
+            //    objectStateManager.GetObjectStateEntries(EntityState.Modified | EntityState.Unchanged);
+
+
+            //foreach (var stateEntry in changes)
+            //{
+            //    var modifiedProperties = stateEntry.GetModifiedProperties();
+
+            //    foreach (var property in modifiedProperties)
+            //    {
+            //        if (Convert.ToString(stateEntry.OriginalValues[property]) !=
+            //            Convert.ToString(stateEntry.CurrentValues[property]))
+            //        {
+            //            listTable.Add(stateEntry.EntityKey.EntitySetName);
+            //            listChanges.Add(property + " From " + Convert.ToString(stateEntry.OriginalValues[property]) +
+            //                            " to " + Convert.ToString(stateEntry.CurrentValues[property]));
+            //        }
+            //    }
+            //}
+
+
+            var changes = ChangeTracker.Entries().Where(e => e.State != EntityState.Unchanged);
+
+            foreach (var change in changes)
+            {
+                //Here you can have name of models that needs history
+
+                if (change.Entity.GetType().Name != "Employees") continue;
+
+                if (change.State != EntityState.Modified) continue;
+
+                var originalVal = change.OriginalValues;
+                var currVal = change.CurrentValues;
+
+                listChanges.AddRange(
+                    from propertyName in originalVal.PropertyNames
+                    let original = originalVal[propertyName]
+                    let current = currVal[propertyName]
+                    where original != current
+                    select "Changed " + propertyName + " From " + original.ToString() + " to " + current.ToString()
+                    );
+            }
+
+            return base.SaveChanges();
+        }
+
+
+        ////End Changes for Auditing
+
     }
 }

@@ -40,7 +40,17 @@ namespace ESS.Controllers.Api
                         l.LeaveApplicationDetails.Any(ld =>
                                 (
                                     ld.IsPosted == LeaveApplicationDetails.NotPosted ||
-                                    ld.IsPosted == LeaveApplicationDetails.PartiallyPosted
+                                    ld.IsPosted == LeaveApplicationDetails.PartiallyPosted ||
+                                    (
+                                        ld.IsPosted == LeaveApplicationDetails.FullyPosted
+                                          &&
+                                          (
+                                              ld.IsCancellationPosted == false ||
+                                              ld.IsCancellationPosted == null
+                                          ) &&
+                                          ld.Cancelled == true
+                                    )
+
                                 ) &&
                                 (
                                     (ld.FromDt <= toDt && ld.ToDt >= fromDt) ||
@@ -113,6 +123,17 @@ namespace ESS.Controllers.Api
                                     leaveApplication.YearMonth == dto1.YearMonth)
                                 {
                                     leaveApplication.IsPosted = dto1.IsPosted;
+                                    l.UpdUser = dto1.UserId;
+                                    l.UpdDt = DateTime.Now;
+
+                                    // If this leave is a cancelled leave, which was fully posted previously,
+                                    // we'll set the IsCancellationPosted flag
+
+                                    if (leaveApplication.ParentId != 0 && leaveApplication.Cancelled == true)
+                                    {
+                                        leaveApplication.IsCancellationPosted = true;
+                                    }
+
 
                                     if (dto1.IsPosted == LeaveApplicationDetails.PostingRejected)
                                     {

@@ -23,14 +23,14 @@ namespace ESS.Controllers.Api
 
         [HttpGet]
         public IHttpActionResult GetReleaseStrategy(
-            string compCode,
-            string wrkGrp,
-            string unitCode,
-            string deptCode,
-            string statCode,
-            string secCode,
-            string catCode,
-            bool isHod,
+            //string compCode,
+            //string wrkGrp,
+            //string unitCode,
+            //string deptCode,
+            //string statCode,
+            //string secCode,
+            //string catCode,
+            //bool isHod,
             string releaseGroup,
             string empUnqId
             )

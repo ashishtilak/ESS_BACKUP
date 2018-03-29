@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Data.Entity;
 using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
+using Newtonsoft.Json;
 
 namespace ESS.Controllers.Api
 {
@@ -19,82 +21,111 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
-        public IHttpActionResult GetReleaseStrategy(
-                        string compCode,
-            string wrkGrp,
-            string unitCode,
-            string deptCode,
-            string statCode)
+
+        public class ReleaseAuthEmp
         {
-            var releaseStrDto = _context.ReleaseStrategy
-                .Where(r =>
-                    r.CompCode == compCode &&
-                    r.WrkGrp == wrkGrp &&
-                    r.UnitCode == unitCode &&
-                    r.DeptCode == deptCode &&
-                    r.StatCode == statCode
-                )
-                .Select(Mapper.Map<ReleaseStrategies, ReleaseStrategyDto>)
+            public string ReleaseCode { get; set; }
+            public string EmpUnqId { get; set; }
+            public string EmpName { get; set; }
+
+        }
+
+        public IHttpActionResult GetReleaseAuth(string empUnqId)
+        {
+            //first get the release auth for this employee
+            var relAuth = _context.ReleaseAuth
+                .Where(r => r.EmpUnqId == empUnqId)
                 .ToList();
 
+            //list of result to be returned
+            List<ReleaseAuthEmp> result = new List<ReleaseAuthEmp>();
 
-            foreach (var dto in releaseStrDto)
+
+            //for each release auth of this employee,
+            //get the release codes
+            foreach (var auth in relAuth)
             {
-                var relStrLvl = _context.ReleaseStrategyLevels
-                    .Where(r =>
-                        r.ReleaseGroupCode == dto.ReleaseGroupCode &&
-                        r.ReleaseStrategy == dto.ReleaseStrategy
-                    )
-                    .Select(Mapper.Map<ReleaseStrategyLevels, ReleaseStrategyLevelDto>)
+                var employees = _context.ReleaseAuth
+                    .Where(r => r.ReleaseCode == auth.ReleaseCode)
+                    .Select(e => e.EmpUnqId)
                     .ToList();
 
-                foreach (var levelDto in relStrLvl)
+                // now we have multiple employees against release code (if exist)
+                foreach (var emp in employees)
                 {
-                    var relCode = levelDto.ReleaseCode;
-                    var releser = _context.ReleaseAuth
-                        .FirstOrDefault(r => r.ReleaseCode == relCode);
+                    ReleaseAuthEmp res = new ReleaseAuthEmp
+                    {
+                        ReleaseCode = auth.ReleaseCode,
+                        EmpUnqId = emp
+                    };
 
-                    if (releser == null)
-                        return BadRequest("No one is authorized to release!");
+                    var empname = _context.Employees.SingleOrDefault(e => e.EmpUnqId == emp);
+                    if (empname != null)
+                        res.EmpName = empname.EmpName;
 
-                    var emp = _context.Employees
-                        .Select(e => new EmployeeDto
-                        {
-                            EmpUnqId = e.EmpUnqId,
-                            EmpName = e.EmpName
-                        })
-                        .Single(e => e.EmpUnqId == releser.EmpUnqId);
+                    result.Add(res);
 
-                    levelDto.EmpUnqId = emp.EmpUnqId;
-                    levelDto.EmpName = emp.EmpName;
-
-                    dto.ReleaseStrategyLevels.Add(levelDto);
                 }
-
-
             }
 
-            if (releaseStrDto.Count > 0)
-                return Ok(releaseStrDto);
-            else
-                return BadRequest("Cannot Find any release strategy for this Dept/Station.");
+            return Ok(result);
         }
 
 
         [HttpPost]
-        public IHttpActionResult ChangeReleaseStrategy(string empUnqId, string secCode)
+        public IHttpActionResult ChangeReleaseStrategy([FromBody] object requestData)
         {
-            var emp = _context.Employees.SingleOrDefault(e => e.EmpUnqId == empUnqId);
 
-            if (emp == null)
-                return BadRequest("Invalid employee code.");
+            var dto = JsonConvert.DeserializeObject<ReleaseStrategyDto>(requestData.ToString());
+
+            //check if release strategy exist. If exist, do nothing,
+            //if not, create new release strategy object
+
+            ReleaseStrategies releaseStrategy = _context.ReleaseStrategy
+                                                    .SingleOrDefault(r =>
+                                                        r.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                                                        r.ReleaseStrategy == dto.ReleaseStrategy
+                                                    )
+
+                                                    ?? new ReleaseStrategies
+                                                    {
+                                                        ReleaseGroupCode = dto.ReleaseGroupCode,
+                                                        ReleaseStrategy = dto.ReleaseStrategy,
+                                                        ReleaseStrategyName = dto.ReleaseStrategyName,
+                                                        IsHod = false,
+                                                        Active = true
+                                                    };
 
 
-            emp.SecCode = secCode;
+
+            var releaseStrategyLevels = _context.ReleaseStrategyLevels
+                .Where(rl =>
+                    rl.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                    rl.ReleaseStrategy == dto.ReleaseStrategy
+                ).ToList();
+
+
+            _context.ReleaseStrategyLevels.RemoveRange(releaseStrategyLevels);
+
+
+            var last = dto.ReleaseStrategyLevels.LastOrDefault();
+
+            foreach (var level in dto.ReleaseStrategyLevels)
+            {
+                ReleaseStrategyLevels newRelStrLevel =
+                    new ReleaseStrategyLevels
+                    {
+                        ReleaseGroupCode = dto.ReleaseGroupCode,
+                        ReleaseStrategy = dto.ReleaseStrategy,
+                        ReleaseStrategyLevel = level.ReleaseStrategyLevel,
+                        ReleaseCode = level.ReleaseCode,
+                        //check if this is last line, in that case 
+                        IsFinalRelease = (last != null && last.Equals(level))
+                    };
+                _context.ReleaseStrategyLevels.Add(newRelStrLevel);
+            }
 
             _context.SaveChanges();
-
-            //TODO: Call API from Attendance server here...
 
             return Ok();
         }

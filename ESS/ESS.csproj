@@ -299,6 +299,14 @@
     <Compile Include="Migrations\201802260401171_AddedEmailtoEmployeeModel.Designer.cs">
       <DependentUpon>201802260401171_AddedEmailtoEmployeeModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803260423584_AddCancellationPostedFlag.cs" />
+    <Compile Include="Migrations\201803260423584_AddCancellationPostedFlag.Designer.cs">
+      <DependentUpon>201803260423584_AddCancellationPostedFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803270455152_RemoveFieldsFromReleaseStrategy.cs" />
+    <Compile Include="Migrations\201803270455152_RemoveFieldsFromReleaseStrategy.Designer.cs">
+      <DependentUpon>201803270455152_RemoveFieldsFromReleaseStrategy.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -470,6 +478,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802260401171_AddedEmailtoEmployeeModel.resx">
       <DependentUpon>201802260401171_AddedEmailtoEmployeeModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803260423584_AddCancellationPostedFlag.resx">
+      <DependentUpon>201803260423584_AddCancellationPostedFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803270455152_RemoveFieldsFromReleaseStrategy.resx">
+      <DependentUpon>201803270455152_RemoveFieldsFromReleaseStrategy.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

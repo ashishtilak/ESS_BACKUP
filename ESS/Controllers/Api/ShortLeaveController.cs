@@ -8,6 +8,7 @@ using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using Newtonsoft.Json;
+using System.Data.Entity;
 
 namespace ESS.Controllers.Api
 {
@@ -77,6 +78,7 @@ namespace ESS.Controllers.Api
                     //and set cancelled flag for details too
 
                     var parentleave = _context.LeaveApplications
+                        .Include(l => l.LeaveApplicationDetails)
                         .Where(l => l.LeaveAppId == leaveCancelDto.ParentId)
                         .ToList();
 
@@ -184,21 +186,56 @@ namespace ESS.Controllers.Api
         public IHttpActionResult CancelLeave(string releaseGroupCode, int leaveAppId)
         {
             var leaveApp = _context.LeaveApplications
+                .Include(l => l.LeaveApplicationDetails)
                 .SingleOrDefault(l => l.ReleaseGroupCode == releaseGroupCode && l.LeaveAppId == leaveAppId);
+
 
             if (leaveApp == null)
                 return BadRequest("Invalid Leave application code.");
 
-            leaveApp.Cancelled = true;
 
+            // Set cancelled flag, and also reset release status to not released
+            leaveApp.Cancelled = true;
+            leaveApp.ReleaseStatusCode = ReleaseStatus.NotReleased;
+
+            // Set cancelled flag for details table also
             foreach (var detail in leaveApp.LeaveApplicationDetails)
             {
                 detail.Cancelled = true;
             }
 
+
+            // Reset release status of application release table
+
+            var appRel = _context.ApplReleaseStatus
+                .Where(a =>
+                    a.YearMonth == leaveApp.YearMonth &&
+                    a.ReleaseGroupCode == leaveApp.ReleaseGroupCode &&
+                    a.ApplicationId == leaveApp.LeaveAppId)
+                .OrderBy(a => a.ReleaseStrategyLevel)
+                .ToList();
+
+
+            List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+            foreach (var appRelDtl in appRel)
+            {
+                appRelDtl.ReleaseStatusCode = appRelDtl.ReleaseStrategyLevel == 1
+                    ? ReleaseStatus.InRelease
+                    : ReleaseStatus.NotReleased;
+
+                apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelDtl));
+            }
+
+
+            var leaveAppDto = Mapper.Map<LeaveApplications, LeaveApplicationDto>(leaveApp);
+            leaveAppDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+
+            leaveAppDto.ApplReleaseStatus.AddRange(apps);
+
+
             _context.SaveChanges();
 
-            return Ok();
+            return Ok(leaveAppDto);
         }
     }
 }

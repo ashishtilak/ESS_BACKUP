@@ -130,7 +130,19 @@ namespace ESS.Controllers.Api
             //YearMonth, ReleaseGroupCode, ApplicationId, ReleaseStrategy, ReleaseStrategyLevel, ReleaseCode
 
 
-            var applicationDetail = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+            var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+
+
+            var applicationDetail = _context.ApplReleaseStatus
+                .SingleOrDefault(
+                    a => a.YearMonth == dto.YearMonth &&
+                         a.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                         a.ApplicationId == dto.ApplicationId &&
+                         a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel
+                );
+
+            if (applicationDetail == null)
+                return BadRequest("Invalid app release status detals...");
 
             //If releaseStatusCode is not I, we've nothing to do...
             if (applicationDetail.ReleaseStatusCode != ReleaseStatus.InRelease)
@@ -167,6 +179,7 @@ namespace ESS.Controllers.Api
 
             //get the corresponding leave app header
             var leaveApplication = _context.LeaveApplications
+                .Include(l => l.LeaveApplicationDetails)
                 .Single(
                     l =>
                         l.YearMonth == applicationDetail.YearMonth &&
@@ -185,12 +198,73 @@ namespace ESS.Controllers.Api
             {
                 if (releaseStatusCode == ReleaseStatus.ReleaseRejected)
                 {
-                    //set this application details status to "R"
-                    //we'll not set next level to "I", it'll forever be "N"
-                    applicationDetail.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                    // Check if this is a short cancelled leave being rejected
+                    if (leaveApplication.ParentId != 0)
+                    {
+                        // We'll first restore the original leave application's cancelled flag
+                        // and delete the new short leave...
 
-                    //now set leave application header release status to "R" as well
-                    leaveApplication.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                        var parentLeave = _context.LeaveApplications
+                            .Include(l => l.LeaveApplicationDetails)
+                            .SingleOrDefault(l =>
+                                l.LeaveAppId == leaveApplication.ParentId &&
+                                l.ReleaseGroupCode == ReleaseGroups.LeaveApplication
+                            );
+
+                        if (parentLeave != null)
+                        {
+                            parentLeave.ParentId = 0;
+                            parentLeave.Cancelled = false;
+
+                            foreach (var detail in parentLeave.LeaveApplicationDetails)
+                            {
+                                detail.Cancelled = false;
+                                detail.ParentId = 0;
+                            }
+
+                            //now delete the short leave
+                            var appRelease = _context.ApplReleaseStatus.Where
+                            (
+                                a => a.YearMonth == leaveApplication.YearMonth &&
+                                     a.ReleaseGroupCode == leaveApplication.ReleaseGroupCode &&
+                                     a.ApplicationId == leaveApplication.LeaveAppId
+                            ).ToList();
+
+                            _context.ApplReleaseStatus.RemoveRange(appRelease);
+                            _context.LeaveApplicationDetails.RemoveRange(leaveApplication.LeaveApplicationDetails);
+                            _context.LeaveApplications.Remove(leaveApplication);
+                        }
+
+                    }
+                    else
+                    {
+                        //now check if this is fully cancelled leave or not
+                        if (leaveApplication.Cancelled == true)
+                        {
+                            //reset cancellation flag and release status to "F"
+                            leaveApplication.Cancelled = false;
+                            leaveApplication.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+
+
+                            //reset release status to fully released
+                            applicationDetail.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+
+                            //reset cancellation flag for leave app details
+                            foreach (var detail in leaveApplication.LeaveApplicationDetails)
+                            {
+                                detail.Cancelled = false;
+                            }
+                        }
+                        else
+                        {
+                            //set this application details status to "R"
+                            //we'll not set next level to "I", it'll forever be "N"
+                            applicationDetail.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+
+                            //now set leave application header release status to "R" as well
+                            leaveApplication.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                        }
+                    }
                 }
                 else if (releaseStatusCode == ReleaseStatus.FullyReleased)
                 {
@@ -232,7 +306,7 @@ namespace ESS.Controllers.Api
 
                 //explicitely change state to modified, because,
                 //we've not taken this record from context...
-                _context.Entry(applicationDetail).State = EntityState.Modified;
+                //_context.Entry(applicationDetail).State = EntityState.Modified;
 
                 //finally update database
                 int result = _context.SaveChanges();
