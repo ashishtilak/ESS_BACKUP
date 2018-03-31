@@ -72,6 +72,8 @@ namespace ESS.Controllers.Api
             return Ok(employeeDto);
         }
 
+        [HttpGet]
+        [ActionName("GetEmployee")]
         public IHttpActionResult GetEmployee(string empUnqId)
         {
             var employee = _context.Employees
@@ -272,6 +274,28 @@ namespace ESS.Controllers.Api
         // create a temp class for password change
         #endregion
 
+
+        [HttpGet]
+        [ActionName("perfattd")]
+        public IHttpActionResult PerfAttd(string empUnqId, string flag)
+        {
+            if (flag == "PERF")
+            {
+                var result = Helpers.CustomHelper.GetPerfAttd(empUnqId);
+                return Ok(result);
+            }
+            else if (flag == "PUNCH")
+            {
+                var result = Helpers.CustomHelper.GetPerfPunch(empUnqId);
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest("Invalid parameter...");
+            }
+
+        }
+
         private class UserPassword
         {
             public string EmpUnqId { get; set; }
@@ -312,5 +336,6 @@ namespace ESS.Controllers.Api
 
             return Ok();
         }
+
     }
 }

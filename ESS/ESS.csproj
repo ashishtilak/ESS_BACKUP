@@ -224,6 +224,8 @@
     <Compile Include="Dto\LeavePostingDto.cs" />
     <Compile Include="Dto\LeaveTypeDto.cs" />
     <Compile Include="Dto\LoginDto.cs" />
+    <Compile Include="Dto\PerfAttdDto.cs" />
+    <Compile Include="Dto\PerfPunchDto.cs" />
     <Compile Include="Dto\ReleaseGroupDto.cs" />
     <Compile Include="Dto\ReleaseStrategyDto.cs" />
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />

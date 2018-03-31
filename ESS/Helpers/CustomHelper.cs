@@ -1065,5 +1065,119 @@ namespace ESS.Helpers
             }
             return leaves;
         }
+
+        public static List<PerfAttdDto> GetPerfAttd(string empUnqId)
+        {
+            List<PerfAttdDto> result = new List<PerfAttdDto>();
+
+            ApplicationDbContext context = new ApplicationDbContext();
+
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            {
+                cn.Open();
+
+                DateTime fromDt = DateTime.Now.AddDays(-30);
+                DateTime toDt = DateTime.Now;
+
+
+
+                string sql = "SELECT [tYear],[tDate],[EmpUnqID],[ScheDuleShift],[ConsShift],[ConsIN],[ConsOut]," +
+                             "[ConsWrkHrs],[ConsOverTime],[Status],[HalfDay],[LeaveTyp],[LeaveHalf],[Earlycome]," +
+                             "[EarlyGoing],[LateCome] " +
+                             "FROM [ATTENDANCE].[dbo].[AttdData] " +
+                             "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
+                             "and compcode = '01' " +
+                             "and wrkgrp  = '" + emp.WrkGrp + "' " +
+                             "and empunqid = '" + empUnqId + "' " +
+                             "and tdate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
+                             toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new PerfAttdDto
+                    {
+                        AttdDate = Convert.ToDateTime(dr["tDate"]),
+                        EmpUnqId = empUnqId,
+                        ScheDuleShift = dr["ScheDuleShift"].ToString(),
+                        ConsShift = dr["ConsShift"].ToString(),
+                        ConsIn = dr.IsDBNull(dr.GetOrdinal("ConsIn"))
+                            ? (DateTime?)null
+                            : Convert.ToDateTime(dr["ConsIn"]),
+                        ConsOut = dr.IsDBNull(dr.GetOrdinal("ConsOut"))
+                            ? (DateTime?)null
+                            : Convert.ToDateTime(dr["ConsOut"]),
+                        ConsWrkHrs = float.Parse(dr["ConsWrkHrs"].ToString()),
+                        ConsOverTime = float.Parse(dr["ConsOverTime"].ToString()),
+                        Status = dr["Status"].ToString(),
+                        HalfDay = Convert.ToBoolean(dr["HalfDay"]),
+                        LeaveType = dr["LeaveTyp"].ToString(),
+                        LeaveHalf = Convert.ToBoolean(dr["LeaveHalf"]),
+                        Earlycome = dr["Earlycome"].ToString(),
+                        EarlyGoing = dr["EarlyGoing"].ToString(),
+                        LateCome = dr["LateCome"].ToString()
+                    };
+
+
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
+
+        public static List<PerfPunchDto> GetPerfPunch(string empUnqId)
+        {
+            List<PerfPunchDto> result = new List<PerfPunchDto>();
+
+            ApplicationDbContext context = new ApplicationDbContext();
+
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            {
+                cn.Open();
+
+                DateTime fromDt = DateTime.Now.AddDays(-30);
+                DateTime toDt = DateTime.Now;
+
+
+
+                string sql = "SELECT [PunchDate],[EmpUnqId],a.[IOFlg],a.[MachineIP],b.[MachineDesc] " +
+                             "FROM [ATTENDANCE].[dbo].[AttdLunchGate] a " +
+                             "LEFT JOIN [ATTENDANCE].[dbo].[ReaderConFig] b on a.[MachineIP] = b.MachineIP " +
+                             "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
+                             "and empunqid = '" + empUnqId + "' " +
+                             "and PunchDate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
+                             toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new PerfPunchDto
+                    {
+                        PunchDate = dr.IsDBNull(dr.GetOrdinal("PunchDate"))
+                            ? (DateTime?)null
+                            : Convert.ToDateTime(dr["PunchDate"]),
+                        IoFlag = dr["IOFlg"].ToString(),
+                        MachineIp = dr["MachineIP"].ToString(),
+                        MachineDesc = dr["MachineDesc"].ToString()
+                    };
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
     }
 }
