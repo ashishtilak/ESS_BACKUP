@@ -1066,7 +1066,7 @@ namespace ESS.Helpers
             return leaves;
         }
 
-        public static List<PerfAttdDto> GetPerfAttd(string empUnqId)
+        public static List<PerfAttdDto> GetPerfAttd(string empUnqId, DateTime? fromDate = null, DateTime? toDate = null)
         {
             List<PerfAttdDto> result = new List<PerfAttdDto>();
 
@@ -1078,9 +1078,8 @@ namespace ESS.Helpers
             {
                 cn.Open();
 
-                DateTime fromDt = DateTime.Now.AddDays(-30);
-                DateTime toDt = DateTime.Now;
-
+                DateTime fromDt = fromDate ?? DateTime.Now.AddDays(-30);
+                DateTime toDt = toDate ?? DateTime.Now;
 
 
                 string sql = "SELECT [tYear],[tDate],[EmpUnqID],[ScheDuleShift],[ConsShift],[ConsIN],[ConsOut]," +

@@ -79,24 +79,28 @@ namespace ESS.Controllers.Api
             var dto = JsonConvert.DeserializeObject<ReleaseStrategyDto>(requestData.ToString());
 
             //check if release strategy exist. If exist, do nothing,
-            //if not, create new release strategy object
+            //if not, create new release strategy object and add to context
 
             ReleaseStrategies releaseStrategy = _context.ReleaseStrategy
                                                     .SingleOrDefault(r =>
                                                         r.ReleaseGroupCode == dto.ReleaseGroupCode &&
                                                         r.ReleaseStrategy == dto.ReleaseStrategy
-                                                    )
+                                                    );
 
-                                                    ?? new ReleaseStrategies
-                                                    {
-                                                        ReleaseGroupCode = dto.ReleaseGroupCode,
-                                                        ReleaseStrategy = dto.ReleaseStrategy,
-                                                        ReleaseStrategyName = dto.ReleaseStrategyName,
-                                                        IsHod = false,
-                                                        Active = true
-                                                    };
+            if (releaseStrategy == null)
+            {
+                releaseStrategy = new ReleaseStrategies
+                {
+                    ReleaseGroupCode = dto.ReleaseGroupCode,
+                    ReleaseStrategy = dto.ReleaseStrategy,
+                    ReleaseStrategyName = dto.ReleaseStrategyName,
+                    IsHod = false,
+                    Active = true
+                };
 
+                _context.ReleaseStrategy.Add(releaseStrategy);
 
+            }
 
             var releaseStrategyLevels = _context.ReleaseStrategyLevels
                 .Where(rl =>

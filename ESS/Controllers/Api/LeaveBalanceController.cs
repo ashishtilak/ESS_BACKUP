@@ -56,7 +56,11 @@ namespace ESS.Controllers.Api
                         {
                             if (details.Cancelled == true &&
                                 (details.IsCancellationPosted == null || details.IsCancellationPosted == false))
-                                l.Availed -= details.TotalDays;
+                            {
+                                //only reduce if full leave is not cancelled
+                                if (details.ParentId != 0)
+                                    l.Availed -= details.TotalDays;
+                            }
                             else
                                 l.Availed += details.TotalDays;
                         }
@@ -67,6 +71,12 @@ namespace ESS.Controllers.Api
                     }
                 }
             }
+
+            //var mahi = leaveBalDto.Where(l => l.EmpUnqId == "20010581").ToList();
+            //foreach (var m in mahi)
+            //{
+            //    m.Balance = 0;
+            //}
 
             return Ok(leaveBalDto);
         }

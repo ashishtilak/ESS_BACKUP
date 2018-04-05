@@ -26,8 +26,10 @@ namespace ESS.Controllers.Api
                 return BadRequest("New open month cannot be less than current open month.");
 
             currentMonth.OpenYear = int.Parse(yearMonth.ToString().Substring(0, 4));
-            DateTime prevMonth = DateTime.Parse("01/" + yearMonth.ToString().Substring(4, 2) + "/" +
-                                                yearMonth.ToString().Substring(0, 4)).AddMonths(-1);
+
+            DateTime prevMonth = DateTime.ParseExact(
+                String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2), "01"),
+                    "yyyy-MM-dd", null).AddMonths(-1);
 
             currentMonth.PrevMonth = int.Parse(prevMonth.Year.ToString() + prevMonth.Month.ToString("00"));
             currentMonth.YearMonth = yearMonth;

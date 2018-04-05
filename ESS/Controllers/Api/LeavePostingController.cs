@@ -58,8 +58,16 @@ namespace ESS.Controllers.Api
                                 )
                             )
                         )
-                .ToList()
-                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>);
+                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
+                .ToList();
+
+            leaveAppDto.RemoveAll(l => l.LeaveApplicationDetails.Any(
+                    ld =>
+                        ld.IsPosted == LeaveApplicationDetails.NotPosted &&
+                        ld.Cancelled == true &&
+                        ld.ParentId == 0
+                )
+            );
 
             return Ok(leaveAppDto);
         }
@@ -129,7 +137,7 @@ namespace ESS.Controllers.Api
                                     // If this leave is a cancelled leave, which was fully posted previously,
                                     // we'll set the IsCancellationPosted flag
 
-                                    if (leaveApplication.ParentId != 0 && leaveApplication.Cancelled == true)
+                                    if (dto1.IsPosted == LeaveApplicationDetails.FullyPosted && leaveApplication.Cancelled == true)
                                     {
                                         leaveApplication.IsCancellationPosted = true;
                                     }

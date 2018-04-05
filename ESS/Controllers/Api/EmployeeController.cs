@@ -277,11 +277,11 @@ namespace ESS.Controllers.Api
 
         [HttpGet]
         [ActionName("perfattd")]
-        public IHttpActionResult PerfAttd(string empUnqId, string flag)
+        public IHttpActionResult PerfAttd(string empUnqId, string flag, DateTime? fromDate = null, DateTime? toDate = null)
         {
             if (flag == "PERF")
             {
-                var result = Helpers.CustomHelper.GetPerfAttd(empUnqId);
+                var result = Helpers.CustomHelper.GetPerfAttd(empUnqId, fromDate, toDate);
                 return Ok(result);
             }
             else if (flag == "PUNCH")
