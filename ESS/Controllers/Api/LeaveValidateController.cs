@@ -105,7 +105,8 @@ namespace ESS.Controllers.Api
                         l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
                         ((l.FromDt <= details.ToDt && l.ToDt >= details.FromDt) ||
                         (l.ToDt <= details.FromDt && l.FromDt >= details.ToDt)) &&
-                        l.LeaveApplication.ReleaseStatusCode == ReleaseStatus.FullyReleased
+                        l.LeaveApplication.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                        l.Cancelled == false
                     )
                     .ToList();
 
@@ -124,6 +125,7 @@ namespace ESS.Controllers.Api
                     existingLeave = _context.LeaveApplicationDetails
                         .Where(l =>
                             l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
+                            l.Cancelled == false &&
                             l.ToDt == detailsFromDt
                         )
                         .ToList();

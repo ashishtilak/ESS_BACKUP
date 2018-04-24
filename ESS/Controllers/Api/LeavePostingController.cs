@@ -88,6 +88,7 @@ namespace ESS.Controllers.Api
                 .Include(rs => rs.RelStrategy)
                 .Include(l => l.LeaveApplicationDetails)
                 .Where(l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                            l.Cancelled == false &&
                             l.LeaveApplicationDetails.Any(
                                 (d =>
                                     (

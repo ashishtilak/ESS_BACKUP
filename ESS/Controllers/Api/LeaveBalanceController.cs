@@ -35,8 +35,8 @@ namespace ESS.Controllers.Api
                     l.EmpUnqId == empUnqId &&
                     l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
                     l.LeaveApplicationDetails.Any(d =>
-                            d.IsPosted == LeaveApplicationDetails.NotPosted ||
-                            d.Cancelled == true
+                            (d.IsPosted == LeaveApplicationDetails.NotPosted || d.Cancelled == true) &&
+                            d.IsCancellationPosted == false
                         )
                 )
                 .Include(l => l.LeaveApplicationDetails)
