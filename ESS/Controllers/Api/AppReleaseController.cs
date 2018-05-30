@@ -297,6 +297,10 @@ namespace ESS.Controllers.Api
                         //if this IS final release, then set leave app header status to "F"
                         leaveApplication.ReleaseStatusCode = ReleaseStatus.FullyReleased;
 
+                        foreach (var l in leaveApplication.LeaveApplicationDetails)
+                        {
+                            l.IsPosted = LeaveApplicationDetails.FullyPosted;
+                        }
 
                         //If leave is fully cancelled and was not posted,
                         //set IsCancellationPosted flag to remove it from leave posting report 
