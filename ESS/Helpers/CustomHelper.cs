@@ -177,7 +177,7 @@ namespace ESS.Helpers
             SyncUnit();
             SyncDept();
             SyncStat();
-            SyncSec();
+            //SyncSec();
             SyncCatg();
             SyncDesg();
             SyncGrade();
@@ -935,8 +935,8 @@ namespace ESS.Helpers
 
                         //get data from attendance server
                         sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
-                              "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, SecCode, CatCode, " +
-                              "DesgCode, GradCode, IsHod, 0 as IsReleaser, 0 as IsHrUser from MastEmp ";
+                              "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
+                              "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser from MastEmp ";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -952,7 +952,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("UnitCode", "UnitCode");
                             bulk.ColumnMappings.Add("DeptCode", "DeptCode");
                             bulk.ColumnMappings.Add("StatCode", "StatCode");
-                            bulk.ColumnMappings.Add("SecCode", "SecCode");
+                            //bulk.ColumnMappings.Add("SecCode", "SecCode");
                             bulk.ColumnMappings.Add("CatCode", "CatCode");
                             bulk.ColumnMappings.Add("DesgCode", "DesgCode");
                             bulk.ColumnMappings.Add("GradCode", "GradeCode");
@@ -980,23 +980,27 @@ namespace ESS.Helpers
                               "Target.UnitCode = Source.UnitCode, " +
                               "Target.DeptCode = Source.DeptCode, " +
                               "Target.StatCode = Source.StatCode, " +
-                              "Target.SecCode = Source.SecCode, " +
+                            //"Target.SecCode = Source.SecCode, " +
                               "Target.CatCode = Source.CatCode, " +
                               "Target.DesgCode = Source.DesgCode, " +
                               "Target.GradeCode = Source.GradeCode, " +
                               "Target.EmpName = Source.EmpName, " +
                               "Target.FatherName = Source.FatherName, " +
-                              "Target.Active = Source.Active, " +
-                              "Target.IsHod = Source.IsHod " +
+                              "Target.Active = Source.Active " +
+                            //"Target.IsHod = Source.IsHod " +
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
-                              "unitcode, deptcode, statcode, seccode, catcode, " +
+                              "unitcode, deptcode, statcode, " +
+                            //"seccode, " +
+                              "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, ishod, isreleaser, ishruser, pass) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
-                              "source.unitcode, source.deptcode, source.statcode, source.seccode, source.catcode, " +
+                              "source.unitcode, source.deptcode, source.statcode, " +
+                            //"source.seccode, " +
+                              "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.ishod, 0, 0, empunqid); ";
+                              "source.active, 0, 0, 0, empunqid); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -1037,7 +1041,7 @@ namespace ESS.Helpers
                 cn.Open();
                 string sql = "select " +
                              "tYear, EmpUnqId, CompCode, WrkGrp, FromDt, ToDt, " +
-                             "LeaveTyp as LeaveTypeCode, TotDay, LeaveHalf " +
+                             "LeaveTyp as LeaveTypeCode, TotDay, LeaveDed, LeaveHalf " +
                              "from LeaveEntry where tyear=" + year + " and empUnqId = '" + empUnqId + "'";
 
                 SqlCommand cmd = new SqlCommand(sql, cn);
@@ -1055,7 +1059,8 @@ namespace ESS.Helpers
                         FromDt = Convert.ToDateTime(dr["FromDt"].ToString()),
                         ToDt = Convert.ToDateTime(dr["ToDt"].ToString()),
                         HalfDayFlag = Convert.ToBoolean(dr["LeaveHalf"].ToString()),
-                        TotalDays = float.Parse(dr["TotDay"].ToString())
+                        TotalDays = float.Parse(dr["TotDay"].ToString()),
+                        LeaveDed = float.Parse(dr["LeaveDed"].ToString())
                     };
 
                     leaves.Add(leave);

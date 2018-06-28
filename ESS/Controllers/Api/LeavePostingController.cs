@@ -147,6 +147,8 @@ namespace ESS.Controllers.Api
                                     if (dto1.IsPosted == LeaveApplicationDetails.PostingRejected)
                                     {
                                         l.Remarks = "HR: " + dto1.Remarks;
+                                        if (l.ReleaseStatusCode == ReleaseStatus.NotReleased)
+                                            l.Remarks = "Cancelled by Self.";
 
                                         //Change release status to "R"
 

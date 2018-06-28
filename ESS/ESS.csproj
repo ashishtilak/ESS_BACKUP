@@ -309,6 +309,10 @@
     <Compile Include="Migrations\201803270455152_RemoveFieldsFromReleaseStrategy.Designer.cs">
       <DependentUpon>201803270455152_RemoveFieldsFromReleaseStrategy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806270412151_RemoveSecCOde.cs" />
+    <Compile Include="Migrations\201806270412151_RemoveSecCOde.Designer.cs">
+      <DependentUpon>201806270412151_RemoveSecCOde.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -486,6 +490,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803270455152_RemoveFieldsFromReleaseStrategy.resx">
       <DependentUpon>201803270455152_RemoveFieldsFromReleaseStrategy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806270412151_RemoveSecCOde.resx">
+      <DependentUpon>201806270412151_RemoveSecCOde.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

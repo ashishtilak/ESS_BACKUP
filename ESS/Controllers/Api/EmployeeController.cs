@@ -42,7 +42,7 @@ namespace ESS.Controllers.Api
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
                         StatCode = e.StatCode,
-                        SecCode = e.SecCode,
+                        //SecCode = e.SecCode,
                         CatCode = e.CatCode,
                         EmpTypeCode = e.EmpTypeCode,
                         GradeCode = e.GradeCode,
@@ -54,7 +54,7 @@ namespace ESS.Controllers.Api
                         UnitName = e.Units.UnitName,
                         DeptName = e.Departments.DeptName,
                         StatName = e.Stations.StatName,
-                        SecName = e.Sections.SecName,
+                        //SecName = e.Sections.SecName,
                         CatName = e.Categories.CatName,
                         EmpTypeName = e.EmpTypes.EmpTypeName,
                         GradeName = e.Grades.GradeName,
@@ -91,7 +91,7 @@ namespace ESS.Controllers.Api
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
                         StatCode = e.StatCode,
-                        SecCode = e.SecCode,
+                        //SecCode = e.SecCode,
                         CatCode = e.CatCode,
                         EmpTypeCode = e.EmpTypeCode,
                         GradeCode = e.GradeCode,
@@ -103,7 +103,7 @@ namespace ESS.Controllers.Api
                         UnitName = e.Units.UnitName,
                         DeptName = e.Departments.DeptName,
                         StatName = e.Stations.StatName,
-                        SecName = e.Sections.SecName,
+                        //SecName = e.Sections.SecName,
                         CatName = e.Categories.CatName,
                         EmpTypeName = e.EmpTypes.EmpTypeName,
                         GradeName = e.Grades.GradeName,
@@ -135,8 +135,8 @@ namespace ESS.Controllers.Api
             public string DeptName { get; set; }
             public string StatCode { get; set; }
             public string StatName { get; set; }
-            public string SecCode { get; set; }
-            public string SecName { get; set; }
+            //public string SecCode { get; set; }
+            //public string SecName { get; set; }
             public string Email { get; set; }
             public string ReleaseGroup { get; set; }
             public string ReleaseStrategy { get; set; }
@@ -161,7 +161,7 @@ namespace ESS.Controllers.Api
             var emps = _context.Employees
                 .Include(d => d.Departments)
                 .Include(s => s.Stations)
-                .Include(e => e.Sections)
+                //.Include(e => e.Sections)
                 .Where(e => e.Active && e.WrkGrp == "COMP")
                 .ToList();
 
@@ -189,11 +189,11 @@ namespace ESS.Controllers.Api
                     e.StatName = emp.Stations.StatName;
                 }
 
-                if (emp.SecCode != null)
-                {
-                    e.SecCode = emp.SecCode;
-                    e.SecName = emp.Sections.SecName;
-                }
+                //if (emp.SecCode != null)
+                //{
+                //    e.SecCode = emp.SecCode;
+                //    e.SecName = emp.Sections.SecName;
+                //}
 
                 e.Email = emp.Email;
 

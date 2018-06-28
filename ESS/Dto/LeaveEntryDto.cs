@@ -16,5 +16,6 @@ namespace ESS.Dto
         public DateTime ToDt { get; set; }
         public bool HalfDayFlag { get; set; }
         public float TotalDays { get; set; }
+        public float LeaveDed { get; set; }
     }
 }

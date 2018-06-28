@@ -98,7 +98,7 @@ namespace ESS.Controllers.Api
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
                         StatCode = e.StatCode,
-                        SecCode = e.SecCode,
+                        //SecCode = e.SecCode,
                         CatCode = e.CatCode,
                         EmpTypeCode = e.EmpTypeCode,
                         GradeCode = e.GradeCode,
@@ -143,6 +143,8 @@ namespace ESS.Controllers.Api
 
             if (applicationDetail == null)
                 return BadRequest("Invalid app release status detals...");
+
+            applicationDetail.Remarks = dto.Remarks;
 
             //If releaseStatusCode is not I, we've nothing to do...
             if (applicationDetail.ReleaseStatusCode != ReleaseStatus.InRelease)
@@ -191,7 +193,7 @@ namespace ESS.Controllers.Api
 
 
 
-
+            leaveApplication.Remarks = dto.Remarks;
 
 
             using (var transaction = _context.Database.BeginTransaction())

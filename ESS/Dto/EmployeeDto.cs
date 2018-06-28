@@ -20,7 +20,7 @@ namespace ESS.Dto
         public string UnitCode { get; set; }
         public string DeptCode { get; set; }
         public string StatCode { get; set; }
-        public string SecCode { get; set; }
+        //public string SecCode { get; set; }
         public string CatCode { get; set; }
         public string EmpTypeCode { get; set; }
         public string GradeCode { get; set; }

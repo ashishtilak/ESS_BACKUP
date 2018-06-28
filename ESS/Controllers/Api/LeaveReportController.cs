@@ -93,6 +93,8 @@ namespace ESS.Controllers.Api
                 var leaveOnDate = _context.LeaveApplications
                     .Include(l => l.LeaveApplicationDetails)
                     .Include(e => e.Employee)
+                    .Include(d => d.Departments)
+                    .Include(s => s.Stations)
                     .Where(l =>
                         l.Cancelled == false &&
                         l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
@@ -123,8 +125,8 @@ namespace ESS.Controllers.Api
                         DataRow dr = dt.Rows.Add();
                         dr["EmpCode"] = l.EmpUnqId;
                         dr["EmpName"] = l.Employee.EmpName;
-                        dr["Department"] = l.DeptCode;
-
+                        dr["Department"] = l.Departments.DeptName;
+                        dr["Station"] = l.Stations.StatName;
                         dr[tDate.ToString("MMM-dd")] = leaveType;
                     }
 
