@@ -87,7 +87,8 @@ namespace ESS.Controllers.Api
                 //check if leave type is there in balance table
                 bool leaveExist = leaveBalDto.Any(l => l.LeaveTypeCode == details.LeaveTypeCode);
 
-                if (!leaveExist && details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay)
+                if (!leaveExist &&
+                    (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay && details.LeaveTypeCode != LeaveTypes.CompOff))
                 {
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
@@ -118,7 +119,8 @@ namespace ESS.Controllers.Api
 
                 if ((details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay) &&
                     (details.LeaveTypeCode != LeaveTypes.OptionalLeave) &&
-                    (details.LeaveTypeCode != LeaveTypes.CasualLeave)
+                    (details.LeaveTypeCode != LeaveTypes.CasualLeave) &&
+                    (details.LeaveTypeCode != LeaveTypes.CompOff)
                    )
                 {
                     var detailsFromDt = details.FromDt.AddDays(-1);
@@ -137,8 +139,17 @@ namespace ESS.Controllers.Api
                 }
 
 
+                // Take days == 1 only, as 
+                // start date will be Week Off date,
+                // End date will be date of CO.
+
+                if (details.LeaveTypeCode == LeaveTypes.CompOff)
+                    details.TotalDays = 1;
+
+
                 //break out of loop in case of LWP
-                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
+                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay ||
+                    details.LeaveTypeCode == LeaveTypes.CompOff)
                     continue;
 
 
@@ -293,6 +304,25 @@ namespace ESS.Controllers.Api
 
             if (overlaps.Any())
                 error.Add("Date ranges must be consicutive, should not overlap.");
+
+
+            // CHECKS FOR COMP OFF ( CO )
+
+            // check if start date is a week off
+            if (lDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
+            {
+                if (ESS.Helpers.CustomHelper.GetWeeklyOff(start, start, lDto.EmpUnqId).Count != 1)
+                {
+                    error.Add("Date selected is not week off as per shift schedule.");
+                }
+                else
+                {
+                    // Check if CO date is <= 3 days from WO day
+                    if (end.Subtract(start).TotalDays > 3)
+                        error.Add("Comp. Off can be taken within 3 days of Week Off.");
+                }
+
+            }
 
 
             // DONE. If there's no error, return success

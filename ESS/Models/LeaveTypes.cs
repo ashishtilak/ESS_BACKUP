@@ -33,5 +33,6 @@ namespace ESS.Models
         public static readonly string PaidLeave = "PL";
         public static readonly string OptionalLeave = "OH";
         public static readonly string LeaveWithoutPay = "LW";
+        public static readonly string CompOff = "CO";
     }
 }

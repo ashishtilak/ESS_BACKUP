@@ -313,6 +313,10 @@
     <Compile Include="Migrations\201806270412151_RemoveSecCOde.Designer.cs">
       <DependentUpon>201806270412151_RemoveSecCOde.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807021147009_AddLeaveType.cs" />
+    <Compile Include="Migrations\201807021147009_AddLeaveType.Designer.cs">
+      <DependentUpon>201807021147009_AddLeaveType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -493,6 +497,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806270412151_RemoveSecCOde.resx">
       <DependentUpon>201806270412151_RemoveSecCOde.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807021147009_AddLeaveType.resx">
+      <DependentUpon>201807021147009_AddLeaveType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
