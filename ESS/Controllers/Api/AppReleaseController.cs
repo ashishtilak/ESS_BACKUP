@@ -296,13 +296,18 @@ namespace ESS.Controllers.Api
                     }
                     else
                     {
-                        //if this IS final release, then set leave app header status to "F"
+                        // DISABLED ON 04.07.2018
+                        // NOW SINCE ESS IS LIVE, HR WILL REVIEW AND POST 
+                        // FROM ESS TO ATTENDANCE.
+
+
+                        ////if this IS final release, then set leave app header status to "F"
                         leaveApplication.ReleaseStatusCode = ReleaseStatus.FullyReleased;
 
-                        foreach (var l in leaveApplication.LeaveApplicationDetails)
-                        {
-                            l.IsPosted = LeaveApplicationDetails.FullyPosted;
-                        }
+                        //foreach (var l in leaveApplication.LeaveApplicationDetails)
+                        //{
+                        //    l.IsPosted = LeaveApplicationDetails.FullyPosted;
+                        //}
 
                         //If leave is fully cancelled and was not posted,
                         //set IsCancellationPosted flag to remove it from leave posting report 
