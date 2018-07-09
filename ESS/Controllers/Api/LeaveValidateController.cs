@@ -99,6 +99,11 @@ namespace ESS.Controllers.Api
                     error.Add(details.LeaveTypeCode + " leave date must be within open month: "
                               + monthFirst.ToShortDateString() + " - " + monthLast.ToShortDateString());
 
+                // Re calculate days because, days passed from client are from grid
+                // which are actual days (total days - holidays - weekoffs)
+                // which are again deducted
+                // Added on 09/07/2018 by Ashish 
+                details.TotalDays = (details.ToDt - details.FromDt).Days + 1;
 
                 //check that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails
