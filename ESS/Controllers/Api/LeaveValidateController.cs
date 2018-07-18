@@ -282,7 +282,16 @@ namespace ESS.Controllers.Api
             //throw error if multiple CL are applied in the same application:
             if (lDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.CasualLeave) > 1)
             {
-                error.Add("Cannot take multiple CLs in single Leave Application.");
+                //check for half CL...
+                bool found = lDto.LeaveApplicationDetails.Any(detail => detail.HalfDayFlag);
+
+                if (!found)
+                    error.Add("Cannot take multiple CLs in single Leave Application.");
+
+                float countCl = lDto.LeaveApplicationDetails.Where(detail => detail.LeaveTypeCode == LeaveTypes.CasualLeave).Sum(detail => detail.TotalDays);
+                if (countCl > 3)
+                    error.Add("CL cannot be more than 3 days");
+
             }
 
             //Date range check
@@ -341,6 +350,9 @@ namespace ESS.Controllers.Api
 
         private string GetLeaveOnDate(DateTime dt, string empUnqId)
         {
+            if (ESS.Helpers.CustomHelper.GetWeeklyOff(dt, dt, empUnqId).Count > 0)
+                return "WO";
+
             var leave = _context.LeaveApplicationDetails
                 .FirstOrDefault(l => l.LeaveApplication.EmpUnqId == empUnqId &&
                     (dt >= l.FromDt && dt <= l.ToDt) &&

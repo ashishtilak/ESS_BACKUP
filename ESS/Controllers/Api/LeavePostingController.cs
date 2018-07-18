@@ -104,6 +104,128 @@ namespace ESS.Controllers.Api
             return Ok(leaveAppDto);
         }
 
+
+        //this will give all leaves for export in excel
+        //create a temporary class for data in rows only
+
+        private class Leaves
+        {
+            //header fields
+            public int LeaveAppId;
+            public string EmpUnqId;
+            public string EmpName;
+            public string FatherName;
+            public string WrkGrpDesc;
+            public string CatName;
+            public string DeptName;
+            public string StatName;
+            public string Remarks;
+            public string ReleaseStrategy;
+
+            public DateTime FromDt;
+            public DateTime ToDt;
+            public bool HalfDayFlag;
+            public float TotalDays;
+            public string LeaveReason;
+
+            public string IsPosted;
+            public bool Cancelled;
+            public int ParentId;
+            public bool IsCancellationPosted;
+        }
+
+        public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt)
+        {
+            var leaveAppDto = _context.LeaveApplications
+                .Include(e => e.Employee)
+                .Include(c => c.Company)
+                .Include(cat => cat.Categories)
+                .Include(w => w.WorkGroup)
+                .Include(d => d.Departments)
+                .Include(s => s.Stations)
+                .Include(u => u.Units)
+                .Include(r => r.ReleaseGroup)
+                .Include(rs => rs.RelStrategy)
+                .Include(l => l.LeaveApplicationDetails)
+                .Where(l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                            l.Cancelled == false &&
+                            l.LeaveApplicationDetails.Any(
+                                (d =>
+                                    (
+                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
+                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
+                                    )
+                                )
+                            )
+                )
+                .ToList()
+                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>);
+
+
+            List<Leaves> leaves = (from appHdr in leaveAppDto
+                                   from appDtl in appHdr.LeaveApplicationDetails
+                                   select new Leaves
+                                   {
+                                       LeaveAppId = appHdr.LeaveAppId,
+                                       EmpUnqId = appHdr.EmpUnqId,
+                                       EmpName = appHdr.Employee.EmpName,
+                                       FatherName = appHdr.Employee.FatherName,
+                                       WrkGrpDesc = appHdr.WorkGroup.WrkGrpDesc,
+                                       CatName = appHdr.CatCode,
+                                       DeptName = appHdr.Departments.DeptName,
+                                       StatName = appHdr.Stations.StatName,
+                                       Remarks = appHdr.Remarks,
+                                       FromDt = appDtl.FromDt,
+                                       ToDt = appDtl.ToDt,
+                                       TotalDays = appDtl.TotalDays,
+                                       HalfDayFlag = appDtl.HalfDayFlag,
+                                       LeaveReason = appDtl.Remarks,
+                                       IsPosted = appDtl.IsPosted,
+                                       Cancelled = appDtl.Cancelled,
+                                       ParentId = appDtl.ParentId,
+                                       IsCancellationPosted = appDtl.IsCancellationPosted
+                                   }).ToList();
+
+
+            //
+            // ABOVE LINQ EXPRESSION CAN BE WRITTEN IN FOR LOOP AS FOLLOWS:
+            // BUT ABOVE ONE IS VERY FAST COMPARED TO FOR LOOP
+            //
+            //foreach (var appHdr in leaveAppDto)
+            //{
+            //    foreach (var appDtl in appHdr.LeaveApplicationDetails)
+            //    {
+            //        Leaves l = new Leaves
+            //        {
+            //            LeaveAppId = appHdr.LeaveAppId,
+            //            EmpUnqId = appHdr.EmpUnqId,
+            //            EmpName = appHdr.Employee.EmpName,
+            //            FatherName = appHdr.Employee.FatherName,
+            //            WrkGrpDesc = appHdr.WorkGroup.WrkGrpDesc,
+            //            CatName = appHdr.CatCode,
+            //            DeptName = appHdr.Departments.DeptName,
+            //            StatName = appHdr.Stations.StatName,
+            //            Remarks = appHdr.Remarks,
+            //            FromDt = appDtl.FromDt,
+            //            ToDt = appDtl.ToDt,
+            //            TotalDays = appDtl.TotalDays,
+            //            HalfDayFlag = appDtl.HalfDayFlag,
+            //            LeaveReason = appDtl.Remarks,
+            //            Cancelled = appDtl.Cancelled,
+            //            ParentId = appDtl.ParentId,
+            //            IsCancellationPosted = appDtl.IsCancellationPosted
+            //        };
+            //        leaves.Add(l);
+            //    }
+            //}
+
+
+
+            return Ok(leaves);
+        }
+
+
+
         public IHttpActionResult PostLeaves([FromBody] object requestData)
         {
             var leavePosting = JsonConvert.DeserializeObject<List<LeavePostingDto>>(requestData.ToString());
