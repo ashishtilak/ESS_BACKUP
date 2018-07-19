@@ -190,6 +190,7 @@
     <Compile Include="Controllers\Api\AutoMailController.cs" />
     <Compile Include="Controllers\Api\ChangeReleaseController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
+    <Compile Include="Controllers\Api\EmpUniformController.cs" />
     <Compile Include="Controllers\Api\HolidayController.cs" />
     <Compile Include="Controllers\Api\LeaveApplicationController.cs" />
     <Compile Include="Controllers\Api\LeaveBalanceController.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="Dto\DesignationDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
+    <Compile Include="Dto\EmpUniformDto.cs" />
     <Compile Include="Dto\GradeDto.cs" />
     <Compile Include="Dto\HolidayDto.cs" />
     <Compile Include="Dto\LeaveApplicationDetailDto.cs" />
@@ -317,6 +319,18 @@
     <Compile Include="Migrations\201807021147009_AddLeaveType.Designer.cs">
       <DependentUpon>201807021147009_AddLeaveType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807180558313_AddedEmpUniform.cs" />
+    <Compile Include="Migrations\201807180558313_AddedEmpUniform.Designer.cs">
+      <DependentUpon>201807180558313_AddedEmpUniform.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807180708406_UpdateEmpUniform.cs" />
+    <Compile Include="Migrations\201807180708406_UpdateEmpUniform.Designer.cs">
+      <DependentUpon>201807180708406_UpdateEmpUniform.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807180715490_UpdateEmpUniforms.cs" />
+    <Compile Include="Migrations\201807180715490_UpdateEmpUniforms.Designer.cs">
+      <DependentUpon>201807180715490_UpdateEmpUniforms.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -327,6 +341,7 @@
     <Compile Include="Models\Designations.cs" />
     <Compile Include="Models\Employees.cs" />
     <Compile Include="Models\EmpTypes.cs" />
+    <Compile Include="Models\EmpUniform.cs" />
     <Compile Include="Models\Grades.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LeaveApplicationDetails.cs" />
@@ -500,6 +515,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807021147009_AddLeaveType.resx">
       <DependentUpon>201807021147009_AddLeaveType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807180558313_AddedEmpUniform.resx">
+      <DependentUpon>201807180558313_AddedEmpUniform.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807180708406_UpdateEmpUniform.resx">
+      <DependentUpon>201807180708406_UpdateEmpUniform.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807180715490_UpdateEmpUniforms.resx">
+      <DependentUpon>201807180715490_UpdateEmpUniforms.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

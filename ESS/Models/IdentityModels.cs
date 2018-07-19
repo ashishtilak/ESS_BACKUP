@@ -75,6 +75,8 @@ namespace ESS.Models
 
         public DbSet<LeaveRules> LeaveRules { get; set; }
 
+        public DbSet<EmpUniform> EmpUniform { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

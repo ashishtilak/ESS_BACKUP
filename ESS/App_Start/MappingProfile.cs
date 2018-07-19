@@ -42,6 +42,8 @@ namespace ESS.App_Start
 
             CreateMap<ApplReleaseStatus, ApplReleaseStatusDto>();
 
+            CreateMap<EmpUniform, EmpUniformDto>();
+
         }
     }
 }

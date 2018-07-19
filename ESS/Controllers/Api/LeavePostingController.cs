@@ -122,6 +122,7 @@ namespace ESS.Controllers.Api
             public string Remarks;
             public string ReleaseStrategy;
 
+            public string LeaveTypeCode;
             public DateTime FromDt;
             public DateTime ToDt;
             public bool HalfDayFlag;
@@ -175,6 +176,7 @@ namespace ESS.Controllers.Api
                                        DeptName = appHdr.Departments.DeptName,
                                        StatName = appHdr.Stations.StatName,
                                        Remarks = appHdr.Remarks,
+                                       LeaveTypeCode = appDtl.LeaveTypeCode,
                                        FromDt = appDtl.FromDt,
                                        ToDt = appDtl.ToDt,
                                        TotalDays = appDtl.TotalDays,
