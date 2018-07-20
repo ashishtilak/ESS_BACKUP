@@ -1183,5 +1183,137 @@ namespace ESS.Helpers
 
             return result;
         }
+
+        public static List<EmpDetailsDto> GetEmpDetails(string empUnqId)
+        {
+            string sql = "SELECT [EmpUnqID],[BirthDT],[BirthPlace],[ContactNo],[BLDGRP]" +
+                         ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
+                         ",[PREADD1],[PREADd2],[PREADD3],[PREADD4],[PREDistrict],[PRECITY],[PRESTATE],[PREPIN],[PREPHONE],[PREPOLICEST]" +
+                         ",[IDPRF1],[IDPRF1NO],[IDPRF1EXPON],[IDPRF2],[IDPRF2NO],[IDPRF2EXPON],[IDPRF3],[IDPRF3NO],[IDPRF3EXPON]" +
+                         ",[RELIGION],[CATAGORY],[SAPID],[JoinDT],[BankAcNo],[BankName],[BankIFSCCode]" +
+                         ",[AdharNo]" +
+                         " FROM [ATTENDANCE].[dbo].[MastEmp] where EmpUnqId = '" + empUnqId + "'";
+
+
+            List<EmpDetailsDto> result = new List<EmpDetailsDto>();
+
+            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            {
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new EmpDetailsDto
+                    {
+                        EmpUnqId = dr["EmpUnqId"].ToString(),
+                        BirthDate = dr.IsDBNull(dr.GetOrdinal("BirthDt"))
+                       ? (DateTime?)null
+                       : Convert.ToDateTime(dr["BirthDt"]),
+                        BirthPlace = dr["BirthPlace"].ToString(),
+                        ContactNo = dr["ContactNo"].ToString(),
+                        BloodGroup = dr["BLDGRP"].ToString(),
+
+                        PerAdd1 = dr["PERADD1"].ToString(),
+                        PerAdd2 = dr["PERADD2"].ToString(),
+                        PerAdd3 = dr["PERADD3"].ToString(),
+                        PerAdd4 = dr["PERADD4"].ToString(),
+                        PerDistrict = dr["PERDistrict"].ToString(),
+                        PerCity = dr["PERCITY"].ToString(),
+                        PerState = dr["PERSTATE"].ToString(),
+                        PerPin = dr["PERPIN"].ToString(),
+                        PerPhone = dr["PERPHONE"].ToString(),
+                        PerPoliceSt = dr["PERPOLICEST"].ToString(),
+
+                        PreAdd1 = dr["PreADD1"].ToString(),
+                        PreAdd2 = dr["PreADD2"].ToString(),
+                        PreAdd3 = dr["PreADD3"].ToString(),
+                        PreAdd4 = dr["PreADD4"].ToString(),
+                        PreDistrict = dr["PreDistrict"].ToString(),
+                        PreCity = dr["PreCITY"].ToString(),
+                        PreState = dr["PreSTATE"].ToString(),
+                        PrePin = dr["PrePIN"].ToString(),
+                        PrePhone = dr["PrePHONE"].ToString(),
+                        PrePoliceSt = dr["PrePOLICEST"].ToString(),
+
+
+
+                        IdPrf1 = dr["IDPRF1"].ToString(),
+                        IdPrf1No = dr["IDPRF1No"].ToString(),
+                        IdPrf1ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF1EXPON"))
+                           ? (DateTime?)null
+                           : Convert.ToDateTime(dr["IDPRF1EXPON"]),
+
+                        IdPrf2 = dr["IDPRF2"].ToString(),
+                        IdPrf2No = dr["IDPRF2No"].ToString(),
+                        IdPrf2ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF2EXPON"))
+                            ? (DateTime?)null
+                            : Convert.ToDateTime(dr["IDPRF2EXPON"]),
+
+                        IdPrf3 = dr["IDPRF3"].ToString(),
+                        IdPrf3No = dr["IDPRF3No"].ToString(),
+                        IdPrf3ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF3EXPON"))
+                            ? (DateTime?)null
+                            : Convert.ToDateTime(dr["IDPRF3EXPON"]),
+
+                        Religion = dr["RELIGION"].ToString(),
+                        Category = dr["CATAGORY"].ToString(),
+
+                        SapId = dr["SAPID"].ToString(),
+                        JoinDt = dr.IsDBNull(dr.GetOrdinal("JoinDt"))
+                           ? (DateTime?)null
+                           : Convert.ToDateTime(dr["JoinDt"]),
+                        BankAcNo = dr["BankAcNo"].ToString(),
+                        BankName = dr["BankName"].ToString(),
+                        BankIfsc = dr["BankIFSCCode"].ToString(),
+                        AadharNo = dr["AdharNo"].ToString(),
+                    };
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
+
+        public static List<EmpEduDto> GetEmpEduDetails(string empUnqId)
+        {
+            string sql =
+                "SELECT [EmpUnqID],[Sr],[PassingYear],[EduName],[Subject],[University],[Per],[OtherInfo] " +
+                "FROM [ATTENDANCE].[dbo].[MastEmpEDU] where EmpUnqId = '" + empUnqId + "'";
+
+
+            List<EmpEduDto> result = new List<EmpEduDto>();
+
+            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            {
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new EmpEduDto
+                    {
+                        EmpUnqId = dr["EmpUnqId"].ToString(),
+                        PassingYear = Int32.Parse(dr["PassingYear"].ToString()),
+                        EduName = dr["EduName"].ToString(),
+                        Subject = dr["Subject"].ToString(),
+                        University = dr["University"].ToString(),
+                        Percentage = Int32.Parse(dr["Per"].ToString()),
+                        Remarks = dr["OtherInfo"].ToString()
+                    };
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
     }
 }

@@ -125,6 +125,31 @@ namespace ESS.Controllers.Api
         }
 
 
+        [HttpGet]
+        [ActionName("GetEmpDetails")]
+        public IHttpActionResult GetEmpDetails(string empUnqId, int mode)
+        {
+            if (mode == 1) //Employee details
+            {
+                var result = Helpers.CustomHelper.GetEmpDetails(empUnqId);
+                return Ok(result);
+            }
+            else if (mode == 2) //Employee education details
+            {
+                var result = Helpers.CustomHelper.GetEmpEduDetails(empUnqId);
+                return Ok(result);
+            }
+            else if (mode == 3) //Family details
+            {
+                return Ok("Not implemented yet...");
+            }
+            return NotFound();
+
+
+
+
+        }
+
         private class EmpRelease
         {
             public string EmpUnqId { get; set; }
@@ -269,11 +294,6 @@ namespace ESS.Controllers.Api
 
             return Ok(result);
         }
-
-        #region
-        // create a temp class for password change
-        #endregion
-
 
         [HttpGet]
         [ActionName("perfattd")]

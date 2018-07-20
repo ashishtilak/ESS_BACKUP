@@ -214,6 +214,8 @@
     <Compile Include="Dto\CompanyDto.cs" />
     <Compile Include="Dto\DepartmentDto.cs" />
     <Compile Include="Dto\DesignationDto.cs" />
+    <Compile Include="Dto\EmpDetailsDto.cs" />
+    <Compile Include="Dto\EmpEduDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />

@@ -226,8 +226,6 @@ namespace ESS.Controllers.Api
             return Ok(leaves);
         }
 
-
-
         public IHttpActionResult PostLeaves([FromBody] object requestData)
         {
             var leavePosting = JsonConvert.DeserializeObject<List<LeavePostingDto>>(requestData.ToString());
@@ -312,5 +310,7 @@ namespace ESS.Controllers.Api
 
             return Ok();
         }
+
+
     }
 }
