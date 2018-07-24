@@ -15,6 +15,9 @@ namespace ESS.Helpers
 
         //private const string ThisServer = "Data Source=172.16.12.14;Initial Catalog=Ash_ESS;Integrated Security=False; User Id=sa; Password=testomonials@123";
         private static string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        public static readonly string AttendanceServerApi = "http://172.16.12.48:9002";
+
+
 
         /// <summary>
         /// Get list of Holidays

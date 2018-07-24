@@ -80,5 +80,15 @@ namespace ESS.Controllers.Api
 
             return Ok(leaveBalDto);
         }
+
+        public IHttpActionResult GetLeaveBalance(string empUnqId, int yearMonth, bool flag)
+        {
+
+            //get leave balance from attendance server
+            //note this will not have leaves that are not posted.
+
+            var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(empUnqId, yearMonth);
+            return Ok(leaveBalDto);
+        }
     }
 }

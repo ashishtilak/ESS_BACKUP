@@ -103,7 +103,8 @@ namespace ESS.Controllers.Api
                 // which are actual days (total days - holidays - weekoffs)
                 // which are again deducted
                 // Added on 09/07/2018 by Ashish 
-                details.TotalDays = (details.ToDt - details.FromDt).Days + 1;
+
+                details.TotalDays = details.HalfDayFlag ? 0.5f : (details.ToDt - details.FromDt).Days + 1;
 
                 //check that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails
