@@ -281,7 +281,15 @@ namespace ESS.Controllers.Api
                                 {
                                     l.Remarks = "HR: " + dto1.Remarks;
                                     if (l.ReleaseStatusCode == ReleaseStatus.NotReleased)
+                                    {
+                                        if ((l.Cancelled ?? true) || l.ParentId != 0)
+                                        {
+                                            return BadRequest("Self Cancellation of cancelled leave not allowed.");
+                                        }
+
                                         l.Remarks = "Cancelled by Self.";
+                                    }
+
 
                                     //Change release status to "R"
 
