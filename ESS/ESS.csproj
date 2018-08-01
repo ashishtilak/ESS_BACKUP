@@ -191,6 +191,7 @@
     <Compile Include="Controllers\Api\ChangeReleaseController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
+    <Compile Include="Controllers\Api\GatePassController.cs" />
     <Compile Include="Controllers\Api\HolidayController.cs" />
     <Compile Include="Controllers\Api\LeaveApplicationController.cs" />
     <Compile Include="Controllers\Api\LeaveBalanceController.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
+    <Compile Include="Dto\GatePassDto.cs" />
     <Compile Include="Dto\GradeDto.cs" />
     <Compile Include="Dto\HolidayDto.cs" />
     <Compile Include="Dto\LeaveApplicationDetailDto.cs" />
@@ -333,6 +335,14 @@
     <Compile Include="Migrations\201807180715490_UpdateEmpUniforms.Designer.cs">
       <DependentUpon>201807180715490_UpdateEmpUniforms.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807270535433_GatePassDbCreated.cs" />
+    <Compile Include="Migrations\201807270535433_GatePassDbCreated.Designer.cs">
+      <DependentUpon>201807270535433_GatePassDbCreated.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201807270726347_GatePassCharFieldConverted.cs" />
+    <Compile Include="Migrations\201807270726347_GatePassCharFieldConverted.Designer.cs">
+      <DependentUpon>201807270726347_GatePassCharFieldConverted.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -344,6 +354,7 @@
     <Compile Include="Models\Employees.cs" />
     <Compile Include="Models\EmpTypes.cs" />
     <Compile Include="Models\EmpUniform.cs" />
+    <Compile Include="Models\GatePass.cs" />
     <Compile Include="Models\Grades.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LeaveApplicationDetails.cs" />
@@ -526,6 +537,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807180715490_UpdateEmpUniforms.resx">
       <DependentUpon>201807180715490_UpdateEmpUniforms.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807270535433_GatePassDbCreated.resx">
+      <DependentUpon>201807270535433_GatePassDbCreated.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807270726347_GatePassCharFieldConverted.resx">
+      <DependentUpon>201807270726347_GatePassCharFieldConverted.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using System.Data.Entity;
+using System.Net.Http;
 using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
@@ -334,73 +334,84 @@ namespace ESS.Controllers.Api
                                     //Call AttendanceServerApi's /api/leavepost method
                                     // 
 
-                                    //////////using (var client = new HttpClient())
-                                    //////////{
-                                    //////////    client.BaseAddress = new Uri(Helpers.CustomHelper.AttendanceServerApi);
-
-                                    //////////    //create object to pass
-
-                                    //////////    AttdLeavePost attdLeaveObj =
-                                    //////////        new AttdLeavePost
-                                    //////////        {
-                                    //////////            AppID = leaveApplication.LeaveAppId,
-                                    //////////            EmpUnqID = l.EmpUnqId,
-                                    //////////            FromDate =
-                                    //////////                leaveApplication.FromDt ??
-                                    //////////                DateTime.Now, //will cause error if dates are null
-                                    //////////            ToDate =
-                                    //////////                leaveApplication.ToDt ??
-                                    //////////                DateTime.Now.AddDays(-1), //will cause error if dates are null
-                                    //////////            LeaveTyp = leaveApplication.LeaveTypeCode,
-                                    //////////            HalfDay = leaveApplication.HalfDayFlag,
-                                    //////////            PostedFlg = false,
-                                    //////////            AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
-                                    //////////            Remarks = leaveApplication.Remarks,
-                                    //////////            ERROR = ""
-                                    //////////        };
-
-                                    //////////    var content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
-                                    //////////        Encoding.UTF8, "application/json");
-
-                                    //////////    var responseTask = client.PostAsync("/api/leavepost", content);
-                                    //////////    responseTask.Wait();
-
-                                    //////////    var result = responseTask.Result;
-
-                                    //////////    if (result.IsSuccessStatusCode)
-                                    //////////    {
-                                    //////////        var readTask = result.Content.ReadAsAsync<AttdLeavePost>();
-                                    //////////        readTask.Wait();
-
-                                    //////////        var attdLeave = readTask.Result;
-
-
-                                    //UPDATE POSTED FLAGE
-
-                                    leaveApplication.IsPosted = dto1.IsPosted;
-                                    l.UpdUser = dto1.UserId;
-                                    l.UpdDt = DateTime.Now;
-
-                                    // If this leave is a cancelled leave, which was fully posted previously,
-                                    // we'll set the IsCancellationPosted flag
-
-                                    if (dto1.IsPosted == LeaveApplicationDetails.FullyPosted &&
-                                        leaveApplication.Cancelled == true)
+                                    //DO NOT POST If full leave is cancelled and is being posted.
+                                    if (leaveApplication.Cancelled == true && leaveApplication.ParentId == 0)
                                     {
+                                        leaveApplication.IsPosted = dto1.IsPosted;
+                                        l.UpdUser = dto1.UserId;
+                                        l.UpdDt = DateTime.Now;
                                         leaveApplication.IsCancellationPosted = true;
+                                        continue;
                                     }
 
-                                    //////////}
-                                    //////////else
-                                    //////////{
-                                    //////////    var readTask = result.Content.ReadAsAsync<AttdLeavePost>();
-                                    //////////    readTask.Wait();
 
-                                    //////////    var attdLeave = readTask.Result;
-                                    //////////    // Some error was there, return it without changing posting flags
-                                    //////////    return BadRequest("Error: " + attdLeave.ERROR);
-                                    //////////}
-                                    //////////}
+                                    using (var client = new HttpClient())
+                                    {
+                                        client.BaseAddress = new Uri(Helpers.CustomHelper.AttendanceServerApi);
+
+                                        //create object to pass
+
+                                        AttdLeavePost attdLeaveObj =
+                                            new AttdLeavePost
+                                            {
+                                                AppID = leaveApplication.LeaveAppId,
+                                                EmpUnqID = l.EmpUnqId,
+                                                FromDate =
+                                                    leaveApplication.FromDt ??
+                                                    DateTime.Now, //will cause error if dates are null
+                                                ToDate =
+                                                    leaveApplication.ToDt ??
+                                                    DateTime.Now.AddDays(-1), //will cause error if dates are null
+                                                LeaveTyp = leaveApplication.LeaveTypeCode,
+                                                HalfDay = leaveApplication.HalfDayFlag,
+                                                PostedFlg = false,
+                                                AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
+                                                Remarks = leaveApplication.Remarks,
+                                                ERROR = ""
+                                            };
+
+                                        var content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
+                                            Encoding.UTF8, "application/json");
+
+                                        var responseTask = client.PostAsync("/api/leavepost", content);
+                                        responseTask.Wait();
+
+                                        var result = responseTask.Result;
+
+                                        if (result.IsSuccessStatusCode)
+                                        {
+                                            var readTask = result.Content.ReadAsAsync<AttdLeavePost>();
+                                            readTask.Wait();
+
+                                            var attdLeave = readTask.Result;
+
+
+                                            //UPDATE POSTED FLAGE
+
+                                            leaveApplication.IsPosted = dto1.IsPosted;
+                                            l.UpdUser = dto1.UserId;
+                                            l.UpdDt = DateTime.Now;
+
+                                            // If this leave is a cancelled leave, which was fully posted previously,
+                                            // we'll set the IsCancellationPosted flag
+
+                                            if (dto1.IsPosted == LeaveApplicationDetails.FullyPosted &&
+                                                leaveApplication.Cancelled == true)
+                                            {
+                                                leaveApplication.IsCancellationPosted = true;
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            var readTask = result.Content.ReadAsAsync<AttdLeavePost>();
+                                            readTask.Wait();
+
+                                            var attdLeave = readTask.Result;
+                                            // Some error was there, return it without changing posting flags
+                                            return BadRequest("Error: " + attdLeave.ERROR);
+                                        }
+                                    }
 
                                 }
                             }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Data.Entity;
-using System.Transactions;
 using System.Web.Http;
 using AutoMapper;
 using ESS.Dto;
@@ -335,7 +331,7 @@ namespace ESS.Controllers.Api
                 //_context.Entry(applicationDetail).State = EntityState.Modified;
 
                 //finally update database
-                int result = _context.SaveChanges();
+                _context.SaveChanges();
 
 
                 transaction.Commit();

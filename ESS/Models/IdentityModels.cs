@@ -77,6 +77,8 @@ namespace ESS.Models
 
         public DbSet<EmpUniform> EmpUniform { get; set; }
 
+        public DbSet<GatePass> GatePass { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
