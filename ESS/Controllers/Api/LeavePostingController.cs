@@ -97,6 +97,17 @@ namespace ESS.Controllers.Api
                                     ) && d.IsPosted == postingFlg
                                 )
                             )
+                            ||
+                            l.ReleaseStatusCode == ReleaseStatus.ReleaseRejected &&
+                            l.Cancelled == false &&
+                            l.LeaveApplicationDetails.Any(
+                                (d =>
+                                    (
+                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
+                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
+                                    ) && d.IsPosted == postingFlg
+                                )
+                            )
                     )
                 .ToList()
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>);
@@ -189,8 +200,10 @@ namespace ESS.Controllers.Api
                                    }).ToList();
 
 
-            //
+            // FOR EDUCATION PURPOSE ONLY:
+            //============================
             // ABOVE LINQ EXPRESSION CAN BE WRITTEN IN FOR LOOP AS FOLLOWS:
+            //
             // BUT ABOVE ONE IS VERY FAST COMPARED TO FOR LOOP
             //
             //foreach (var appHdr in leaveAppDto)
@@ -312,6 +325,8 @@ namespace ESS.Controllers.Api
                                         b.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
                                     }
 
+                                    leaveApplication.IsPosted = LeaveApplicationDetails.PostingRejected;
+
                                     //now skip this loop
                                     continue;
                                 }
@@ -347,7 +362,7 @@ namespace ESS.Controllers.Api
 
                                     using (var client = new HttpClient())
                                     {
-                                        client.BaseAddress = new Uri(Helpers.CustomHelper.AttendanceServerApi);
+                                        client.BaseAddress = new Uri(Helpers.CustomHelper.GetAttendanceServerApi());
 
                                         //create object to pass
 

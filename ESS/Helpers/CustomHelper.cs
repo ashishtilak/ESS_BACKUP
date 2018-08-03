@@ -12,13 +12,13 @@ namespace ESS.Helpers
     public class CustomHelper
     {
         private const string RemoteServer = "Data Source=172.16.12.47;Initial Catalog=ATTENDANCE;Integrated Security=False; User Id=sa; Password=testomonials";
-
-        //private const string ThisServer = "Data Source=172.16.12.14;Initial Catalog=ESS;Integrated Security=False; User Id=sa; Password=testomonials@123";
         private static readonly string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-        //public static readonly string AttendanceServerApi = "http://172.16.12.44:8082";
-        public static readonly string AttendanceServerApi = "http://172.16.12.48:9002";
 
 
+        public static string GetAttendanceServerApi()
+        {
+            return System.Configuration.ConfigurationManager.ConnectionStrings["AttendanceServerApi"].ConnectionString;
+        }
 
         /// <summary>
         /// Get list of Holidays
