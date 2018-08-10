@@ -46,6 +46,8 @@ namespace ESS.App_Start
 
             CreateMap<GatePass, GatePassDto>();
 
+            CreateMap<EmpAddress, EmpAddressDto>();
+
         }
     }
 }

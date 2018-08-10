@@ -63,11 +63,52 @@ namespace ESS.Controllers.Api
                         IsHod = e.IsHod,
                         IsHrUser = e.IsHrUser,
                         IsReleaser = e.IsReleaser,
-                        Email = e.Email
+                        Email = e.Email,
+
                     }
                 )
-                .ToList()
-                .Take(100);
+                .Where(e => e.Active && e.WrkGrp == "COMP")
+                .ToList();
+
+            //get all employee per address
+            var empPerAdd = Helpers.CustomHelper.GetEmpPerAddress();
+
+
+            foreach (var dto in employeeDto)
+            {
+                var empAdd = _context.EmpAddress.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+
+                if (empAdd == null) continue;
+
+                dto.EmpUnqId = empAdd.EmpUnqId;
+                dto.PreAdd1 = empAdd.PreAdd1;
+                dto.PreAdd2 = empAdd.PreAdd2;
+                dto.PreAdd3 = empAdd.PreAdd3;
+                dto.PreAdd4 = empAdd.PreAdd4;
+                dto.PreDistrict = empAdd.PreDistrict;
+                dto.PreCity = empAdd.PreCity;
+                dto.PreState = empAdd.PreState;
+                dto.PrePin = empAdd.PrePin;
+                dto.PrePhone = empAdd.PrePhone;
+                dto.PreResPhone = empAdd.PreResPhone;
+
+
+                var perAdd = empPerAdd.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+
+                if (perAdd == null) continue;
+
+                dto.EmpUnqId = perAdd.EmpUnqId;
+                dto.PerAdd1 = perAdd.PerAdd1;
+                dto.PerAdd2 = perAdd.PerAdd2;
+                dto.PerAdd3 = perAdd.PerAdd3;
+                dto.PerAdd4 = perAdd.PerAdd4;
+                dto.PerDistrict = perAdd.PerDistrict;
+                dto.PerCity = perAdd.PerCity;
+                dto.PerState = perAdd.PerState;
+                dto.PerPin = perAdd.PerPin;
+                dto.PerPhone = perAdd.PerPhone;
+                dto.PerPoliceSt = perAdd.PerPoliceSt;
+            }
 
             return Ok(employeeDto);
         }

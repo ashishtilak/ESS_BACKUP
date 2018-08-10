@@ -79,6 +79,8 @@ namespace ESS.Models
 
         public DbSet<GatePass> GatePass { get; set; }
 
+        public DbSet<EmpAddress> EmpAddress { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

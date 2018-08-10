@@ -33,6 +33,7 @@ namespace ESS.Dto
         public string PreState { get; set; }
         public string PrePin { get; set; }
         public string PrePhone { get; set; }
+        public string PreResPhone { get; set; }
         public string PrePoliceSt { get; set; }
 
         public string IdPrf1 { get; set; }

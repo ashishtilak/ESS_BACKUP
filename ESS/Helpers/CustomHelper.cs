@@ -14,7 +14,6 @@ namespace ESS.Helpers
         private const string RemoteServer = "Data Source=172.16.12.47;Initial Catalog=ATTENDANCE;Integrated Security=False; User Id=sa; Password=testomonials";
         private static readonly string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
-
         public static string GetAttendanceServerApi()
         {
             return System.Configuration.ConfigurationManager.ConnectionStrings["AttendanceServerApi"].ConnectionString;
@@ -1190,6 +1189,9 @@ namespace ESS.Helpers
 
         public static List<EmpDetailsDto> GetEmpDetails(string empUnqId)
         {
+
+            ApplicationDbContext context = new ApplicationDbContext();
+
             string sql = "SELECT [EmpUnqID],[BirthDT],[BirthPlace],[ContactNo],[BLDGRP]" +
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
                          ",[PREADD1],[PREADd2],[PREADD3],[PREADD4],[PREDistrict],[PRECITY],[PRESTATE],[PREPIN],[PREPHONE],[PREPOLICEST]" +
@@ -1210,6 +1212,7 @@ namespace ESS.Helpers
 
                 while (dr.Read())
                 {
+
                     var res = new EmpDetailsDto
                     {
                         EmpUnqId = dr["EmpUnqId"].ToString(),
@@ -1243,7 +1246,6 @@ namespace ESS.Helpers
                         PrePoliceSt = dr["PrePOLICEST"].ToString(),
 
 
-
                         IdPrf1 = dr["IDPRF1"].ToString(),
                         IdPrf1No = dr["IDPRF1No"].ToString(),
                         IdPrf1ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF1EXPON"))
@@ -1273,6 +1275,66 @@ namespace ESS.Helpers
                         BankName = dr["BankName"].ToString(),
                         BankIfsc = dr["BankIFSCCode"].ToString(),
                         AadharNo = dr["AdharNo"].ToString(),
+                    };
+
+                    var empAdd = context.EmpAddress.SingleOrDefault(e => e.EmpUnqId == res.EmpUnqId);
+                    if (empAdd != null)
+                    {
+                        res.PreAdd1 = empAdd.PreAdd1;
+                        res.PreAdd2 = empAdd.PreAdd2;
+                        res.PreAdd3 = empAdd.PreAdd3;
+                        res.PreAdd4 = empAdd.PreAdd4;
+                        res.PreDistrict = empAdd.PreDistrict;
+                        res.PreCity = empAdd.PreCity;
+                        res.PreState = empAdd.PreState;
+                        res.PrePin = empAdd.PrePin;
+                        res.PrePhone = empAdd.PrePhone;
+                        res.PreResPhone = empAdd.PreResPhone;
+                    }
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
+
+        public static List<EmpDetailsDto> GetEmpPerAddress()
+        {
+            ApplicationDbContext context = new ApplicationDbContext();
+
+            string sql = "SELECT [EmpUnqID]" +
+                         ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
+                         " FROM [ATTENDANCE].[dbo].[MastEmp] where WRKGRP = 'COMP' and Active= 1 ";
+
+
+            List<EmpDetailsDto> result = new List<EmpDetailsDto>();
+
+            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            {
+                cn.Open();
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+
+                    var res = new EmpDetailsDto
+                    {
+                        EmpUnqId = dr["EmpUnqId"].ToString(),
+                        PerAdd1 = dr["PERADD1"].ToString(),
+                        PerAdd2 = dr["PERADD2"].ToString(),
+                        PerAdd3 = dr["PERADD3"].ToString(),
+                        PerAdd4 = dr["PERADD4"].ToString(),
+                        PerDistrict = dr["PERDistrict"].ToString(),
+                        PerCity = dr["PERCITY"].ToString(),
+                        PerState = dr["PERSTATE"].ToString(),
+                        PerPin = dr["PERPIN"].ToString(),
+                        PerPhone = dr["PERPHONE"].ToString(),
+                        PerPoliceSt = dr["PERPOLICEST"].ToString(),
+
                     };
 
                     result.Add(res);

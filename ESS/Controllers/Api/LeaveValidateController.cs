@@ -134,6 +134,7 @@ namespace ESS.Controllers.Api
                         .Where(l =>
                             l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
                             l.Cancelled == false &&
+                            l.IsPosted != LeaveApplicationDetails.PostingRejected &&
                             l.ToDt == detailsFromDt
                         )
                         .ToList();

@@ -189,6 +189,7 @@
     <Compile Include="Controllers\Api\AppReleaseController.cs" />
     <Compile Include="Controllers\Api\AutoMailController.cs" />
     <Compile Include="Controllers\Api\ChangeReleaseController.cs" />
+    <Compile Include="Controllers\Api\EmpAddressController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
     <Compile Include="Controllers\Api\GatePassController.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="Dto\CompanyDto.cs" />
     <Compile Include="Dto\DepartmentDto.cs" />
     <Compile Include="Dto\DesignationDto.cs" />
+    <Compile Include="Dto\EmpAddressDto.cs" />
     <Compile Include="Dto\EmpDetailsDto.cs" />
     <Compile Include="Dto\EmpEduDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
@@ -343,6 +345,10 @@
     <Compile Include="Migrations\201807270726347_GatePassCharFieldConverted.Designer.cs">
       <DependentUpon>201807270726347_GatePassCharFieldConverted.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808070927011_AddedEmployeePresentAddress.cs" />
+    <Compile Include="Migrations\201808070927011_AddedEmployeePresentAddress.Designer.cs">
+      <DependentUpon>201808070927011_AddedEmployeePresentAddress.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -351,6 +357,7 @@
     <Compile Include="Models\Contractors.cs" />
     <Compile Include="Models\Departments.cs" />
     <Compile Include="Models\Designations.cs" />
+    <Compile Include="Models\EmpAddress.cs" />
     <Compile Include="Models\Employees.cs" />
     <Compile Include="Models\EmpTypes.cs" />
     <Compile Include="Models\EmpUniform.cs" />
@@ -543,6 +550,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807270726347_GatePassCharFieldConverted.resx">
       <DependentUpon>201807270726347_GatePassCharFieldConverted.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808070927011_AddedEmployeePresentAddress.resx">
+      <DependentUpon>201808070927011_AddedEmployeePresentAddress.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

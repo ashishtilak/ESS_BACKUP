@@ -71,6 +71,25 @@ namespace ESS.Controllers.Api
                 )
             );
 
+
+            foreach (var lApp in leaveAppDto)
+            {
+                var app = _context.ApplReleaseStatus
+                    .Where(l =>
+                        l.YearMonth == lApp.YearMonth &&
+                        l.ReleaseGroupCode == lApp.ReleaseGroupCode &&
+                        l.ApplicationId == lApp.LeaveAppId &&
+                        l.IsFinalRelease
+                        )
+                    .ToList()
+                    .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                foreach (var applReleaseStatusDto in app)
+                {
+                    lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
+                }
+            }
+
             return Ok(leaveAppDto);
         }
 

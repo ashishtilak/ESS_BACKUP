@@ -46,8 +46,8 @@ namespace ESS.Controllers.Api
         {
             var currentMonth = _context.OpenMonth.First();
 
-            if (yearMonth < currentMonth.YearMonth)
-                return BadRequest("New open month cannot be less than current open month.");
+            //if (yearMonth < currentMonth.YearMonth)
+            //    return BadRequest("New open month cannot be less than current open month.");
 
             currentMonth.OpenYear = int.Parse(yearMonth.ToString().Substring(0, 4));
 
