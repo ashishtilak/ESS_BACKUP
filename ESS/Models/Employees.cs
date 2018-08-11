@@ -68,6 +68,8 @@ namespace ESS.Models
 
         public bool Active { get; set; }
 
+        public bool OtFlag { get; set; }
+
         //siple roles
         public bool IsReleaser { get; set; }
 

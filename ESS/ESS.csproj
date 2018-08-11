@@ -353,6 +353,10 @@
     <Compile Include="Migrations\201808110426058_AddPerEmail.Designer.cs">
       <DependentUpon>201808110426058_AddPerEmail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808110936454_OtFlagAddedInEmp.cs" />
+    <Compile Include="Migrations\201808110936454_OtFlagAddedInEmp.Designer.cs">
+      <DependentUpon>201808110936454_OtFlagAddedInEmp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -560,6 +564,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201808110426058_AddPerEmail.resx">
       <DependentUpon>201808110426058_AddPerEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808110936454_OtFlagAddedInEmp.resx">
+      <DependentUpon>201808110936454_OtFlagAddedInEmp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

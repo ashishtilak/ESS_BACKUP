@@ -26,6 +26,8 @@ namespace ESS.Dto
         public string GradeCode { get; set; }
         public string DesgCode { get; set; }
 
+        public bool OtFlag { get; set; }
+
         public bool IsReleaser { get; set; }
         public bool IsHrUser { get; set; }
         public bool IsHod { get; set; }
