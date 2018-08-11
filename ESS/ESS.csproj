@@ -349,6 +349,10 @@
     <Compile Include="Migrations\201808070927011_AddedEmployeePresentAddress.Designer.cs">
       <DependentUpon>201808070927011_AddedEmployeePresentAddress.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808110426058_AddPerEmail.cs" />
+    <Compile Include="Migrations\201808110426058_AddPerEmail.Designer.cs">
+      <DependentUpon>201808110426058_AddPerEmail.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -553,6 +557,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201808070927011_AddedEmployeePresentAddress.resx">
       <DependentUpon>201808070927011_AddedEmployeePresentAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808110426058_AddPerEmail.resx">
+      <DependentUpon>201808110426058_AddPerEmail.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

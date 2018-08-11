@@ -18,5 +18,6 @@ namespace ESS.Dto
         public string PrePin { get; set; }
         public string PrePhone { get; set; }
         public string PreResPhone { get; set; }
+        public string PreEmail { get; set; }
     }
 }

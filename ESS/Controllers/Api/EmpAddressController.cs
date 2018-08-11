@@ -57,6 +57,7 @@ namespace ESS.Controllers.Api
                 empAdd.PrePin = dto.PrePin;
                 empAdd.PrePhone = dto.PrePhone;
                 empAdd.PreResPhone = dto.PreResPhone;
+                empAdd.PreEmail = dto.PreEmail;
             }
             else
             {
@@ -78,7 +79,8 @@ namespace ESS.Controllers.Api
                     PreState = dto.PreState,
                     PrePin = dto.PrePin,
                     PrePhone = dto.PrePhone,
-                    PreResPhone = dto.PreResPhone
+                    PreResPhone = dto.PreResPhone,
+                    PreEmail = dto.PreEmail
                 };
 
                 _context.EmpAddress.Add(newAdd);

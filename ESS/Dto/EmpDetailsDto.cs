@@ -35,6 +35,7 @@ namespace ESS.Dto
         public string PrePhone { get; set; }
         public string PreResPhone { get; set; }
         public string PrePoliceSt { get; set; }
+        public string PreEmail { get; set; }
 
         public string IdPrf1 { get; set; }
         public string IdPrf1No { get; set; }

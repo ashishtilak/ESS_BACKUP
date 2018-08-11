@@ -113,8 +113,6 @@ namespace ESS.Controllers.Api
             return Ok(leaveAppDto);
         }
 
-
-
         public List<LeaveApplicationDto> GetLeaveApplication(string empUnqId, int days)
         {
             DateTime reqDate = DateTime.Now.AddDays(days * -1);

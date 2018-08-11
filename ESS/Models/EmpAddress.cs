@@ -42,5 +42,7 @@ namespace ESS.Models
         [StringLength(20)]
         public string PreResPhone { get; set; }
 
+        [StringLength(70)]
+        public string PreEmail { get; set; }
     }
 }

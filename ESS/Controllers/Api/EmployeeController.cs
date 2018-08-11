@@ -91,6 +91,7 @@ namespace ESS.Controllers.Api
                 dto.PrePin = empAdd.PrePin;
                 dto.PrePhone = empAdd.PrePhone;
                 dto.PreResPhone = empAdd.PreResPhone;
+                dto.PreEmail = empAdd.PreEmail;
 
 
                 var perAdd = empPerAdd.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);

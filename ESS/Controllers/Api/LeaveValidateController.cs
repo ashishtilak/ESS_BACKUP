@@ -324,18 +324,23 @@ namespace ESS.Controllers.Api
 
             // CHECKS FOR COMP OFF ( CO )
 
-            // check if start date is a week off
+            // check if start date is a Holiday
             if (lDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
-                if (ESS.Helpers.CustomHelper.GetWeeklyOff(start, start, lDto.EmpUnqId).Count != 1)
+                if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp).Count != 1)
                 {
-                    error.Add("Date selected is not week off as per shift schedule.");
+                    error.Add("Date selected is not Holiday.");
                 }
                 else
                 {
-                    // Check if CO date is <= 3 days from WO day
-                    if (end.Subtract(start).TotalDays > 3)
+                    // Check if CO date is <= 7 days from WO day
+                    if (end.Subtract(start).TotalDays > 7)
                         error.Add("Comp. Off can be taken within 3 days of Week Off.");
+                }
+
+                if (Helpers.CustomHelper.GetWeeklyOff(end, end, lDto.EmpUnqId).Count == 1)
+                {
+                    error.Add("Comp. Off cannot be taken on Week Off day.");
                 }
 
             }

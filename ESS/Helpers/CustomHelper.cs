@@ -1290,6 +1290,7 @@ namespace ESS.Helpers
                         res.PrePin = empAdd.PrePin;
                         res.PrePhone = empAdd.PrePhone;
                         res.PreResPhone = empAdd.PreResPhone;
+                        res.PreEmail = empAdd.PreEmail;
                     }
 
                     result.Add(res);
