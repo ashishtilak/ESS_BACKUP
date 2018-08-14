@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -8,9 +9,12 @@ namespace ESS.Models
 {
     public class EmpAddress
     {
-        [Key]
+        [Key, Column(Order = 0)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
+
+        [Key, Column(Order = 1)]
+        public int Counter { get; set; }
 
         [StringLength(100)]
         public string PreAdd1 { get; set; }
@@ -44,5 +48,8 @@ namespace ESS.Models
 
         [StringLength(70)]
         public string PreEmail { get; set; }
+
+        public DateTime UpdDt { get; set; }
+
     }
 }

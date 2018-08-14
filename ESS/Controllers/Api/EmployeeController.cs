@@ -76,7 +76,9 @@ namespace ESS.Controllers.Api
 
             foreach (var dto in employeeDto)
             {
-                var empAdd = _context.EmpAddress.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+                var empAdd = _context.EmpAddress
+                    .OrderByDescending(e => e.Counter)
+                    .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (empAdd == null) continue;
 

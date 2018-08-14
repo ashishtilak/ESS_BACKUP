@@ -1279,7 +1279,9 @@ namespace ESS.Helpers
                         AadharNo = dr["AdharNo"].ToString(),
                     };
 
-                    var empAdd = context.EmpAddress.SingleOrDefault(e => e.EmpUnqId == res.EmpUnqId);
+                    var empAdd = context.EmpAddress
+                        .OrderByDescending(e => e.Counter)
+                        .FirstOrDefault(e => e.EmpUnqId == res.EmpUnqId);
                     if (empAdd != null)
                     {
                         res.PreAdd1 = empAdd.PreAdd1;
