@@ -140,7 +140,7 @@ namespace ESS.Controllers.Api
                     {
                         //get releaser ID from ReleaseAuth model
                         var relAuth = _context.ReleaseAuth
-                            .Single(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
+                            .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
 
 
                         ApplReleaseStatus appRelStat = new ApplReleaseStatus
@@ -156,7 +156,7 @@ namespace ESS.Controllers.Api
                                     ReleaseStatus.InRelease
                                     : ReleaseStatus.NotReleased,
                             ReleaseDate = null,
-                            ReleaseAuth = relAuth.EmpUnqId,
+                            ReleaseAuth = (relAuth.EmpUnqId ?? ""),
                             IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
                         };
 

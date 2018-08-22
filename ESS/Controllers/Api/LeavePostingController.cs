@@ -406,6 +406,12 @@ namespace ESS.Controllers.Api
                                                 ERROR = ""
                                             };
 
+                                        //Change From date to To date in case of COff
+
+                                        if (attdLeaveObj.LeaveTyp == LeaveTypes.CompOff)
+                                            attdLeaveObj.FromDate = attdLeaveObj.ToDate;
+
+
                                         var content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
                                             Encoding.UTF8, "application/json");
 

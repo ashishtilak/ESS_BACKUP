@@ -274,7 +274,8 @@ namespace ESS.Controllers.Api
                 var leaves = lDto.LeaveApplicationDetails.Where(x => x.LeaveTypeCode != LeaveTypes.CasualLeave);
 
                 //find if there's a leave type other than LWP
-                bool found = leaves.Any(d => d.LeaveTypeCode != LeaveTypes.LeaveWithoutPay);
+                bool found = leaves.Any(d => d.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
+                    d.LeaveTypeCode != LeaveTypes.OptionalLeave);
 
                 if (found)
                     error.Add("CL cannot be clubbed with any other leaves.");
