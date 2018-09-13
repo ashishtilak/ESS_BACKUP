@@ -43,11 +43,13 @@ namespace ESS.Controllers.Api
             int year = _context.OpenMonth.Select(t => t.OpenYear).Single();
 
             var monthFirst = DateTime.ParseExact(
-                String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2), "01"),
+                String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2),
+                    "01"),
                 "yyyy-MM-dd", null).AddMonths(-1);
 
             var monthLast = DateTime.ParseExact(
-                String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2), "01"),
+                String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2),
+                    "01"),
                 "yyyy-MM-dd", null).AddMonths(4).AddDays(-1);
 
             // Reject if any leave is pending for release
@@ -88,7 +90,8 @@ namespace ESS.Controllers.Api
                 bool leaveExist = leaveBalDto.Any(l => l.LeaveTypeCode == details.LeaveTypeCode);
 
                 if (!leaveExist &&
-                    (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay && details.LeaveTypeCode != LeaveTypes.CompOff))
+                    (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
+                     details.LeaveTypeCode != LeaveTypes.CompOff))
                 {
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
@@ -111,7 +114,7 @@ namespace ESS.Controllers.Api
                     .Where(l =>
                         l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
                         ((l.FromDt <= details.ToDt && l.ToDt >= details.FromDt) ||
-                        (l.ToDt <= details.FromDt && l.FromDt >= details.ToDt)) &&
+                         (l.ToDt <= details.FromDt && l.FromDt >= details.ToDt)) &&
                         l.LeaveApplication.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
                         l.Cancelled == false
                     )
@@ -127,7 +130,7 @@ namespace ESS.Controllers.Api
                     (details.LeaveTypeCode != LeaveTypes.OptionalLeave) &&
                     (details.LeaveTypeCode != LeaveTypes.CasualLeave) &&
                     (details.LeaveTypeCode != LeaveTypes.CompOff)
-                   )
+                )
                 {
                     var detailsFromDt = details.FromDt.AddDays(-1);
                     existingLeave = _context.LeaveApplicationDetails
@@ -191,9 +194,6 @@ namespace ESS.Controllers.Api
                 offDays += weekOffs.Count;
 
 
-
-
-
                 // CL can't be more than 3 days
                 if (details.LeaveTypeCode == LeaveTypes.CasualLeave &&
                     details.TotalDays > 3)
@@ -203,7 +203,6 @@ namespace ESS.Controllers.Api
                 if (details.LeaveTypeCode == LeaveTypes.PaidLeave &&
                     details.TotalDays < 3)
                     error.Add("EL cannot be less than 3 days");
-
 
 
                 //check leave balance
@@ -220,7 +219,6 @@ namespace ESS.Controllers.Api
 
                     if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt))
                         error.Add("Invalid Optional holiday. Pl verify date.");
-
                 }
 
 
@@ -263,8 +261,8 @@ namespace ESS.Controllers.Api
                 {
                     //For other types of leaves.
                 }
-
             }
+
             #endregion
 
             //if there are multiple leaves and one of them is CL, throw error
@@ -275,7 +273,7 @@ namespace ESS.Controllers.Api
 
                 //find if there's a leave type other than LWP
                 bool found = leaves.Any(d => d.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
-                    d.LeaveTypeCode != LeaveTypes.OptionalLeave);
+                                             d.LeaveTypeCode != LeaveTypes.OptionalLeave);
 
                 if (found)
                     error.Add("CL cannot be clubbed with any other leaves.");
@@ -291,10 +289,10 @@ namespace ESS.Controllers.Api
                 if (!found)
                     error.Add("Cannot take multiple CLs in single Leave Application.");
 
-                float countCl = lDto.LeaveApplicationDetails.Where(detail => detail.LeaveTypeCode == LeaveTypes.CasualLeave).Sum(detail => detail.TotalDays);
+                float countCl = lDto.LeaveApplicationDetails
+                    .Where(detail => detail.LeaveTypeCode == LeaveTypes.CasualLeave).Sum(detail => detail.TotalDays);
                 if (countCl > 3)
                     error.Add("CL cannot be more than 3 days");
-
             }
 
             //Date range check
@@ -315,9 +313,9 @@ namespace ESS.Controllers.Api
                 .SelectMany(
                     x1 => lDto.LeaveApplicationDetails,
                     (x1, x2) => new { x1, x2 })
-                    .Where(t => !(Equals(t.x1, t.x2)))
-                    .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
-                    .Select(t => t.x2);
+                .Where(t => !(Equals(t.x1, t.x2)))
+                .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
+                .Select(t => t.x2);
 
             if (overlaps.Any())
                 error.Add("Date ranges must be consicutive, should not overlap.");
@@ -343,7 +341,6 @@ namespace ESS.Controllers.Api
                 {
                     error.Add("Comp. Off cannot be taken on Week Off day.");
                 }
-
             }
 
 
@@ -353,7 +350,6 @@ namespace ESS.Controllers.Api
 
 
             return Content(HttpStatusCode.BadRequest, error);
-
         }
 
         private string GetLeaveOnDate(DateTime dt, string empUnqId)
@@ -363,8 +359,8 @@ namespace ESS.Controllers.Api
 
             var leave = _context.LeaveApplicationDetails
                 .FirstOrDefault(l => l.LeaveApplication.EmpUnqId == empUnqId &&
-                    (dt >= l.FromDt && dt <= l.ToDt) &&
-                    l.LeaveApplication.ReleaseStatusCode != ReleaseStatus.ReleaseRejected);
+                                     (dt >= l.FromDt && dt <= l.ToDt) &&
+                                     l.LeaveApplication.ReleaseStatusCode != ReleaseStatus.ReleaseRejected);
 
             return leave != null ? leave.LeaveTypeCode : "";
         }
