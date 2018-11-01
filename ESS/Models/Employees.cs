@@ -77,6 +77,13 @@ namespace ESS.Models
 
         public bool IsHod { get; set; }
 
+        public bool IsGpReleaser { get; set; }
+
+        public bool IsSecUser { get; set; }
+
+        public bool IsAdmin { get; set; }
+
+
         [StringLength(20)]
         public string Pass { get; set; }
 

@@ -192,6 +192,7 @@
     <Compile Include="Controllers\Api\EmpAddressController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
+    <Compile Include="Controllers\Api\GateInOutController.cs" />
     <Compile Include="Controllers\Api\GatePassController.cs" />
     <Compile Include="Controllers\Api\HolidayController.cs" />
     <Compile Include="Controllers\Api\LeaveApplicationController.cs" />
@@ -360,6 +361,34 @@
     <Compile Include="Migrations\201808130715415_AddedCounterInEmpAddress.cs" />
     <Compile Include="Migrations\201808130715415_AddedCounterInEmpAddress.Designer.cs">
       <DependentUpon>201808130715415_AddedCounterInEmpAddress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810091010248_GPReleaseFieldsAdded.cs" />
+    <Compile Include="Migrations\201810091010248_GPReleaseFieldsAdded.Designer.cs">
+      <DependentUpon>201810091010248_GPReleaseFieldsAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810120451136_AddYearMonthToGatePass.cs" />
+    <Compile Include="Migrations\201810120451136_AddYearMonthToGatePass.Designer.cs">
+      <DependentUpon>201810120451136_AddYearMonthToGatePass.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810130648502_AttdFieldsinGatePassModel.cs" />
+    <Compile Include="Migrations\201810130648502_AttdFieldsinGatePassModel.Designer.cs">
+      <DependentUpon>201810130648502_AttdFieldsinGatePassModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810130702191_NullableDateiinGatePassModel.cs" />
+    <Compile Include="Migrations\201810130702191_NullableDateiinGatePassModel.Designer.cs">
+      <DependentUpon>201810130702191_NullableDateiinGatePassModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810220715402_AddedAttdFieldsInGatePass.cs" />
+    <Compile Include="Migrations\201810220715402_AddedAttdFieldsInGatePass.Designer.cs">
+      <DependentUpon>201810220715402_AddedAttdFieldsInGatePass.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810220726599_UpdDtUserInReleaseStrategy.cs" />
+    <Compile Include="Migrations\201810220726599_UpdDtUserInReleaseStrategy.Designer.cs">
+      <DependentUpon>201810220726599_UpdDtUserInReleaseStrategy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810301215175_AddFlagsInEmpModel.cs" />
+    <Compile Include="Migrations\201810301215175_AddFlagsInEmpModel.Designer.cs">
+      <DependentUpon>201810301215175_AddFlagsInEmpModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -574,6 +603,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201808130715415_AddedCounterInEmpAddress.resx">
       <DependentUpon>201808130715415_AddedCounterInEmpAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810091010248_GPReleaseFieldsAdded.resx">
+      <DependentUpon>201810091010248_GPReleaseFieldsAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810120451136_AddYearMonthToGatePass.resx">
+      <DependentUpon>201810120451136_AddYearMonthToGatePass.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810130648502_AttdFieldsinGatePassModel.resx">
+      <DependentUpon>201810130648502_AttdFieldsinGatePassModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810130702191_NullableDateiinGatePassModel.resx">
+      <DependentUpon>201810130702191_NullableDateiinGatePassModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810220715402_AddedAttdFieldsInGatePass.resx">
+      <DependentUpon>201810220715402_AddedAttdFieldsInGatePass.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810220726599_UpdDtUserInReleaseStrategy.resx">
+      <DependentUpon>201810220726599_UpdDtUserInReleaseStrategy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810301215175_AddFlagsInEmpModel.resx">
+      <DependentUpon>201810301215175_AddFlagsInEmpModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

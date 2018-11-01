@@ -20,6 +20,8 @@ namespace ESS.Controllers.Api
 
 
         // GET /api/apprelease
+        [HttpGet]
+        [ActionName("getapplreleasestatus")]
         public IHttpActionResult GetApplReleaseStatus(string empUnqId)
         {
             //TODO: Remove magic string "I"
@@ -31,7 +33,11 @@ namespace ESS.Controllers.Api
 
 
             var app = _context.ApplReleaseStatus
-                .Where(l => relAuth.Contains(l.ReleaseCode) && l.ReleaseStatusCode == "I")
+                .Where(l =>
+                    relAuth.Contains(l.ReleaseCode) &&
+                    l.ReleaseStatusCode == "I" &&
+                    l.ReleaseGroupCode == "LA"
+                    )
                 .ToList();
 
             var appIds = app.Select(a => a.ApplicationId).ToArray();
@@ -119,7 +125,113 @@ namespace ESS.Controllers.Api
         }
 
 
+        [HttpGet]
+        [ActionName("getapplreleasestatus")]
+        public IHttpActionResult GetApplReleaseStatus(string empUnqId, string releaseGroupCode)
+        {
+            if (releaseGroupCode == "GP")
+            {
+                var relAuth = _context.ReleaseAuth
+                    .Where(r => r.EmpUnqId == empUnqId)
+                    .Select(r => r.ReleaseCode)
+                    .ToArray();
+
+
+                var app = _context.ApplReleaseStatus
+                    .Where(l => relAuth.Contains(l.ReleaseCode) && l.ReleaseStatusCode == "I")
+                    .ToList();
+
+                var appIds = app.Select(a => a.ApplicationId).ToArray();
+
+                var gp = _context.GatePass
+                    .Include(r => r.ReleaseGroup)
+                    .Include(rs => rs.RelStrategy)
+                    .Where(l => appIds.Contains(l.Id))
+                    .Select(Mapper.Map<GatePass, GatePassDto>)
+                    .ToList();
+
+
+                foreach (var dto in gp)
+                {
+                    var appl = _context.ApplReleaseStatus
+                        .Where(l =>
+                            l.YearMonth == dto.YearMonth &&
+                            l.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                            l.ApplicationId == dto.Id)
+                        .ToList()
+                        .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                    foreach (var applReleaseStatusDto in appl)
+                    {
+                        var relCode = _context.ReleaseAuth
+                            .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                            .ToList();
+
+                        foreach (var auth in relCode)
+                        {
+                            if (auth.EmpUnqId == empUnqId)
+                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                        }
+
+                        dto.ApplReleaseStatus = new System.Collections.Generic.List<ApplReleaseStatusDto>
+                        {
+                            applReleaseStatusDto
+                        };
+
+                    }
+
+
+                    var employeeDto = _context.Employees
+                        .Select(e => new EmployeeDto
+                        {
+                            EmpUnqId = e.EmpUnqId,
+                            EmpName = e.EmpName,
+                            FatherName = e.FatherName,
+                            Active = e.Active,
+                            Pass = e.Pass,
+
+                            CompCode = e.CatCode,
+                            WrkGrp = e.WrkGrp,
+                            UnitCode = e.UnitCode,
+                            DeptCode = e.DeptCode,
+                            StatCode = e.StatCode,
+                            //SecCode = e.SecCode,
+                            CatCode = e.CatCode,
+                            EmpTypeCode = e.EmpTypeCode,
+                            GradeCode = e.GradeCode,
+                            DesgCode = e.DesgCode,
+                            IsHod = e.IsHod,
+
+                            CompName = e.Company.CompName,
+                            WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                            UnitName = e.Units.UnitName,
+                            DeptName = e.Departments.DeptName,
+                            StatName = e.Stations.StatName,
+                            CatName = e.Categories.CatName,
+                            EmpTypeName = e.EmpTypes.EmpTypeName,
+                            GradeName = e.Grades.GradeName,
+                            DesgName = e.Designations.DesgName
+                        })
+                        .Single(e => e.EmpUnqId == dto.EmpUnqId);
+
+                    dto.DeptName = employeeDto.DeptName;
+                    dto.StatName = employeeDto.StatName;
+                    dto.EmpName = employeeDto.EmpName;
+                    dto.ModeName = dto.GetMode(dto.Mode);
+                    dto.StatusName = dto.GetStatus(dto.GatePassStatus);
+                    dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
+
+                    //dto.Employee = employeeDto;
+                }
+                return Ok(gp);
+
+            }
+            else
+                return BadRequest("Not implemented");
+        }
+
         [HttpPost]
+        [ActionName("UpdateApplReleaseStatus")]
         public IHttpActionResult UpdateApplReleaseStatus([FromBody] object requestData, string empUnqId, string releaseStatusCode)
         {
             //Following details will be filled:
@@ -338,6 +450,142 @@ namespace ESS.Controllers.Api
             }
 
             return Ok(leaveApplication);
+        }
+
+        [HttpPost]
+        [ActionName("updategpstatus")]
+        public IHttpActionResult UpdateGpStatus([FromBody] object requestData, string empUnqId,
+            string releaseStatusCode, string releaseGroupCode)
+        {
+            //Following details will be filled:
+            //YearMonth, ReleaseGroupCode, ApplicationId, ReleaseStrategy, ReleaseStrategyLevel, ReleaseCode
+
+
+            var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+
+
+            var applicationDetail = _context.ApplReleaseStatus
+                .SingleOrDefault(
+                    a => a.YearMonth == dto.YearMonth &&
+                         a.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                         a.ApplicationId == dto.ApplicationId &&
+                         a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel
+                );
+
+            if (applicationDetail == null)
+                return BadRequest("Invalid app release status detals...");
+
+            applicationDetail.Remarks = dto.Remarks;
+
+            //If releaseStatusCode is not I, we've nothing to do...
+            if (applicationDetail.ReleaseStatusCode != ReleaseStatus.InRelease)
+                return BadRequest("Application is not in release state.");
+
+            //first verfy if release code is correct based on the relase code
+            DateTime today = DateTime.Now;
+
+            var relAuth = _context.ReleaseAuth
+                .Single(
+                    r =>
+                        r.ReleaseCode == applicationDetail.ReleaseCode &&
+                        r.EmpUnqId == empUnqId &&
+                        r.Active &&
+                        today >= r.ValidFrom &&
+                        today <= r.ValidTo
+                );
+
+            if (relAuth == null)
+                BadRequest("Invalid releaser code. Check Active, Valid From, Valid to.");
+
+            //releaser is Ok. Now find release strategy level details
+            var relStrLevel = _context.ReleaseStrategyLevels
+                .Single(
+                    r =>
+                        r.ReleaseGroupCode == applicationDetail.ReleaseGroupCode &&
+                        r.ReleaseStrategy == applicationDetail.ReleaseStrategy &&
+                        r.ReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel &&
+                        r.ReleaseCode == applicationDetail.ReleaseCode
+                );
+
+            if (relStrLevel == null)
+                return BadRequest("Release strategy detail not found:");
+
+
+            var gp = _context.GatePass
+                .Single(
+                    g =>
+                    g.YearMonth == applicationDetail.YearMonth &&
+                    g.Id == applicationDetail.ApplicationId
+                );
+
+            gp.GpRemarks = dto.Remarks;
+
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                if (releaseStatusCode == ReleaseStatus.ReleaseRejected)
+                {
+                    //set this application details status to "R"
+                    //we'll not set next level to "I", it'll forever be "N"
+                    applicationDetail.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+
+                    //now set leave application header release status to "R" as well
+                    gp.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                }
+                else if (releaseStatusCode == ReleaseStatus.FullyReleased)
+                {
+
+                    //if this is NOT the final release, set next level release status to "I"
+                    if (!applicationDetail.IsFinalRelease)
+                    {
+                        //get next application level object
+                        var nextApplicationLevel = _context.ApplReleaseStatus
+                            .Single(
+                                a =>
+                                    a.YearMonth == applicationDetail.YearMonth &&
+                                    a.ReleaseGroupCode == applicationDetail.ReleaseGroupCode &&
+                                    a.ApplicationId == applicationDetail.ApplicationId &&
+                                    a.ReleaseStrategy == applicationDetail.ReleaseStrategy &&
+                                    a.ReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel + 1
+                            );
+
+                        if (nextApplicationLevel == null)
+                            return BadRequest("This is not final release, and next release not found! Check database.");
+
+                        //change status of next level object
+                        nextApplicationLevel.ReleaseStatusCode = ReleaseStatus.InRelease;
+
+                        //also update leave application status to "P"
+                        gp.ReleaseStatusCode = ReleaseStatus.PartiallyReleased;
+                    }
+                    else
+                    {
+                        // DISABLED ON 04.07.2018
+                        // NOW SINCE ESS IS LIVE, HR WILL REVIEW AND POST 
+                        // FROM ESS TO ATTENDANCE.
+
+
+                        ////if this IS final release, then set leave app header status to "F"
+                        gp.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+
+                    }
+
+                    //Finally set this application details status to "F"
+                    applicationDetail.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                    applicationDetail.ReleaseDate = today;
+                    applicationDetail.ReleaseAuth = empUnqId;
+
+                }
+
+                //finally update database
+                _context.SaveChanges();
+
+
+                transaction.Commit();
+            }
+
+            return Ok(gp);
+
         }
     }
 }

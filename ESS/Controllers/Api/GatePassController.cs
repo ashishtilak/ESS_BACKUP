@@ -50,6 +50,7 @@ namespace ESS.Controllers.Api
         /// <param name="request">EmpUnqId:GatePassId - 20005116:00000008</param>
         /// <returns>Returns OutGatePass type object</returns>
         /// 
+        /// 
         public IHttpActionResult GetGatePass(string request)
         {
             string[] str = request.Split(':');
@@ -107,6 +108,8 @@ namespace ESS.Controllers.Api
                 {
                     gpDto.GatePassStatus = GatePass.GatePassStatuses.Out;
                     gpDto.GateOutDateTime = DateTime.Now;
+
+                    gpDto.AttdFlag = "O";
 
                     ogp.GatePassStatus = gpDto.GatePassStatus;
                     ogp.GateOutDateTime = gpDto.GateOutDateTime;
@@ -177,7 +180,7 @@ namespace ESS.Controllers.Api
                 return BadRequest("Invalid employee code.");
 
             //return if employee is not a releaser
-            if (!releaser.IsReleaser)
+            if (!releaser.IsGpReleaser)
                 return BadRequest("Employee is not authorized to release (check flag).");
 
 
@@ -193,14 +196,11 @@ namespace ESS.Controllers.Api
             {
                 var relStrategyLevel = _context.ReleaseStrategyLevels
                     .Include(r => r.ReleaseStrategies)
-                    .Where(r => r.ReleaseCode == releaseAuth.ReleaseCode)
+                    .Where(r => r.ReleaseCode == releaseAuth.ReleaseCode && r.ReleaseGroupCode == "GP")
                     .ToList();
 
 
                 var relStrategy = relStrategyLevel.Select(level => level.ReleaseStrategies).ToList();
-
-
-
 
 
                 //and for each strategy we found above,
@@ -251,7 +251,35 @@ namespace ESS.Controllers.Api
                 }
             }
 
+            var labourGp = _context.GatePass
+                .Where(
+                    g => g.AddUser == empUnqId &&
+                         g.GatePassDate >= fromDt &&
+                         g.GatePassDate <= toDt &&
+                         g.GatePassStatus != GatePass.GatePassStatuses.ForceClosed
+                )
+                .Select(Mapper.Map<GatePass, GatePassDto>)
+                .ToList();
 
+            foreach (var dto in labourGp)
+            {
+                var emp = _context.Employees
+                    .Include(d => d.Departments)
+                    .Include(s => s.Stations)
+                    .SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+
+                if (emp != null)
+                {
+                    dto.EmpName = emp.EmpName;
+                    dto.DeptName = emp.Departments.DeptName;
+                    dto.StatName = emp.Stations.StatName;
+                }
+
+                dto.ModeName = dto.GetMode(dto.Mode);
+                dto.StatusName = dto.GetStatus(dto.GatePassStatus);
+                dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
+            }
+            result.AddRange(labourGp);
 
             return Ok(result);
         }
@@ -349,6 +377,8 @@ namespace ESS.Controllers.Api
                 var emp = _context.Employees
                     .Include(d => d.Departments)
                     .Include(s => s.Stations)
+                    .Include(c => c.Categories)
+                    .Include(g => g.Designations)
                     .SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (emp == null) continue;
@@ -356,6 +386,10 @@ namespace ESS.Controllers.Api
                 dto.EmpName = emp.EmpName;
                 dto.DeptName = emp.Departments.DeptName.Trim();
                 dto.StatName = emp.Stations.StatName;
+
+                dto.WrkGrp = emp.WrkGrp;
+                dto.CatName = emp.Categories.CatName;
+                dto.DesgName = emp.Designations.DesgName;
 
                 dto.ModeName = dto.GetMode(dto.Mode);
                 dto.StatusName = dto.GetStatus(dto.GatePassStatus);
@@ -374,8 +408,12 @@ namespace ESS.Controllers.Api
             public string PlaceOfVisit { get; set; }
             public string Reason { get; set; }
             public string AddUser { get; set; }
+            public string ReleaseGroupCode { get; set; }
+            public int YearMonth { get; set; }
         }
+
         [HttpPost]
+        [ActionName("CreateGatePass")]
         public IHttpActionResult CreateGatePass([FromBody] object requestData)
         {
             try
@@ -406,13 +444,41 @@ namespace ESS.Controllers.Api
                     maxGpId = 0;
                 }
 
+
                 List<GatePass> gps = new List<GatePass>();
 
                 foreach (var gp in dto)
                 {
+                    //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
+                    var relStrat = _context.ReleaseStrategy
+                        .FirstOrDefault(
+                            r =>
+                                r.ReleaseGroupCode == gp.ReleaseGroupCode &&
+                                r.ReleaseStrategy == gp.EmpUnqId &&
+                                r.Active == true
+                        );
+
+                    if (relStrat == null)
+                        return BadRequest("Release strategy not configured for Employee " + gp.EmpUnqId);
+
+
+                    //get release strategy levels
+                    var relStratLevels = _context.ReleaseStrategyLevels
+                        .Where(
+                            rl =>
+                                rl.ReleaseGroupCode == gp.ReleaseGroupCode &&
+                                rl.ReleaseStrategy == relStrat.ReleaseStrategy
+                        ).ToList();
+
+
+                    relStrat.ReleaseStrategyLevels = relStratLevels;
+
+
+                    //loop through all GP details 
                     GatePass newGp = new GatePass
                     {
-                        Id = maxId + 1,
+                        YearMonth = gp.YearMonth,
+                        Id = maxId + gp.GatePassItem,
                         GatePassDate = DateTime.Now.Date,
                         GatePassNo = maxGpId + 1,
                         GatePassItem = gp.GatePassItem,
@@ -420,11 +486,50 @@ namespace ESS.Controllers.Api
                         Mode = gp.Mode,
                         PlaceOfVisit = gp.PlaceOfVisit,
                         Reason = gp.Reason,
+                        ReleaseGroupCode = gp.ReleaseGroupCode,
+                        ReleaseStatusCode = ReleaseStatus.InRelease,
+                        ReleaseStrategy = gp.EmpUnqId,
                         AddUser = gp.AddUser,
                         AddDateTime = DateTime.Now,
                         GatePassStatus = GatePass.GatePassStatuses.New
                     };
+
                     gps.Add(newGp);
+
+
+                    //create a temp collection to be added to leaveapplicationdto later on
+                    List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+
+                    foreach (var relStratReleaseStrategyLevel in relStrat.ReleaseStrategyLevels)
+                    {
+                        //get releaser ID from ReleaseAuth model
+                        var relAuth = _context.ReleaseAuth
+                            .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
+
+
+                        ApplReleaseStatus appRelStat = new ApplReleaseStatus
+                        {
+                            YearMonth = gp.YearMonth,
+                            ReleaseGroupCode = gps.Last().ReleaseGroupCode,
+                            ApplicationId = gps.Last().Id,
+                            ReleaseStrategy = relStratReleaseStrategyLevel.ReleaseStrategy,
+                            ReleaseStrategyLevel = relStratReleaseStrategyLevel.ReleaseStrategyLevel,
+                            ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
+                            ReleaseStatusCode =
+                                relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1 ?
+                                    ReleaseStatus.InRelease
+                                    : ReleaseStatus.NotReleased,
+                            ReleaseDate = null,
+                            ReleaseAuth = relAuth.EmpUnqId,
+                            IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
+                        };
+
+                        //add to collection
+                        apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
+
+                        _context.ApplReleaseStatus.Add(appRelStat);
+                    }
+
                     _context.GatePass.Add(newGp);
                 }
 
@@ -436,5 +541,77 @@ namespace ESS.Controllers.Api
                 return BadRequest(exception.ToString());
             }
         }
+
+
+        [HttpPost]
+        [ActionName("CreateLabourGatePass")]
+        public IHttpActionResult CreateLabourGatePass([FromBody] object requestData, string workGroup)
+        {
+            try
+            {
+                List<RequestGp> dto = JsonConvert.DeserializeObject<List<RequestGp>>(requestData.ToString());
+
+                if (!ModelState.IsValid)
+                    return BadRequest();
+
+                int maxId, maxGpId;
+
+                try
+                {
+                    maxId = _context.GatePass.Max(g => g.Id);
+                }
+                catch
+                {
+                    maxId = 0;
+                }
+
+                try
+                {
+                    maxGpId = _context.GatePass.Where(
+                        i => DbFunctions.TruncateTime(i.GatePassDate) == DbFunctions.TruncateTime(DateTime.Now)).Max(g => g.GatePassNo);
+                }
+                catch
+                {
+                    maxGpId = 0;
+                }
+
+
+                List<GatePass> gps = new List<GatePass>();
+
+                foreach (var gp in dto)
+                {
+                    //loop through all GP details 
+                    GatePass newGp = new GatePass
+                    {
+                        YearMonth = gp.YearMonth,
+                        Id = maxId + gp.GatePassItem,
+                        GatePassDate = DateTime.Now.Date,
+                        GatePassNo = maxGpId + 1,
+                        GatePassItem = gp.GatePassItem,
+                        EmpUnqId = gp.EmpUnqId,
+                        Mode = gp.Mode,
+                        PlaceOfVisit = gp.PlaceOfVisit,
+                        Reason = gp.Reason,
+                        ReleaseGroupCode = gp.ReleaseGroupCode,
+                        ReleaseStatusCode = ReleaseStatus.FullyReleased,
+                        AddUser = gp.AddUser,
+                        AddDateTime = DateTime.Now,
+                        GatePassStatus = GatePass.GatePassStatuses.New
+                    };
+
+                    gps.Add(newGp);
+
+                    _context.GatePass.Add(newGp);
+                }
+
+                _context.SaveChanges();
+                return Ok(gps);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.ToString());
+            }
+        }
+
     }
 }

@@ -54,6 +54,9 @@ namespace ESS.Controllers.Api
                         IsReleaser = e.IsReleaser,
                         IsHrUser = e.IsHrUser,
                         IsHod = e.IsHod,
+                        IsSecUser = e.IsSecUser,
+                        IsGpReleaser = e.IsGpReleaser,
+                        IsAdmin = e.IsAdmin,
 
                         CompName = e.Company.CompName,
                         WrkGrpDesc = e.WorkGroup.WrkGrpDesc,

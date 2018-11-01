@@ -33,6 +33,9 @@ namespace ESS.Dto
         //        public CategoryDto Category { get; set; }
         public bool IsHod { get; set; }
 
+        public DateTime? UpdDt { get; set; }
+        public string UpdUser { get; set; }
+
         public List<ReleaseStrategyLevelDto> ReleaseStrategyLevels;
     }
 }

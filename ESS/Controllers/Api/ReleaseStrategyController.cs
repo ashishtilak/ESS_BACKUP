@@ -22,29 +22,10 @@ namespace ESS.Controllers.Api
 
 
         [HttpGet]
-        public IHttpActionResult GetReleaseStrategy(
-            //string compCode,
-            //string wrkGrp,
-            //string unitCode,
-            //string deptCode,
-            //string statCode,
-            //string secCode,
-            //string catCode,
-            //bool isHod,
-            string releaseGroup,
-            string empUnqId
-            )
+        public IHttpActionResult GetReleaseStrategy(string releaseGroup, string empUnqId)
         {
             var releaseStrDto = _context.ReleaseStrategy
                 .Where(r =>
-                    //r.CompCode == compCode &&
-                    //r.WrkGrp == wrkGrp &&
-                    //r.UnitCode == unitCode &&
-                    //r.DeptCode == deptCode &&
-                    //r.StatCode == statCode &&
-                    //r.SecCode == secCode &&
-                    //    //r.CatCode == catCode &&
-                    //r.IsHod == isHod &&
                     r.ReleaseStrategy == empUnqId &&
                     r.ReleaseGroupCode == releaseGroup
                 )

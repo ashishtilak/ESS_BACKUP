@@ -120,7 +120,7 @@ namespace ESS.Controllers.Api
                     )
                     .ToList();
 
-                if (existingLeave.Count > 0)
+                if (existingLeave.Count > 0 && details.LeaveTypeCode != LeaveTypes.CompOff)
                     error.Add(details.LeaveTypeCode + " leave date must not overlap with leave already taken. ");
 
                 //Check that previous leave should not be CL the day before this leave app's date
@@ -217,8 +217,23 @@ namespace ESS.Controllers.Api
                     if (details.TotalDays > 1)
                         error.Add("Only one OH is allowed.");
 
+                    if (details.HalfDayFlag)
+                        error.Add("Half day OH is no allowed.");
+
                     if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt))
                         error.Add("Invalid Optional holiday. Pl verify date.");
+
+                    DateTime ohd = details.FromDt.AddDays(-1);
+                    Dictionary<DateTime, string> prevoh = new Dictionary<DateTime, string>();
+                    prevoh.Add(ohd, GetLeaveOnDate(ohd, lDto.EmpUnqId));
+
+                    if (!string.IsNullOrEmpty(prevoh[ohd]))
+                    {
+                        if (prevoh[ohd] == "OH")
+                        {
+                            error.Add("You've already taken OH on previous day.");
+                        }
+                    }
                 }
 
 
@@ -295,6 +310,12 @@ namespace ESS.Controllers.Api
                     error.Add("CL cannot be more than 3 days");
             }
 
+            //throw error if multiple CL are applied in the same application:
+            if (lDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.OptionalLeave) > 1)
+            {
+                error.Add("Cannot take multiple Optional Leaves in single Leave Application.");
+            }
+
             //Date range check
             DateTime start = lDto.LeaveApplicationDetails.Select(x => x.FromDt).Min();
             DateTime end = lDto.LeaveApplicationDetails.Select(x => x.ToDt).Max();
@@ -307,18 +328,20 @@ namespace ESS.Controllers.Api
                 error.Add("Date ranges must be continuous. No gaps allowed");
 
 
-            //Check if ranges overlap
+            //Check if ranges overlap skip in case of CO
+            if (lDto.LeaveApplicationDetails.All(x => x.LeaveTypeCode != LeaveTypes.CompOff))
+            {
+                var overlaps = lDto.LeaveApplicationDetails.SelectMany(
+                        x1 => lDto.LeaveApplicationDetails,
+                        (x1, x2) => new { x1, x2 })
+                    .Where(t => !(Equals(t.x1, t.x2)))
+                    .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
+                    .Select(t => t.x2);
 
-            var overlaps = lDto.LeaveApplicationDetails
-                .SelectMany(
-                    x1 => lDto.LeaveApplicationDetails,
-                    (x1, x2) => new { x1, x2 })
-                .Where(t => !(Equals(t.x1, t.x2)))
-                .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
-                .Select(t => t.x2);
+                if (overlaps.Any())
+                    error.Add("Date ranges must be consicutive, should not overlap.");
 
-            if (overlaps.Any())
-                error.Add("Date ranges must be consicutive, should not overlap.");
+            }
 
 
             // CHECKS FOR COMP OFF ( CO )

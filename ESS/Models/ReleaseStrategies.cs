@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -66,6 +67,14 @@ namespace ESS.Models
         public bool IsHod { get; set; }
 
         public bool Active { get; set; }
+
+        [Column(TypeName = "datetime2")]
+        public DateTime? UpdDt { get; set; }
+
+        [StringLength(10)]
+        public string UpdUser { get; set; }
+
+
 
         public List<ReleaseStrategyLevels> ReleaseStrategyLevels;
     }

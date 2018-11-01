@@ -95,11 +95,18 @@ namespace ESS.Controllers.Api
                     ReleaseStrategy = dto.ReleaseStrategy,
                     ReleaseStrategyName = dto.ReleaseStrategyName,
                     IsHod = false,
-                    Active = true
+                    Active = true,
+                    UpdDt = dto.UpdDt,
+                    UpdUser = dto.UpdUser
                 };
 
                 _context.ReleaseStrategy.Add(releaseStrategy);
 
+            }
+            else
+            {
+                releaseStrategy.UpdDt = dto.UpdDt;
+                releaseStrategy.UpdUser = dto.UpdUser;
             }
 
             var releaseStrategyLevels = _context.ReleaseStrategyLevels

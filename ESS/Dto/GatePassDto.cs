@@ -9,6 +9,7 @@ namespace ESS.Dto
     public class GatePassDto
     {
         public int Id { get; set; }
+        public int YearMonth { get; set; }
         public DateTime GatePassDate { get; set; }
         public int GatePassNo { get; set; }
         public int GatePassItem { get; set; }
@@ -26,11 +27,26 @@ namespace ESS.Dto
         public string GateInUser { get; set; }
         public string GateInIp { get; set; }
 
+        public string ReleaseGroupCode { get; set; }
+        public string ReleaseStrategy { get; set; }
+        public string ReleaseStatusCode { get; set; }
+
+        public string GpRemarks { get; set; }
+        public DateTime? AttdUpdate { get; set; }
+        public string AttdFlag { get; set; }
+
+        public DateTime? AttdGpOutTime { get; set; }
+        public DateTime? AttdGpInTime { get; set; }
+
         public string EmpName { get; set; }
         public string DeptName { get; set; }
         public string StatName { get; set; }
         public string ModeName { get; set; }
         public string StatusName { get; set; }
+
+        public string WrkGrp { get; set; }
+        public string CatName { get; set; }
+        public string DesgName { get; set; }
 
         public string BarCode { get; set; }
 
@@ -65,5 +81,7 @@ namespace ESS.Dto
             return empUnqId + ":" + id.ToString("00000000");
         }
 
+
+        public List<ApplReleaseStatusDto> ApplReleaseStatus { get; set; }
     }
 }

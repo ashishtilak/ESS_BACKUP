@@ -939,7 +939,9 @@ namespace ESS.Helpers
                         //get data from attendance server
                         sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                               "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
-                              "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag from MastEmp ";
+                              "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
+                              "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser " +
+                              "from MastEmp ";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -966,6 +968,9 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("IsReleaser", "IsReleaser");
                             bulk.ColumnMappings.Add("IsHrUser", "IsHrUser");
                             bulk.ColumnMappings.Add("OtFlag", "OtFlag");
+                            bulk.ColumnMappings.Add("IsAdmin", "IsAdmin");
+                            bulk.ColumnMappings.Add("IsGpReleaser", "IsGpReleaser");
+                            bulk.ColumnMappings.Add("IsSecUser", "IsSecUser");
 
                             bulk.WriteToServer(dt);
                         }
@@ -999,13 +1004,14 @@ namespace ESS.Helpers
                             //"seccode, " +
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
-                              "active, OtFlag, ishod, isreleaser, ishruser, pass) " +
+                              "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
+                              "isadmin, isgpreleaser, issecuser ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.OtFlag, 0, 0, 0, empunqid); ";
+                              "source.active, source.OtFlag, 0, 0, 0, 0, 0, 0, empunqid); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
