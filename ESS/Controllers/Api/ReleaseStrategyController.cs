@@ -96,17 +96,50 @@ namespace ESS.Controllers.Api
                     .FirstOrDefault();
 
 
-                if (gpReleaseStrDto == null)
+
+                List<GpReleaseStrategyLevelDto> relStrLvl = new List<GpReleaseStrategyLevelDto>();
+
+                if (gpReleaseStrDto != null)
+                {
+                    relStrLvl = _context.GpReleaseStrategyLevels
+                        .Where(r =>
+                            r.ReleaseGroupCode == gpReleaseStrDto.ReleaseGroupCode &&
+                            r.GpReleaseStrategy == gpReleaseStrDto.GpReleaseStrategy
+                        )
+                        .Select(Mapper.Map<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>)
+                        .ToList();
+
+
+                }
+
+                // DAY release strategy
+
+                var gpReleaseStrDayDto = _context.GpReleaseStrategy
+                    .Where(r =>
+                        r.ReleaseGroupCode == releaseGroup &&
+                        r.GpReleaseStrategy == empUnqId &&
+                        r.Active
+                    )
+                    .Select(Mapper.Map<GpReleaseStrategies, GpReleaseStrategyDto>)
+                    .FirstOrDefault();
+
+
+                if (gpReleaseStrDto == null && gpReleaseStrDayDto == null)
                     return BadRequest("Invalid release strategy/not defined.");
 
 
-                var relStrLvl = _context.GpReleaseStrategyLevels
+                var relStrLvlDay = _context.GpReleaseStrategyLevels
                     .Where(r =>
-                        r.ReleaseGroupCode == gpReleaseStrDto.ReleaseGroupCode &&
-                        r.GpReleaseStrategy == gpReleaseStrDto.GpReleaseStrategy
+                        r.ReleaseGroupCode == gpReleaseStrDayDto.ReleaseGroupCode &&
+                        r.GpReleaseStrategy == gpReleaseStrDayDto.GpReleaseStrategy
                     )
                     .Select(Mapper.Map<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>)
                     .ToList();
+
+
+                relStrLvl.AddRange(relStrLvlDay);
+
+                int count = 0;
 
                 foreach (var levelDto in relStrLvl)
                 {
@@ -115,9 +148,8 @@ namespace ESS.Controllers.Api
                         .Where(r => r.ReleaseCode == relCode)
                         .ToList();
 
-                    if (releser.Count == 0)
-                        return BadRequest("No one is authorized to release!");
-
+                    if (releser.Count != 0)
+                        count += releser.Count;
 
                     foreach (var r in releser)
                     {
@@ -147,6 +179,9 @@ namespace ESS.Controllers.Api
                         gpReleaseStrDto.GpReleaseStrategyLevels.Add(relDto);
                     }
                 }
+
+                if (count == 0)
+                    return BadRequest("No one is authorized to release!");
 
                 return Ok(gpReleaseStrDto);
 
