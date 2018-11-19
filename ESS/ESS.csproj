@@ -224,6 +224,8 @@
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
     <Compile Include="Dto\GatePassDto.cs" />
+    <Compile Include="Dto\GpReleaseStrategyDto.cs" />
+    <Compile Include="Dto\GpReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\GradeDto.cs" />
     <Compile Include="Dto\HolidayDto.cs" />
     <Compile Include="Dto\LeaveApplicationDetailDto.cs" />
@@ -390,6 +392,30 @@
     <Compile Include="Migrations\201810301215175_AddFlagsInEmpModel.Designer.cs">
       <DependentUpon>201810301215175_AddFlagsInEmpModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811020546528_NewGpReleaseStrategy.cs" />
+    <Compile Include="Migrations\201811020546528_NewGpReleaseStrategy.Designer.cs">
+      <DependentUpon>201811020546528_NewGpReleaseStrategy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811020604427_AddNightRelFlaginRelAuth.cs" />
+    <Compile Include="Migrations\201811020604427_AddNightRelFlaginRelAuth.Designer.cs">
+      <DependentUpon>201811020604427_AddNightRelFlaginRelAuth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811021008136_GpReleaseStrategyInGatepass.cs" />
+    <Compile Include="Migrations\201811021008136_GpReleaseStrategyInGatepass.Designer.cs">
+      <DependentUpon>201811021008136_GpReleaseStrategyInGatepass.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811021017556_ChangeFieldinGP.cs" />
+    <Compile Include="Migrations\201811021017556_ChangeFieldinGP.Designer.cs">
+      <DependentUpon>201811021017556_ChangeFieldinGP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811021023504_RemovedForeignKeyinGP.cs" />
+    <Compile Include="Migrations\201811021023504_RemovedForeignKeyinGP.Designer.cs">
+      <DependentUpon>201811021023504_RemovedForeignKeyinGP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.cs" />
+    <Compile Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.Designer.cs">
+      <DependentUpon>201811130708498_AddNightFlagInGpReleaseStrategy.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -403,6 +429,8 @@
     <Compile Include="Models\EmpTypes.cs" />
     <Compile Include="Models\EmpUniform.cs" />
     <Compile Include="Models\GatePass.cs" />
+    <Compile Include="Models\GpReleaseStrategies.cs" />
+    <Compile Include="Models\GpReleaseStrategyLevels.cs" />
     <Compile Include="Models\Grades.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LeaveApplicationDetails.cs" />
@@ -624,6 +652,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810301215175_AddFlagsInEmpModel.resx">
       <DependentUpon>201810301215175_AddFlagsInEmpModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811020546528_NewGpReleaseStrategy.resx">
+      <DependentUpon>201811020546528_NewGpReleaseStrategy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811020604427_AddNightRelFlaginRelAuth.resx">
+      <DependentUpon>201811020604427_AddNightRelFlaginRelAuth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811021008136_GpReleaseStrategyInGatepass.resx">
+      <DependentUpon>201811021008136_GpReleaseStrategyInGatepass.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811021017556_ChangeFieldinGP.resx">
+      <DependentUpon>201811021017556_ChangeFieldinGP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811021023504_RemovedForeignKeyinGP.resx">
+      <DependentUpon>201811021023504_RemovedForeignKeyinGP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.resx">
+      <DependentUpon>201811130708498_AddNightFlagInGpReleaseStrategy.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

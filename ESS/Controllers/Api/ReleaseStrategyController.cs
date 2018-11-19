@@ -24,51 +24,135 @@ namespace ESS.Controllers.Api
         [HttpGet]
         public IHttpActionResult GetReleaseStrategy(string releaseGroup, string empUnqId)
         {
-            var releaseStrDto = _context.ReleaseStrategy
-                .Where(r =>
-                    r.ReleaseStrategy == empUnqId &&
-                    r.ReleaseGroupCode == releaseGroup
-                )
-                .Select(Mapper.Map<ReleaseStrategies, ReleaseStrategyDto>)
-                .FirstOrDefault();
-
-
-            if (releaseStrDto == null)
-                return BadRequest("Invalid release strategy/not defined.");
-
-
-            var relStrLvl = _context.ReleaseStrategyLevels
-                .Where(r =>
-                    r.ReleaseGroupCode == releaseStrDto.ReleaseGroupCode &&
-                    r.ReleaseStrategy == releaseStrDto.ReleaseStrategy
-                )
-                .Select(Mapper.Map<ReleaseStrategyLevels, ReleaseStrategyLevelDto>)
-                .ToList();
-
-            foreach (var levelDto in relStrLvl)
+            if (releaseGroup == ReleaseGroups.LeaveApplication)
             {
-                var relCode = levelDto.ReleaseCode;
-                var releser = _context.ReleaseAuth
-                    .FirstOrDefault(r => r.ReleaseCode == relCode);
+                var releaseStrDto = _context.ReleaseStrategy
+                    .Where(r =>
+                        r.ReleaseStrategy == empUnqId &&
+                        r.ReleaseGroupCode == releaseGroup
+                    )
+                    .Select(Mapper.Map<ReleaseStrategies, ReleaseStrategyDto>)
+                    .FirstOrDefault();
 
-                if (releser == null)
-                    return BadRequest("No one is authorized to release!");
 
-                var emp = _context.Employees
-                    .Select(e => new EmployeeDto
-                    {
-                        EmpUnqId = e.EmpUnqId,
-                        EmpName = e.EmpName
-                    })
-                    .Single(e => e.EmpUnqId == releser.EmpUnqId);
+                if (releaseStrDto == null)
+                    return BadRequest("Invalid release strategy/not defined.");
 
-                levelDto.EmpUnqId = emp.EmpUnqId;
-                levelDto.EmpName = emp.EmpName;
 
-                releaseStrDto.ReleaseStrategyLevels.Add(levelDto);
+                var relStrLvl = _context.ReleaseStrategyLevels
+                    .Where(r =>
+                        r.ReleaseGroupCode == releaseStrDto.ReleaseGroupCode &&
+                        r.ReleaseStrategy == releaseStrDto.ReleaseStrategy
+                    )
+                    .Select(Mapper.Map<ReleaseStrategyLevels, ReleaseStrategyLevelDto>)
+                    .ToList();
+
+                foreach (var levelDto in relStrLvl)
+                {
+                    var relCode = levelDto.ReleaseCode;
+                    var releser = _context.ReleaseAuth
+                        .FirstOrDefault(r => r.ReleaseCode == relCode);
+
+                    if (releser == null)
+                        return BadRequest("No one is authorized to release!");
+
+                    var emp = _context.Employees
+                        .Select(e => new EmployeeDto
+                        {
+                            EmpUnqId = e.EmpUnqId,
+                            EmpName = e.EmpName
+                        })
+                        .Single(e => e.EmpUnqId == releser.EmpUnqId);
+
+                    levelDto.EmpUnqId = emp.EmpUnqId;
+                    levelDto.EmpName = emp.EmpName;
+
+                    releaseStrDto.ReleaseStrategyLevels.Add(levelDto);
+                }
+
+                return Ok(releaseStrDto);
             }
+            else if (releaseGroup == ReleaseGroups.GatePass)
+            {
+                //Get emp details like compcode, wrkgrp....
 
-            return Ok(releaseStrDto);
+                var gpEmp = _context.Employees
+                    .SingleOrDefault(e => e.EmpUnqId == empUnqId);
+
+                if (gpEmp == null)
+                    return BadRequest("Invalid employee");
+
+                var gpReleaseStrDto = _context.GpReleaseStrategy
+                    .Where(r =>
+                        r.ReleaseGroupCode == releaseGroup &&
+                        r.CompCode == gpEmp.CompCode &&
+                        r.WrkGrp == gpEmp.WrkGrp &&
+                        r.UnitCode == gpEmp.UnitCode &&
+                        r.DeptCode == gpEmp.DeptCode &&
+                        r.StatCode == gpEmp.StatCode &&
+                        r.Active
+                    )
+                    .Select(Mapper.Map<GpReleaseStrategies, GpReleaseStrategyDto>)
+                    .FirstOrDefault();
+
+
+                if (gpReleaseStrDto == null)
+                    return BadRequest("Invalid release strategy/not defined.");
+
+
+                var relStrLvl = _context.GpReleaseStrategyLevels
+                    .Where(r =>
+                        r.ReleaseGroupCode == gpReleaseStrDto.ReleaseGroupCode &&
+                        r.GpReleaseStrategy == gpReleaseStrDto.GpReleaseStrategy
+                    )
+                    .Select(Mapper.Map<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>)
+                    .ToList();
+
+                foreach (var levelDto in relStrLvl)
+                {
+                    var relCode = levelDto.ReleaseCode;
+                    var releser = _context.ReleaseAuth
+                        .Where(r => r.ReleaseCode == relCode)
+                        .ToList();
+
+                    if (releser.Count == 0)
+                        return BadRequest("No one is authorized to release!");
+
+
+                    foreach (var r in releser)
+                    {
+
+                        var emp = _context.Employees
+                            .Select(e => new EmployeeDto
+                            {
+                                EmpUnqId = e.EmpUnqId,
+                                EmpName = e.EmpName
+                            })
+                            .Single(e => e.EmpUnqId == r.EmpUnqId);
+
+                        GpReleaseStrategyLevelDto relDto =
+                            new GpReleaseStrategyLevelDto
+                            {
+                                ReleaseGroupCode = levelDto.ReleaseGroupCode,
+                                GpReleaseStrategy = levelDto.GpReleaseStrategy,
+                                GpReleaseStrategyLevel = levelDto.GpReleaseStrategyLevel,
+                                ReleaseCode = levelDto.ReleaseCode,
+                                IsFinalRelease = levelDto.IsFinalRelease,
+                                EmpUnqId = emp.EmpUnqId,
+                                EmpName = emp.EmpName,
+                                IsGpNightReleaser = r.IsGpNightReleaser
+                            };
+
+
+                        gpReleaseStrDto.GpReleaseStrategyLevels.Add(relDto);
+                    }
+                }
+
+                return Ok(gpReleaseStrDto);
+
+            }
+            else
+                return BadRequest("Release strategy group code not found."); //If other that LA/GP is specified, return error
         }
 
 

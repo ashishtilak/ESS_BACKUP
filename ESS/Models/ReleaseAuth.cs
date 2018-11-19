@@ -27,5 +27,7 @@ namespace ESS.Models
         public DateTime? ValidTo { get; set; }
 
         public bool Active { get; set; }
+
+        public bool IsGpNightReleaser { get; set; }
     }
 }

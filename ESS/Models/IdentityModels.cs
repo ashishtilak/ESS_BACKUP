@@ -81,6 +81,10 @@ namespace ESS.Models
 
         public DbSet<EmpAddress> EmpAddress { get; set; }
 
+        public DbSet<GpReleaseStrategies> GpReleaseStrategy { get; set; }
+
+        public DbSet<GpReleaseStrategyLevels> GpReleaseStrategyLevels { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

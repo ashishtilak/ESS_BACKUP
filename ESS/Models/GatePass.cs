@@ -50,10 +50,10 @@ namespace ESS.Models
         public ReleaseGroups ReleaseGroup { get; set; }
 
         [StringLength(15)]
-        public string ReleaseStrategy { get; set; }
+        public string GpReleaseStrategy { get; set; }
 
-        [ForeignKey("ReleaseGroupCode, ReleaseStrategy")]
-        public ReleaseStrategies RelStrategy { get; set; }
+        [ForeignKey("ReleaseGroupCode, GpReleaseStrategy")]
+        public GpReleaseStrategies RelStrategy { get; set; }
 
         [StringLength(1)]
         public string ReleaseStatusCode { get; set; }

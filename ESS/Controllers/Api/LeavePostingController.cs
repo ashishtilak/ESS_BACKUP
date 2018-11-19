@@ -574,7 +574,12 @@ namespace ESS.Controllers.Api
                                     //Change From date to To date in case of COff
 
                                     if (attdLeaveObj.LeaveTyp == LeaveTypes.CompOff)
+                                    {
+                                        //In case of CompOff, 
+                                        leaveApplication.FromDt = leaveApplication.ToDt;
                                         attdLeaveObj.FromDate = attdLeaveObj.ToDate;
+                                    }
+
 
                                     bool result;
 

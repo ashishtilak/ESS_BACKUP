@@ -48,6 +48,9 @@ namespace ESS.App_Start
 
             CreateMap<EmpAddress, EmpAddressDto>();
 
+            CreateMap<GpReleaseStrategies, GpReleaseStrategyDto>();
+            CreateMap<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>();
+
         }
     }
 }

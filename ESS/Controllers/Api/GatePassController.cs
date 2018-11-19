@@ -194,13 +194,13 @@ namespace ESS.Controllers.Api
             //loop through all release codes found
             foreach (var releaseAuth in relCode)
             {
-                var relStrategyLevel = _context.ReleaseStrategyLevels
-                    .Include(r => r.ReleaseStrategies)
+                var relStrategyLevel = _context.GpReleaseStrategyLevels
+                    .Include(r => r.GpReleaseStrategies)
                     .Where(r => r.ReleaseCode == releaseAuth.ReleaseCode && r.ReleaseGroupCode == "GP")
                     .ToList();
 
 
-                var relStrategy = relStrategyLevel.Select(level => level.ReleaseStrategies).ToList();
+                var relStrategy = relStrategyLevel.Select(level => level.GpReleaseStrategies).ToList();
 
 
                 //and for each strategy we found above,
@@ -212,13 +212,27 @@ namespace ESS.Controllers.Api
                         .Include(d => d.Departments)
                         .Include(s => s.Stations)
                         .Where(
-                            e => e.EmpUnqId == strategy.ReleaseStrategy &&
+                            e => e.EmpUnqId == strategy.GpReleaseStrategy &&
                                     strategy.Active
                         )
                         .Select(Mapper.Map<Employees, EmployeeDto>).ToList();
 
 
-                    //employees.AddRange(relEmployee);
+                    var relEmployee2 = _context.Employees
+                        .Include(d => d.Departments)
+                        .Include(s => s.Stations)
+                        .Where(
+                            e => e.CompCode == strategy.CompCode &&
+                                 e.WrkGrp == strategy.WrkGrp &&
+                                 e.UnitCode == strategy.UnitCode &&
+                                 e.DeptCode == strategy.DeptCode &&
+                                 e.StatCode == strategy.StatCode &&
+                                 e.Active
+                        )
+                        .Select(Mapper.Map<Employees, EmployeeDto>).ToList();
+
+
+                    relEmployee.AddRange(relEmployee2);
 
                     foreach (var emp in relEmployee)
                     {
@@ -280,6 +294,8 @@ namespace ESS.Controllers.Api
                 dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
             }
             result.AddRange(labourGp);
+
+            result = result.GroupBy(r => r.Id).Select(r => r.First()).ToList();
 
             return Ok(result);
         }
@@ -449,13 +465,21 @@ namespace ESS.Controllers.Api
 
                 foreach (var gp in dto)
                 {
+                    var emp = _context.Employees
+                        .SingleOrDefault(e => e.EmpUnqId == gp.EmpUnqId);
+
+                    if (emp == null)
+                        return BadRequest("Employee not found: " + gp.EmpUnqId.ToString());
+
+
                     //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
-                    var relStrat = _context.ReleaseStrategy
+                    var relStrat = _context.GpReleaseStrategy
                         .FirstOrDefault(
                             r =>
                                 r.ReleaseGroupCode == gp.ReleaseGroupCode &&
-                                r.ReleaseStrategy == gp.EmpUnqId &&
-                                r.Active == true
+                                r.GpReleaseStrategy == gp.EmpUnqId &&
+                                r.Active
+
                         );
 
                     if (relStrat == null)
@@ -463,15 +487,15 @@ namespace ESS.Controllers.Api
 
 
                     //get release strategy levels
-                    var relStratLevels = _context.ReleaseStrategyLevels
+                    var relStratLevels = _context.GpReleaseStrategyLevels
                         .Where(
                             rl =>
                                 rl.ReleaseGroupCode == gp.ReleaseGroupCode &&
-                                rl.ReleaseStrategy == relStrat.ReleaseStrategy
+                                rl.GpReleaseStrategy == relStrat.GpReleaseStrategy
                         ).ToList();
 
 
-                    relStrat.ReleaseStrategyLevels = relStratLevels;
+                    relStrat.GpReleaseStrategyLevels = relStratLevels;
 
 
                     //loop through all GP details 
@@ -488,7 +512,7 @@ namespace ESS.Controllers.Api
                         Reason = gp.Reason,
                         ReleaseGroupCode = gp.ReleaseGroupCode,
                         ReleaseStatusCode = ReleaseStatus.InRelease,
-                        ReleaseStrategy = gp.EmpUnqId,
+                        GpReleaseStrategy = relStrat.GpReleaseStrategy,
                         AddUser = gp.AddUser,
                         AddDateTime = DateTime.Now,
                         GatePassStatus = GatePass.GatePassStatuses.New
@@ -500,7 +524,7 @@ namespace ESS.Controllers.Api
                     //create a temp collection to be added to leaveapplicationdto later on
                     List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
 
-                    foreach (var relStratReleaseStrategyLevel in relStrat.ReleaseStrategyLevels)
+                    foreach (var relStratReleaseStrategyLevel in relStrat.GpReleaseStrategyLevels)
                     {
                         //get releaser ID from ReleaseAuth model
                         var relAuth = _context.ReleaseAuth
@@ -512,11 +536,11 @@ namespace ESS.Controllers.Api
                             YearMonth = gp.YearMonth,
                             ReleaseGroupCode = gps.Last().ReleaseGroupCode,
                             ApplicationId = gps.Last().Id,
-                            ReleaseStrategy = relStratReleaseStrategyLevel.ReleaseStrategy,
-                            ReleaseStrategyLevel = relStratReleaseStrategyLevel.ReleaseStrategyLevel,
+                            ReleaseStrategy = relStratReleaseStrategyLevel.GpReleaseStrategy,
+                            ReleaseStrategyLevel = relStratReleaseStrategyLevel.GpReleaseStrategyLevel,
                             ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
                             ReleaseStatusCode =
-                                relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1 ?
+                                relStratReleaseStrategyLevel.GpReleaseStrategyLevel == 1 ?
                                     ReleaseStatus.InRelease
                                     : ReleaseStatus.NotReleased,
                             ReleaseDate = null,
@@ -534,7 +558,7 @@ namespace ESS.Controllers.Api
                 }
 
                 _context.SaveChanges();
-                return Ok(gps);
+                return Ok();
             }
             catch (Exception exception)
             {

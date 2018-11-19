@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Data.Entity;
 using System.Web.Http;
+using System.Collections.Generic;
 using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
@@ -133,97 +134,185 @@ namespace ESS.Controllers.Api
             {
                 var relAuth = _context.ReleaseAuth
                     .Where(r => r.EmpUnqId == empUnqId)
-                    .Select(r => r.ReleaseCode)
-                    .ToArray();
-
-
-                var app = _context.ApplReleaseStatus
-                    .Where(l => relAuth.Contains(l.ReleaseCode) && l.ReleaseStatusCode == "I")
                     .ToList();
 
-                var appIds = app.Select(a => a.ApplicationId).ToArray();
-
-                var gp = _context.GatePass
-                    .Include(r => r.ReleaseGroup)
-                    .Include(rs => rs.RelStrategy)
-                    .Where(l => appIds.Contains(l.Id))
-                    .Select(Mapper.Map<GatePass, GatePassDto>)
-                    .ToList();
+                List<GatePassDto> outputGp = new List<GatePassDto>();
 
 
-                foreach (var dto in gp)
+                foreach (var rAuth in relAuth)
                 {
-                    var appl = _context.ApplReleaseStatus
-                        .Where(l =>
-                            l.YearMonth == dto.YearMonth &&
-                            l.ReleaseGroupCode == dto.ReleaseGroupCode &&
-                            l.ApplicationId == dto.Id)
-                        .ToList()
-                        .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+                    List<ApplReleaseStatus> app = new List<ApplReleaseStatus>();
 
-                    foreach (var applReleaseStatusDto in appl)
+
+                    if (rAuth.IsGpNightReleaser)
                     {
-                        var relCode = _context.ReleaseAuth
-                            .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
-                            .ToList();
+                        // ************************************************************
+                        //
+                        // GET ALL THE EMPLOYEE FOR WHOME empUnqId IS RELEASER FOR NIGHT!
+                        // ALGORITHM:
+                        //
+                        // Goto ReleaseStrategylevels and pass ReleaseCode of releaser, get GpReleaseStrategy 
+                        // Pass GpReleaseStrategy to GpReleaseStrategies table and get Comp,WrkGrp,Unit,Dept,Stat
+                        // Get List of all employees belonging to that Comp/Wrk/Unit/Dept/Stat
+                        // then pass this list of employees to AppReleaseStatus table with releasestatuscode = 'I'
+                        // TADA... you got the list!!
+                        //
+                        // ************************************************************
 
-                        foreach (var auth in relCode)
+                        // CHECK IF TIME IS BETWEEN 8:00 PM AND 8:00 AM ...
+                        DateTime today = DateTime.Now;
+
+                        DateTime fromEight = DateTime.Today.AddHours(20);
+                        DateTime toEight = DateTime.Today.AddHours(28);
+
+
+                        if (today >= fromEight && today <= toEight)
                         {
-                            if (auth.EmpUnqId == empUnqId)
-                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                            // YES!! IT'S NIGHT TIME...
+                            var vRelLvl = _context.GpReleaseStrategyLevels
+                                .Where(r => r.ReleaseCode == rAuth.ReleaseCode)
+                                .Select(r => r.GpReleaseStrategy)
+                                .ToArray();
+
+                            var vRelStr = _context.GpReleaseStrategy
+                                .Where(r => vRelLvl.Contains(r.GpReleaseStrategy))
+                                .ToList();
+
+
+                            List<String> vEmp = new List<string>();
+
+                            foreach (var relObj in vRelStr)
+                            {
+                                var vEmptmp = _context.Employees
+                                    .Where(
+                                        e =>
+                                            e.CompCode == relObj.CompCode &&
+                                            e.WrkGrp == relObj.WrkGrp &&
+                                            e.UnitCode == relObj.UnitCode &&
+                                            e.DeptCode == relObj.DeptCode &&
+                                            e.StatCode == relObj.StatCode
+                                    )
+                                    .Select(e => e.EmpUnqId)
+                                    .ToList();
+
+                                vEmp.AddRange(vEmptmp);
+                            }
+
+                            var vGp = _context.GatePass
+                                .Where(g => g.ReleaseStatusCode == "I" &&
+                                            vEmp.Contains(g.EmpUnqId)
+                                )
+                                .Select(g => g.Id)
+                                .ToArray();
+
+
+                            app = _context.ApplReleaseStatus
+                                .Where(l =>
+                                    l.ReleaseGroupCode == "GP" &&
+                                    l.ReleaseStatusCode == "I" &&
+                                    vGp.Contains(l.ApplicationId))
+                                .ToList();
+
                         }
 
-                        dto.ApplReleaseStatus = new System.Collections.Generic.List<ApplReleaseStatusDto>
-                        {
-                            applReleaseStatusDto
-                        };
+                    }
+                    else
+                    {
+                        app = _context.ApplReleaseStatus
+                            .Where(l => rAuth.ReleaseCode == l.ReleaseCode && l.ReleaseStatusCode == "I")
+                            .ToList();
 
                     }
 
+                    var appIds = app.Select(a => a.ApplicationId).ToArray();
 
-                    var employeeDto = _context.Employees
-                        .Select(e => new EmployeeDto
+                    var gp = _context.GatePass
+                        .Include(r => r.ReleaseGroup)
+                        .Include(rs => rs.RelStrategy)
+                        .Where(l => appIds.Contains(l.Id))
+                        .Select(Mapper.Map<GatePass, GatePassDto>)
+                        .ToList();
+
+
+                    foreach (var dto in gp)
+                    {
+                        var appl = _context.ApplReleaseStatus
+                            .Where(l =>
+                                l.YearMonth == dto.YearMonth &&
+                                l.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                                l.ApplicationId == dto.Id)
+                            .ToList()
+                            .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                        foreach (var applReleaseStatusDto in appl)
                         {
-                            EmpUnqId = e.EmpUnqId,
-                            EmpName = e.EmpName,
-                            FatherName = e.FatherName,
-                            Active = e.Active,
-                            Pass = e.Pass,
+                            var relCode = _context.ReleaseAuth
+                                .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                                .ToList();
 
-                            CompCode = e.CatCode,
-                            WrkGrp = e.WrkGrp,
-                            UnitCode = e.UnitCode,
-                            DeptCode = e.DeptCode,
-                            StatCode = e.StatCode,
-                            //SecCode = e.SecCode,
-                            CatCode = e.CatCode,
-                            EmpTypeCode = e.EmpTypeCode,
-                            GradeCode = e.GradeCode,
-                            DesgCode = e.DesgCode,
-                            IsHod = e.IsHod,
+                            foreach (var auth in relCode)
+                            {
+                                if (auth.EmpUnqId == empUnqId)
+                                    applReleaseStatusDto.ReleaseAuth = empUnqId;
+                            }
 
-                            CompName = e.Company.CompName,
-                            WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
-                            UnitName = e.Units.UnitName,
-                            DeptName = e.Departments.DeptName,
-                            StatName = e.Stations.StatName,
-                            CatName = e.Categories.CatName,
-                            EmpTypeName = e.EmpTypes.EmpTypeName,
-                            GradeName = e.Grades.GradeName,
-                            DesgName = e.Designations.DesgName
-                        })
-                        .Single(e => e.EmpUnqId == dto.EmpUnqId);
+                            dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
+                            {
+                                applReleaseStatusDto
+                            };
 
-                    dto.DeptName = employeeDto.DeptName;
-                    dto.StatName = employeeDto.StatName;
-                    dto.EmpName = employeeDto.EmpName;
-                    dto.ModeName = dto.GetMode(dto.Mode);
-                    dto.StatusName = dto.GetStatus(dto.GatePassStatus);
-                    dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
+                        }
 
-                    //dto.Employee = employeeDto;
-                }
-                return Ok(gp);
+
+                        var employeeDto = _context.Employees
+                            .Select(e => new EmployeeDto
+                            {
+                                EmpUnqId = e.EmpUnqId,
+                                EmpName = e.EmpName,
+                                FatherName = e.FatherName,
+                                Active = e.Active,
+                                Pass = e.Pass,
+
+                                CompCode = e.CatCode,
+                                WrkGrp = e.WrkGrp,
+                                UnitCode = e.UnitCode,
+                                DeptCode = e.DeptCode,
+                                StatCode = e.StatCode,
+                                //SecCode = e.SecCode,
+                                CatCode = e.CatCode,
+                                EmpTypeCode = e.EmpTypeCode,
+                                GradeCode = e.GradeCode,
+                                DesgCode = e.DesgCode,
+                                IsHod = e.IsHod,
+
+                                CompName = e.Company.CompName,
+                                WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                                UnitName = e.Units.UnitName,
+                                DeptName = e.Departments.DeptName,
+                                StatName = e.Stations.StatName,
+                                CatName = e.Categories.CatName,
+                                EmpTypeName = e.EmpTypes.EmpTypeName,
+                                GradeName = e.Grades.GradeName,
+                                DesgName = e.Designations.DesgName
+                            })
+                            .Single(e => e.EmpUnqId == dto.EmpUnqId);
+
+                        dto.DeptName = employeeDto.DeptName;
+                        dto.StatName = employeeDto.StatName;
+                        dto.EmpName = employeeDto.EmpName;
+                        dto.ModeName = dto.GetMode(dto.Mode);
+                        dto.StatusName = dto.GetStatus(dto.GatePassStatus);
+                        dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
+
+                        //dto.Employee = employeeDto;
+                    } //foreach dto in gp
+
+                    // Add this to output list and loop if more...
+                    outputGp.AddRange(gp);
+
+                } // End for loop for release auth
+
+                return Ok(outputGp);
 
             }
             else
@@ -460,7 +549,7 @@ namespace ESS.Controllers.Api
             //Following details will be filled:
             //YearMonth, ReleaseGroupCode, ApplicationId, ReleaseStrategy, ReleaseStrategyLevel, ReleaseCode
 
-
+            string vRelStr = "";
             var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
 
 
@@ -481,29 +570,92 @@ namespace ESS.Controllers.Api
             if (applicationDetail.ReleaseStatusCode != ReleaseStatus.InRelease)
                 return BadRequest("Application is not in release state.");
 
+
+            /* ***********************************************************************
+             * 
+             *      CHECK IF TIME IS BETWEEN 8:00 PM AND 8:00 AM ...
+             * 
+             *********************************************************************** */
             //first verfy if release code is correct based on the relase code
             DateTime today = DateTime.Now;
 
-            var relAuth = _context.ReleaseAuth
-                .Single(
-                    r =>
-                        r.ReleaseCode == applicationDetail.ReleaseCode &&
-                        r.EmpUnqId == empUnqId &&
-                        r.Active &&
-                        today >= r.ValidFrom &&
-                        today <= r.ValidTo
-                );
 
-            if (relAuth == null)
-                BadRequest("Invalid releaser code. Check Active, Valid From, Valid to.");
+            DateTime fromEight = DateTime.Today.AddHours(20);
+            DateTime toEight = DateTime.Today.AddHours(28);
+
+
+            ReleaseAuth relAuth;
+
+            if (today >= fromEight && today <= toEight)
+            {
+                // THIS IS NIGHT DUTY RELEASE TIME...
+
+                //Get the release strategy
+                var vEmp = _context.Employees
+                    .FirstOrDefault(e => e.EmpUnqId == applicationDetail.ReleaseStrategy);
+
+                vRelStr = _context.GpReleaseStrategy
+                    .Where(
+                        g =>
+                            g.CompCode == vEmp.CompCode &&
+                            g.WrkGrp == vEmp.WrkGrp &&
+                            g.UnitCode == vEmp.UnitCode &&
+                            g.DeptCode == vEmp.DeptCode &&
+                            g.StatCode == vEmp.StatCode &&
+                            g.NightFlag
+                    )
+                    .Select(g => g.GpReleaseStrategy)
+                    .FirstOrDefault();
+
+                var vRelStrlev = _context.GpReleaseStrategyLevels
+                    .Where(g => g.GpReleaseStrategy == vRelStr)
+                    .Select(g => g.ReleaseCode)
+                    .ToArray();
+
+                relAuth = _context.ReleaseAuth
+                    .FirstOrDefault(
+                        r =>
+                            vRelStrlev.Contains(r.ReleaseCode) &&
+                            r.EmpUnqId == empUnqId &&
+                            r.Active &&
+                            r.IsGpNightReleaser &&
+                            today >= r.ValidFrom &&
+                            today <= r.ValidTo
+                    );
+
+                if (relAuth == null)
+                    BadRequest("Employee not authorized for night release.");
+                else
+                    applicationDetail.ReleaseCode = relAuth.ReleaseCode;
+
+            }
+            else
+            {
+
+                relAuth = _context.ReleaseAuth
+                    .Single(
+                        r =>
+                            r.ReleaseCode == applicationDetail.ReleaseCode &&
+                            r.EmpUnqId == empUnqId &&
+                            r.Active &&
+                            today >= r.ValidFrom &&
+                            today <= r.ValidTo
+                    );
+
+                if (relAuth == null)
+                    BadRequest("Invalid releaser code. Check Active, Valid From, Valid to.");
+
+                vRelStr = applicationDetail.ReleaseStrategy;
+            }
+
 
             //releaser is Ok. Now find release strategy level details
-            var relStrLevel = _context.ReleaseStrategyLevels
+            var relStrLevel = _context.GpReleaseStrategyLevels
                 .Single(
                     r =>
                         r.ReleaseGroupCode == applicationDetail.ReleaseGroupCode &&
-                        r.ReleaseStrategy == applicationDetail.ReleaseStrategy &&
-                        r.ReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel &&
+                        r.GpReleaseStrategy == vRelStr &&
+                        r.GpReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel &&
                         r.ReleaseCode == applicationDetail.ReleaseCode
                 );
 
@@ -577,10 +729,19 @@ namespace ESS.Controllers.Api
 
                 }
 
+
                 //finally update database
                 _context.SaveChanges();
 
+                // UPDATE RELEASESTRATEGY MANUALLY, AS IT IS KEY FIELD AND CANNOT BE UPDATED BY ENTITY FRAMEWORK
 
+                string strSql = "update ApplReleaseStatus set ReleaseStrategy = '" + vRelStr + "' " +
+                                "where ReleaseGroupCode = 'GP' " +
+                                "and ApplicationId = " + applicationDetail.ApplicationId + "";
+
+                _context.Database.ExecuteSqlCommand(strSql);
+
+                //now commit changes...
                 transaction.Commit();
             }
 
