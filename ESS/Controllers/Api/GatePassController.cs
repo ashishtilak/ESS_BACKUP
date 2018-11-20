@@ -83,8 +83,8 @@ namespace ESS.Controllers.Api
                     Id = gpDto.Id,
                     EmpUnqID = gpDto.EmpUnqId,
                     EmpName = emp.EmpName,
-                    DeptName = emp.Departments.DeptName,
-                    StatName = emp.Stations.StatName,
+                    DeptName = emp.Departments == null ? "" : emp.Departments.DeptName,
+                    StatName = emp.Stations == null ? "" : emp.Stations.StatName,
                     GateOutDateTime = gpDto.GateOutDateTime,
                     GateInDateTime = gpDto.GateInDateTime,
                     PlaceOfVisit = gpDto.PlaceOfVisit,
@@ -324,8 +324,8 @@ namespace ESS.Controllers.Api
 
 
                 dto.EmpName = emp.EmpName;
-                dto.DeptName = emp.Departments.DeptName.Trim();
-                dto.StatName = emp.Stations.StatName;
+                dto.DeptName = emp.Departments == null ? "" : emp.Departments.DeptName.Trim();
+                dto.StatName = emp.Stations == null ? "" : emp.Stations.StatName;
 
                 dto.ModeName = dto.GetMode(dto.Mode);
                 dto.StatusName = dto.GetStatus(dto.GatePassStatus);
@@ -361,8 +361,9 @@ namespace ESS.Controllers.Api
             foreach (var dto in gatepass)
             {
                 dto.EmpName = emp.EmpName;
-                dto.DeptName = emp.Departments.DeptName.Trim();
-                dto.StatName = emp.Stations.StatName;
+
+                dto.DeptName = emp.Departments == null ? "" : emp.Departments.DeptName.Trim();
+                dto.StatName = emp.Stations == null ? "" : emp.Stations.StatName;
 
                 dto.ModeName = dto.GetMode(dto.Mode);
                 dto.StatusName = dto.GetStatus(dto.GatePassStatus);
@@ -386,8 +387,6 @@ namespace ESS.Controllers.Api
                 .Select(Mapper.Map<GatePass, GatePassDto>)
                 .ToList();
 
-
-
             foreach (var dto in gatepass)
             {
                 var emp = _context.Employees
@@ -400,12 +399,11 @@ namespace ESS.Controllers.Api
                 if (emp == null) continue;
 
                 dto.EmpName = emp.EmpName;
-                dto.DeptName = emp.Departments.DeptName.Trim();
-                dto.StatName = emp.Stations.StatName;
-
+                dto.DeptName = emp.Departments == null ? "" : emp.Departments.DeptName.Trim();
+                dto.StatName = emp.Stations == null ? "" : emp.Stations.StatName;
                 dto.WrkGrp = emp.WrkGrp;
-                dto.CatName = emp.Categories.CatName;
-                dto.DesgName = emp.Designations.DesgName;
+                dto.CatName = emp.Categories == null ? "" : emp.Categories.CatName;
+                dto.DesgName = emp.Designations == null ? "" : emp.Designations.DesgName;
 
                 dto.ModeName = dto.GetMode(dto.Mode);
                 dto.StatusName = dto.GetStatus(dto.GatePassStatus);
