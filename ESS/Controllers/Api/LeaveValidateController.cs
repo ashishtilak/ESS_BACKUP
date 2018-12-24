@@ -349,20 +349,23 @@ namespace ESS.Controllers.Api
             // check if start date is a Holiday
             if (lDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
-                if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp).Count != 1)
+                if (start != end)
                 {
-                    error.Add("Date selected is not Holiday.");
-                }
-                else
-                {
-                    // Check if CO date is <= 7 days from WO day
-                    if (end.Subtract(start).TotalDays > 7)
-                        error.Add("Comp. Off can be taken within 3 days of Week Off.");
-                }
+                    if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp).Count != 1)
+                    {
+                        error.Add("Date selected is not Holiday.");
+                    }
+                    else
+                    {
+                        // Check if CO date is <= 7 days from WO day
+                        if (end.Subtract(start).TotalDays > 7)
+                            error.Add("Comp. Off can be taken within 3 days of Week Off.");
+                    }
 
-                if (Helpers.CustomHelper.GetWeeklyOff(end, end, lDto.EmpUnqId).Count == 1)
-                {
-                    error.Add("Comp. Off cannot be taken on Week Off day.");
+                    if (Helpers.CustomHelper.GetWeeklyOff(end, end, lDto.EmpUnqId).Count == 1)
+                    {
+                        error.Add("Comp. Off cannot be taken on Week Off day.");
+                    }
                 }
             }
 

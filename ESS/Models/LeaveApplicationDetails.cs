@@ -60,6 +60,11 @@ namespace ESS.Models
 
         public bool? IsCancellationPosted { get; set; }
 
+        public string PostUser { get; set; }
+        [Column(TypeName = "datetime2")]
+        public DateTime? PostedDt { get; set; }
+
+
         public static readonly string NotPosted = "N";
         public static readonly string FullyPosted = "F";
         public static readonly string PartiallyPosted = "P";

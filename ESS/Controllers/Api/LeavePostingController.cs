@@ -345,8 +345,11 @@ namespace ESS.Controllers.Api
                                     //Change release status to "R"
 
                                     l.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
-                                    l.UpdUser = dto1.UserId;
-                                    l.UpdDt = DateTime.Now;
+                                    //l.UpdUser = dto1.UserId;
+                                    //l.UpdDt = DateTime.Now;
+
+                                    leaveApplication.PostUser = dto1.UserId;
+                                    leaveApplication.PostedDt = DateTime.Now;
 
                                     var appRelStat = _context.ApplReleaseStatus
                                         .Where(
@@ -444,8 +447,11 @@ namespace ESS.Controllers.Api
                                                 {
 
                                                     leaveApplication.IsPosted = dto1.IsPosted;
-                                                    l.UpdUser = dto1.UserId;
-                                                    l.UpdDt = DateTime.Now;
+                                                    leaveApplication.PostUser = dto1.UserId;
+                                                    leaveApplication.PostedDt = DateTime.Now;
+
+                                                    //l.UpdUser = dto1.UserId;
+                                                    //l.UpdDt = DateTime.Now;
 
                                                     _context.SaveChanges();
 
@@ -513,8 +519,11 @@ namespace ESS.Controllers.Api
                                                     if (!result)
                                                     {
                                                         leaveApplication.IsPosted = dto1.IsPosted;
-                                                        l.UpdUser = dto1.UserId;
-                                                        l.UpdDt = DateTime.Now;
+                                                        leaveApplication.PostUser = dto1.UserId;
+                                                        leaveApplication.PostedDt = DateTime.Now;
+
+                                                        //l.UpdUser = dto1.UserId;
+                                                        //l.UpdDt = DateTime.Now;
 
                                                         _context.SaveChanges();
 
@@ -531,8 +540,10 @@ namespace ESS.Controllers.Api
                                     }
 
                                     leaveApplication.IsPosted = dto1.IsPosted;
-                                    l.UpdUser = dto1.UserId;
-                                    l.UpdDt = DateTime.Now;
+                                    leaveApplication.PostUser = dto1.UserId;
+                                    leaveApplication.PostedDt = DateTime.Now;
+                                    //l.UpdUser = dto1.UserId;
+                                    //l.UpdDt = DateTime.Now;
                                 }
                                 else
                                 {
@@ -544,8 +555,10 @@ namespace ESS.Controllers.Api
                                     if (leaveApplication.Cancelled == true && leaveApplication.ParentId == 0)
                                     {
                                         leaveApplication.IsPosted = dto1.IsPosted;
-                                        l.UpdUser = dto1.UserId;
-                                        l.UpdDt = DateTime.Now;
+                                        leaveApplication.PostUser = dto1.UserId;
+                                        leaveApplication.PostedDt = DateTime.Now;
+                                        //l.UpdUser = dto1.UserId;
+                                        //l.UpdDt = DateTime.Now;
                                         leaveApplication.IsCancellationPosted = true;
                                         continue;
                                     }
@@ -590,8 +603,10 @@ namespace ESS.Controllers.Api
                                         //UPDATE POSTED FLAGE
 
                                         leaveApplication.IsPosted = dto1.IsPosted;
-                                        l.UpdUser = dto1.UserId;
-                                        l.UpdDt = DateTime.Now;
+                                        leaveApplication.PostUser = dto1.UserId;
+                                        leaveApplication.PostedDt = DateTime.Now;
+                                        //l.UpdUser = dto1.UserId;
+                                        //l.UpdDt = DateTime.Now;
 
                                         // If this leave is a cancelled leave, which was fully posted previously,
                                         // we'll set the IsCancellationPosted flag

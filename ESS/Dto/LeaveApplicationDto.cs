@@ -27,6 +27,7 @@ namespace ESS.Dto
         public string ReleaseStatusCode { get; set; }
         public DateTime AddDt { get; set; }
         public string AddUser { get; set; }
+        public string ClientIp { get; set; }
         public DateTime UpdDt { get; set; }
         public string UpdUser { get; set; }
         public string Remarks { get; set; }

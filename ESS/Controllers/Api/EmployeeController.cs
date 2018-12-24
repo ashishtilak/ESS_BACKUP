@@ -268,7 +268,8 @@ namespace ESS.Controllers.Api
 
                 var relStr = _context.ReleaseStrategy
                     .SingleOrDefault(r =>
-                        r.ReleaseStrategy == e.EmpUnqId
+                        r.ReleaseStrategy == e.EmpUnqId &&
+                        r.ReleaseGroupCode == ReleaseGroups.LeaveApplication
                     );
 
                 if (relStr == null)

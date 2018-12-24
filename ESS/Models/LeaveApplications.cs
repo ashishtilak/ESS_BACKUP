@@ -87,6 +87,10 @@ namespace ESS.Models
         [StringLength(10)]
         public string AddUser { get; set; }
 
+
+        [StringLength(15)]
+        public string ClientIp { get; set; }
+
         [Column(TypeName = "datetime2")]
         public DateTime? UpdDt { get; set; }
 

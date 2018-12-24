@@ -11,7 +11,7 @@ namespace ESS.Helpers
 {
     public class CustomHelper
     {
-        private const string RemoteServer = "Data Source=172.16.12.47;Initial Catalog=ATTENDANCE;Integrated Security=False; User Id=sa; Password=testomonials";
+        private static readonly string RemoteServer = System.Configuration.ConfigurationManager.ConnectionStrings["RemoteConnection"].ConnectionString;
         private static readonly string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
         public static string GetAttendanceServerApi()
@@ -1011,7 +1011,7 @@ namespace ESS.Helpers
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.OtFlag, 0, 0, 0, 0, 0, 0, empunqid); ";
+                              "source.active, source.OtFlag, 0, 0, 0, 0, 0, 0, 0); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();

@@ -202,6 +202,7 @@
     <Compile Include="Controllers\Api\LeaveReportController.cs" />
     <Compile Include="Controllers\Api\LeaveValidateController.cs" />
     <Compile Include="Controllers\Api\LoginController.cs" />
+    <Compile Include="Controllers\Api\ManageLeaveController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
@@ -415,6 +416,10 @@
     <Compile Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.cs" />
     <Compile Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.Designer.cs">
       <DependentUpon>201811130708498_AddNightFlagInGpReleaseStrategy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812221157091_AddPostingAuditFieldsInLeave.cs" />
+    <Compile Include="Migrations\201812221157091_AddPostingAuditFieldsInLeave.Designer.cs">
+      <DependentUpon>201812221157091_AddPostingAuditFieldsInLeave.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -670,6 +675,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811130708498_AddNightFlagInGpReleaseStrategy.resx">
       <DependentUpon>201811130708498_AddNightFlagInGpReleaseStrategy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812221157091_AddPostingAuditFieldsInLeave.resx">
+      <DependentUpon>201812221157091_AddPostingAuditFieldsInLeave.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
