@@ -35,7 +35,10 @@ namespace ESS.Controllers.Api
                     l.EmpUnqId == empUnqId &&
                     l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
                     l.LeaveApplicationDetails.Any(d =>
-                            (d.IsPosted == LeaveApplicationDetails.NotPosted || d.Cancelled == true) &&
+                            (
+                                (d.IsPosted == LeaveApplicationDetails.NotPosted ||
+                                 d.IsPosted == LeaveApplicationDetails.PartiallyPosted)
+                            || d.Cancelled == true) &&
                             d.IsCancellationPosted == false
                         )
                 )
@@ -46,7 +49,11 @@ namespace ESS.Controllers.Api
             {
                 foreach (var details in apps.LeaveApplicationDetails)
                 {
-                    if (details.IsPosted != LeaveApplicationDetails.NotPosted) continue;
+                    if (details.IsPosted != LeaveApplicationDetails.NotPosted)
+                    {
+                        if (details.IsPosted != LeaveApplicationDetails.PartiallyPosted)
+                            continue;
+                    }
 
                     try
                     {
@@ -62,7 +69,20 @@ namespace ESS.Controllers.Api
                                     l.Availed -= details.TotalDays;
                             }
                             else
-                                l.Availed += details.TotalDays;
+                            {
+                                if (details.LeaveTypeCode == LeaveTypes.SickLeave)
+                                {
+                                    if (details.TotalDays > 3)
+                                    {
+                                        l.Availed = l.Availed - 3 + details.TotalDays;
+                                    }
+                                    else
+                                        l.Availed += details.TotalDays;
+                                }
+                                else
+                                    l.Availed += details.TotalDays;
+                            }
+
                         }
                     }
                     catch
