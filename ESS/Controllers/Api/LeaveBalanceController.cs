@@ -20,6 +20,100 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
+        public IHttpActionResult GetLeaveBalance(int yearMonth)
+        {
+            var employees = _context.Employees.Where(e => e.Active == true && e.WrkGrp == "COMP")
+                .Select(e => e.EmpUnqId)
+                .ToList();
+
+            List<LeaveBalanceDto> result = new List<LeaveBalanceDto>();
+
+            foreach (var empUnqId in employees)
+            {
+
+                //get leave balance from attendance server
+                //note this will not have leaves that are not posted.
+
+                var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(empUnqId, yearMonth);
+
+                //now get applied and released leaves that are not posted
+
+                var leaveAppDtl = _context.LeaveApplications
+                    .Where(l =>
+                        l.EmpUnqId == empUnqId &&
+                        l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                        l.LeaveApplicationDetails.Any(d =>
+                            (
+                                (d.IsPosted == LeaveApplicationDetails.NotPosted ||
+                                 d.IsPosted == LeaveApplicationDetails.PartiallyPosted)
+                                || d.Cancelled == true) &&
+                            d.IsCancellationPosted == false
+                        )
+                    )
+                    .Include(l => l.LeaveApplicationDetails)
+                    .ToList();
+
+                foreach (var apps in leaveAppDtl)
+                {
+                    foreach (var details in apps.LeaveApplicationDetails)
+                    {
+                        if (details.IsPosted != LeaveApplicationDetails.NotPosted)
+                        {
+                            if (details.IsPosted != LeaveApplicationDetails.PartiallyPosted)
+                                continue;
+                        }
+
+                        try
+                        {
+                            var l = leaveBalDto.Single(x => x.LeaveTypeCode == details.LeaveTypeCode);
+
+                            if (l != null)
+                            {
+                                if (details.Cancelled == true &&
+                                    (details.IsCancellationPosted == null || details.IsCancellationPosted == false))
+                                {
+                                    //only reduce if full leave is not cancelled
+                                    if (details.ParentId != 0)
+                                        l.Availed -= details.TotalDays;
+                                }
+                                else
+                                {
+                                    if (details.LeaveTypeCode == LeaveTypes.SickLeave)
+                                    {
+                                        if (details.TotalDays > 3)
+                                        {
+                                            l.Availed = l.Availed - 3 + details.TotalDays;
+                                        }
+                                        else
+                                            l.Availed += details.TotalDays;
+                                    }
+                                    //else
+                                    //    l.Availed += details.TotalDays;
+                                }
+
+                            }
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    }
+                }
+
+
+                result.AddRange(leaveBalDto);
+
+                //var mahi = leaveBalDto.Where(l => l.EmpUnqId == "20010581").ToList();
+                //foreach (var m in mahi)
+                //{
+                //    m.Balance = 0;
+                //}
+            }
+
+            return Ok(result);
+
+        }
+
         public IHttpActionResult GetLeaveBalance(string empUnqId, int yearMonth)
         {
 
@@ -79,8 +173,8 @@ namespace ESS.Controllers.Api
                                     else
                                         l.Availed += details.TotalDays;
                                 }
-                                else
-                                    l.Availed += details.TotalDays;
+                                //else
+                                //    l.Availed += details.TotalDays;
                             }
 
                         }

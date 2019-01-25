@@ -229,7 +229,7 @@ namespace ESS.Controllers.Api
 
                     if (!string.IsNullOrEmpty(prevoh[ohd]))
                     {
-                        if (prevoh[ohd] == "OH")
+                        if (prevoh[ohd] == LeaveTypes.OptionalLeave)
                         {
                             error.Add("You've already taken OH on previous day.");
                         }
@@ -301,8 +301,15 @@ namespace ESS.Controllers.Api
                 //check for half CL...
                 bool found = lDto.LeaveApplicationDetails.Any(detail => detail.HalfDayFlag);
 
+                bool findOptional =
+                    lDto.LeaveApplicationDetails.Any(detail => detail.LeaveTypeCode == LeaveTypes.OptionalLeave);
+
                 if (!found)
-                    error.Add("Cannot take multiple CLs in single Leave Application.");
+                {
+                    if (!findOptional)
+                        error.Add("Cannot take multiple CLs in single Leave Application.");
+                }
+
 
                 float countCl = lDto.LeaveApplicationDetails
                     .Where(detail => detail.LeaveTypeCode == LeaveTypes.CasualLeave).Sum(detail => detail.TotalDays);

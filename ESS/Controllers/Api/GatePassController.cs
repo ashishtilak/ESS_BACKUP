@@ -458,105 +458,111 @@ namespace ESS.Controllers.Api
                     maxGpId = 0;
                 }
 
-
-                List<GatePass> gps = new List<GatePass>();
-
-                foreach (var gp in dto)
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var emp = _context.Employees
-                        .SingleOrDefault(e => e.EmpUnqId == gp.EmpUnqId);
 
-                    if (emp == null)
-                        return BadRequest("Employee not found: " + gp.EmpUnqId.ToString());
+                    List<GatePass> gps = new List<GatePass>();
 
-
-                    //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
-                    var relStrat = _context.GpReleaseStrategy
-                        .FirstOrDefault(
-                            r =>
-                                r.ReleaseGroupCode == gp.ReleaseGroupCode &&
-                                r.GpReleaseStrategy == gp.EmpUnqId &&
-                                r.Active
-
-                        );
-
-                    if (relStrat == null)
-                        return BadRequest("Release strategy not configured for Employee " + gp.EmpUnqId);
-
-
-                    //get release strategy levels
-                    var relStratLevels = _context.GpReleaseStrategyLevels
-                        .Where(
-                            rl =>
-                                rl.ReleaseGroupCode == gp.ReleaseGroupCode &&
-                                rl.GpReleaseStrategy == relStrat.GpReleaseStrategy
-                        ).ToList();
-
-
-                    relStrat.GpReleaseStrategyLevels = relStratLevels;
-
-
-                    //loop through all GP details 
-                    GatePass newGp = new GatePass
+                    foreach (var gp in dto)
                     {
-                        YearMonth = gp.YearMonth,
-                        Id = maxId + gp.GatePassItem,
-                        GatePassDate = DateTime.Now.Date,
-                        GatePassNo = maxGpId + 1,
-                        GatePassItem = gp.GatePassItem,
-                        EmpUnqId = gp.EmpUnqId,
-                        Mode = gp.Mode,
-                        PlaceOfVisit = gp.PlaceOfVisit,
-                        Reason = gp.Reason,
-                        ReleaseGroupCode = gp.ReleaseGroupCode,
-                        ReleaseStatusCode = ReleaseStatus.InRelease,
-                        GpReleaseStrategy = relStrat.GpReleaseStrategy,
-                        AddUser = gp.AddUser,
-                        AddDateTime = DateTime.Now,
-                        GatePassStatus = GatePass.GatePassStatuses.New
-                    };
+                        var emp = _context.Employees
+                            .SingleOrDefault(e => e.EmpUnqId == gp.EmpUnqId);
 
-                    gps.Add(newGp);
+                        if (emp == null)
+                            return BadRequest("Employee not found: " + gp.EmpUnqId.ToString());
 
 
-                    //create a temp collection to be added to leaveapplicationdto later on
-                    List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+                        //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
+                        var relStrat = _context.GpReleaseStrategy
+                            .FirstOrDefault(
+                                r =>
+                                    r.ReleaseGroupCode == gp.ReleaseGroupCode &&
+                                    r.GpReleaseStrategy == gp.EmpUnqId &&
+                                    r.Active
 
-                    foreach (var relStratReleaseStrategyLevel in relStrat.GpReleaseStrategyLevels)
-                    {
-                        //get releaser ID from ReleaseAuth model
-                        var relAuth = _context.ReleaseAuth
-                            .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
+                            );
+
+                        if (relStrat == null)
+                            return BadRequest("Release strategy not configured for Employee " + gp.EmpUnqId);
 
 
-                        ApplReleaseStatus appRelStat = new ApplReleaseStatus
+                        //get release strategy levels
+                        var relStratLevels = _context.GpReleaseStrategyLevels
+                            .Where(
+                                rl =>
+                                    rl.ReleaseGroupCode == gp.ReleaseGroupCode &&
+                                    rl.GpReleaseStrategy == relStrat.GpReleaseStrategy
+                            ).ToList();
+
+
+                        relStrat.GpReleaseStrategyLevels = relStratLevels;
+
+
+                        //loop through all GP details 
+                        GatePass newGp = new GatePass
                         {
                             YearMonth = gp.YearMonth,
-                            ReleaseGroupCode = gps.Last().ReleaseGroupCode,
-                            ApplicationId = gps.Last().Id,
-                            ReleaseStrategy = relStratReleaseStrategyLevel.GpReleaseStrategy,
-                            ReleaseStrategyLevel = relStratReleaseStrategyLevel.GpReleaseStrategyLevel,
-                            ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
-                            ReleaseStatusCode =
-                                relStratReleaseStrategyLevel.GpReleaseStrategyLevel == 1 ?
-                                    ReleaseStatus.InRelease
-                                    : ReleaseStatus.NotReleased,
-                            ReleaseDate = null,
-                            ReleaseAuth = relAuth.EmpUnqId,
-                            IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
+                            Id = maxId + gp.GatePassItem,
+                            GatePassDate = DateTime.Now.Date,
+                            GatePassNo = maxGpId + 1,
+                            GatePassItem = gp.GatePassItem,
+                            EmpUnqId = gp.EmpUnqId,
+                            Mode = gp.Mode,
+                            PlaceOfVisit = gp.PlaceOfVisit,
+                            Reason = gp.Reason,
+                            ReleaseGroupCode = gp.ReleaseGroupCode,
+                            ReleaseStatusCode = ReleaseStatus.InRelease,
+                            GpReleaseStrategy = relStrat.GpReleaseStrategy,
+                            AddUser = gp.AddUser,
+                            AddDateTime = DateTime.Now,
+                            GatePassStatus = GatePass.GatePassStatuses.New
                         };
 
-                        //add to collection
-                        apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
+                        gps.Add(newGp);
 
-                        _context.ApplReleaseStatus.Add(appRelStat);
+
+                        //create a temp collection to be added to leaveapplicationdto later on
+                        List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+
+                        foreach (var relStratReleaseStrategyLevel in relStrat.GpReleaseStrategyLevels)
+                        {
+                            //get releaser ID from ReleaseAuth model
+                            var relAuth = _context.ReleaseAuth
+                                .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
+
+
+                            ApplReleaseStatus appRelStat = new ApplReleaseStatus
+                            {
+                                YearMonth = gp.YearMonth,
+                                ReleaseGroupCode = gps.Last().ReleaseGroupCode,
+                                ApplicationId = gps.Last().Id,
+                                ReleaseStrategy = relStratReleaseStrategyLevel.GpReleaseStrategy,
+                                ReleaseStrategyLevel = relStratReleaseStrategyLevel.GpReleaseStrategyLevel,
+                                ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
+                                ReleaseStatusCode =
+                                    relStratReleaseStrategyLevel.GpReleaseStrategyLevel == 1
+                                        ? ReleaseStatus.InRelease
+                                        : ReleaseStatus.NotReleased,
+                                ReleaseDate = null,
+                                ReleaseAuth = relAuth.EmpUnqId,
+                                IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
+                            };
+
+                            //add to collection
+                            apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
+
+                            _context.ApplReleaseStatus.Add(appRelStat);
+                        }
+
+                        _context.GatePass.Add(newGp);
                     }
 
-                    _context.GatePass.Add(newGp);
-                }
+                    _context.SaveChanges();
 
-                _context.SaveChanges();
-                return Ok();
+                    transaction.Commit();
+
+                    return Ok();
+                }
             }
             catch (Exception exception)
             {

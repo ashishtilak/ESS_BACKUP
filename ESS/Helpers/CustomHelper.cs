@@ -1011,7 +1011,7 @@ namespace ESS.Helpers
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.OtFlag, 0, 0, 0, 0, 0, 0, 0); ";
+                              "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();

@@ -180,6 +180,7 @@ namespace ESS.Controllers.Api
                     }
                 }
 
+
                 if (count == 0)
                     return BadRequest("No one is authorized to release!");
 

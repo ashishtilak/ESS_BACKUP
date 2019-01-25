@@ -149,9 +149,13 @@ namespace ESS.Controllers.Api
             body += bodyTable;
 
             body += "<br/>Kindly review the same in <a href='http://172.16.12.44:8080'>ESS Portal</a>.";
+
+            //body += "<br/>Kindly review the same in <a href='http://172.16.10.9:8080'>ESS Portal</a>.";
+
             body += "</body></html>";
 
             SmtpClient smtpClient = new SmtpClient("172.16.12.47", 25)
+            //SmtpClient smtpClient = new SmtpClient("172.16.10.15", 25)
             {
                 //Credentials = new System.Net.NetworkCredential("tilaka@jindalsaw.com", "ashish123$$"),
                 UseDefaultCredentials = true,
@@ -162,6 +166,7 @@ namespace ESS.Controllers.Api
             MailMessage mail = new MailMessage
             {
                 From = new MailAddress("attendance.ipu@jindalsaw.com", "ESS Portal"),
+                //From = new MailAddress("attnd.nkp@jindalsaw.com", "ESS Portal"),
                 Subject = "Notification from ESS Portal",
                 BodyEncoding = System.Text.Encoding.UTF8,
                 IsBodyHtml = true,
