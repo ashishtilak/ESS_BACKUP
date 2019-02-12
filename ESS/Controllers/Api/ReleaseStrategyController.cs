@@ -278,7 +278,9 @@ namespace ESS.Controllers.Api
                                 IsHod = e.IsHod,
                                 IsHrUser = e.IsHrUser,
                                 IsReleaser = e.IsReleaser,
-                                Email = e.Email
+                                Email = e.Email,
+
+                                Location = e.Location
                             }
                         )
                         .ToList();

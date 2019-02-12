@@ -48,9 +48,13 @@ namespace ESS.Controllers.Api
             //Check half day totaldays
             lDto.TotalDays = changedLeave.HalfDayFlag ? 0.5f : (changedLeave.ToDt - changedLeave.FromDt).Days + 1;
 
+            var emp = _context.Employees.FirstOrDefault(e => e.EmpUnqId == empUnqId);
+            if (emp == null)
+                return BadRequest("Invalid employee. Pl chck in Db.");
+
             //Get list of holidays
             List<DateTime> holidays =
-                ESS.Helpers.CustomHelper.GetHolidays(changedLeave.FromDt, changedLeave.ToDt, lDto.CompCode, lDto.WrkGrp);
+                ESS.Helpers.CustomHelper.GetHolidays(changedLeave.FromDt, changedLeave.ToDt, lDto.CompCode, lDto.WrkGrp, emp.Location);
 
             lDto.TotalDays -= holidays.Count;
 

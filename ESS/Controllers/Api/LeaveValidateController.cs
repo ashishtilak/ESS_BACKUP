@@ -39,6 +39,8 @@ namespace ESS.Controllers.Api
 
             //get leave balance each leave wise for current year
 
+            var emp = _context.Employees.Single(e => e.EmpUnqId == lDto.EmpUnqId);
+
             int yearMonth = _context.OpenMonth.Select(t => t.YearMonth).Single();
             int year = _context.OpenMonth.Select(t => t.OpenYear).Single();
 
@@ -165,7 +167,7 @@ namespace ESS.Controllers.Api
 
                 //now get holidays between from/to date and add them to off days
                 List<DateTime> holidays =
-                    ESS.Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, lDto.CompCode, lDto.WrkGrp);
+                    ESS.Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, lDto.CompCode, lDto.WrkGrp, emp.Location);
 
                 details.TotalDays -= holidays.Count;
 
@@ -220,12 +222,12 @@ namespace ESS.Controllers.Api
                     if (details.HalfDayFlag)
                         error.Add("Half day OH is no allowed.");
 
-                    if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt))
+                    if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt, emp.Location))
                         error.Add("Invalid Optional holiday. Pl verify date.");
 
                     DateTime ohd = details.FromDt.AddDays(-1);
-                    Dictionary<DateTime, string> prevoh = new Dictionary<DateTime, string>();
-                    prevoh.Add(ohd, GetLeaveOnDate(ohd, lDto.EmpUnqId));
+                    Dictionary<DateTime, string> prevoh =
+                        new Dictionary<DateTime, string> { { ohd, GetLeaveOnDate(ohd, lDto.EmpUnqId) } };
 
                     if (!string.IsNullOrEmpty(prevoh[ohd]))
                     {
@@ -358,7 +360,7 @@ namespace ESS.Controllers.Api
             {
                 if (start != end)
                 {
-                    if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp).Count != 1)
+                    if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp, emp.Location).Count != 1)
                     {
                         error.Add("Date selected is not Holiday.");
                     }

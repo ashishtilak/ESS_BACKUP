@@ -71,6 +71,7 @@ namespace ESS.Dto
         public string PerPhone { get; set; }
         public string PerPoliceSt { get; set; }
 
+        public string Location { get; set; }
 
         //public CompanyDto Company { get; set; }
         //public WorkGroupDto WorkGroup { get; set; }

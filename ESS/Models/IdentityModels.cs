@@ -85,6 +85,8 @@ namespace ESS.Models
 
         public DbSet<GpReleaseStrategyLevels> GpReleaseStrategyLevels { get; set; }
 
+        public DbSet<Locations> Location { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

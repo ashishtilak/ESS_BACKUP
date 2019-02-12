@@ -24,7 +24,7 @@ namespace ESS.Controllers.Api
 
 
         //get /api/employee
-        public IHttpActionResult GetEmployees()
+        public IHttpActionResult GetEmployees(string location)
         {
 
             var employeeDto = _context.Employees
@@ -65,13 +65,15 @@ namespace ESS.Controllers.Api
                         IsReleaser = e.IsReleaser,
                         Email = e.Email,
 
+                        Location = e.Location
+
                     }
                 )
                 .Where(e => e.Active && e.WrkGrp == "COMP")
                 .ToList();
 
             //get all employee per address
-            var empPerAdd = Helpers.CustomHelper.GetEmpPerAddress();
+            var empPerAdd = Helpers.CustomHelper.GetEmpPerAddress(location);
 
 
             foreach (var dto in employeeDto)
@@ -156,7 +158,9 @@ namespace ESS.Controllers.Api
                         IsHod = e.IsHod,
                         IsHrUser = e.IsHrUser,
                         IsReleaser = e.IsReleaser,
-                        Email = e.Email
+                        Email = e.Email,
+
+                        Location = e.Location
                     }
                 )
                 .Where(e => e.EmpUnqId == empUnqId)

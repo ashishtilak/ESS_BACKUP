@@ -421,6 +421,10 @@
     <Compile Include="Migrations\201812221157091_AddPostingAuditFieldsInLeave.Designer.cs">
       <DependentUpon>201812221157091_AddPostingAuditFieldsInLeave.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902070634387_LocationModel_EmpModelChange.cs" />
+    <Compile Include="Migrations\201902070634387_LocationModel_EmpModelChange.Designer.cs">
+      <DependentUpon>201902070634387_LocationModel_EmpModelChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -443,6 +447,7 @@
     <Compile Include="Models\LeaveBalance.cs" />
     <Compile Include="Models\LeaveRules.cs" />
     <Compile Include="Models\LeaveTypes.cs" />
+    <Compile Include="Models\Locations.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\OpenMonth.cs" />
     <Compile Include="Models\ReleaseAuth.cs" />
@@ -678,6 +683,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201812221157091_AddPostingAuditFieldsInLeave.resx">
       <DependentUpon>201812221157091_AddPostingAuditFieldsInLeave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902070634387_LocationModel_EmpModelChange.resx">
+      <DependentUpon>201902070634387_LocationModel_EmpModelChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

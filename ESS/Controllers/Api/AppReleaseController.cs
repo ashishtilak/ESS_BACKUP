@@ -116,7 +116,9 @@ namespace ESS.Controllers.Api
                         CatName = e.Categories.CatName,
                         EmpTypeName = e.EmpTypes.EmpTypeName,
                         GradeName = e.Grades.GradeName,
-                        DesgName = e.Designations.DesgName
+                        DesgName = e.Designations.DesgName,
+
+                        Location = e.Location
                     })
                     .Single(e => e.EmpUnqId == dto.EmpUnqId);
 
@@ -293,7 +295,9 @@ namespace ESS.Controllers.Api
                                 CatName = e.Categories.CatName,
                                 EmpTypeName = e.EmpTypes.EmpTypeName,
                                 GradeName = e.Grades.GradeName,
-                                DesgName = e.Designations.DesgName
+                                DesgName = e.Designations.DesgName,
+
+                                Location = e.Location
                             })
                             .Single(e => e.EmpUnqId == dto.EmpUnqId);
 

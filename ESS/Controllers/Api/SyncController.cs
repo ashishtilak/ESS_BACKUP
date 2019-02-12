@@ -18,11 +18,11 @@ namespace ESS.Controllers.Api
         }
 
         [HttpGet]
-        public IHttpActionResult SyncDb()
+        public IHttpActionResult SyncDb(string location)
         {
             try
             {
-                Helpers.CustomHelper.SyncData();
+                Helpers.CustomHelper.SyncData(location);
             }
             catch (Exception ex)
             {

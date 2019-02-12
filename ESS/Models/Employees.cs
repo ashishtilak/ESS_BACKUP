@@ -88,5 +88,8 @@ namespace ESS.Models
         public string Pass { get; set; }
 
         public string Email { get; set; }
+
+        [StringLength(5)]
+        public string Location { get; set; }
     }
 }

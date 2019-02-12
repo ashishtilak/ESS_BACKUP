@@ -68,7 +68,9 @@ namespace ESS.Controllers.Api
                         EmpTypeName = e.EmpTypes.EmpTypeName,
                         GradeName = e.Grades.GradeName,
                         DesgName = e.Designations.DesgName,
-                        OtFlag = e.OtFlag
+                        OtFlag = e.OtFlag,
+
+                        Location = e.Location
                     }
                 )
                 .Where(e => e.EmpUnqId == loginDto.EmpUnqId && e.Pass == loginDto.Pass)

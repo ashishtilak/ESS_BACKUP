@@ -10,11 +10,11 @@ namespace ESS.Controllers.Api
     public class LeaveEntryController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult GetLeaveEntries(string empUnqId, int year)
+        public IHttpActionResult GetLeaveEntries(string empUnqId)
         {
             try
             {
-                var leaves = Helpers.CustomHelper.GetLeaveEntries(empUnqId, year);
+                var leaves = Helpers.CustomHelper.GetLeaveEntries(empUnqId);
                 return Ok(leaves);
 
             }

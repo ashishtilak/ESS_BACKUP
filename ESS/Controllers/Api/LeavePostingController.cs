@@ -172,6 +172,7 @@ namespace ESS.Controllers.Api
             public string StatName;
             public string Remarks;
             public string ReleaseStrategy;
+            public string Lcoation;
 
             public string LeaveTypeCode;
             public DateTime FromDt;
@@ -227,6 +228,7 @@ namespace ESS.Controllers.Api
                                        DeptName = appHdr.Departments.DeptName,
                                        StatName = appHdr.Stations.StatName,
                                        Remarks = appHdr.Remarks,
+                                       Lcoation = appHdr.Employee.Location,
                                        LeaveTypeCode = appDtl.LeaveTypeCode,
                                        FromDt = appDtl.FromDt,
                                        ToDt = appDtl.ToDt,
@@ -292,6 +294,7 @@ namespace ESS.Controllers.Api
             public string AttdUser { get; set; }
             public string Remarks { get; set; }
             public string ERROR { get; set; }
+            public string Location { get; set; }
         }
 
         [HttpPost]
@@ -315,6 +318,7 @@ namespace ESS.Controllers.Api
 
                         foreach (var l in leave)
                         {
+                            var emp = _context.Employees.Single(e => e.EmpUnqId == l.EmpUnqId);
 
                             foreach (var leaveApplication in l.LeaveApplicationDetails)
                             {
@@ -401,7 +405,7 @@ namespace ESS.Controllers.Api
 
                                                 // if this day is holiday/week off, then skip this day
                                                 List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp);
+                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp, l.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -432,12 +436,13 @@ namespace ESS.Controllers.Api
                                                         PostedFlg = false,
                                                         AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
                                                         Remarks = leaveApplication.Remarks,
-                                                        ERROR = ""
+                                                        ERROR = "",
+                                                        Location = emp.Location
                                                     };
 
                                                 bool result;
 
-                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, out result);
+                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
 
                                                 // if there was error in leave posting,
                                                 // save partial  posting flag in ESS
@@ -464,7 +469,7 @@ namespace ESS.Controllers.Api
                                             {
                                                 // if this day is holiday/week off, then skip this day
                                                 List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp);
+                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp, l.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -505,12 +510,13 @@ namespace ESS.Controllers.Api
                                                             PostedFlg = false,
                                                             AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
                                                             Remarks = leaveApplication.Remarks,
-                                                            ERROR = ""
+                                                            ERROR = "",
+                                                            Location = emp.Location
                                                         };
 
                                                     bool result;
 
-                                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, out result);
+                                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
 
                                                     // if there was error in leave posting,
                                                     // save partial  posting flag in ESS
@@ -581,7 +587,8 @@ namespace ESS.Controllers.Api
                                             PostedFlg = false,
                                             AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
                                             Remarks = leaveApplication.Remarks,
-                                            ERROR = ""
+                                            ERROR = "",
+                                            Location = emp.Location
                                         };
 
                                     //Change From date to To date in case of COff
@@ -596,7 +603,7 @@ namespace ESS.Controllers.Api
 
                                     bool result;
 
-                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, out result);
+                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
 
                                     if (result)
                                     {
@@ -647,12 +654,12 @@ namespace ESS.Controllers.Api
         }
 
 
-        private AttdLeavePost AttdPostLeave(AttdLeavePost attdLeaveObj, out bool output)
+        private AttdLeavePost AttdPostLeave(AttdLeavePost attdLeaveObj, string location, out bool output)
         {
 
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(Helpers.CustomHelper.GetAttendanceServerApi());
+                client.BaseAddress = new Uri(Helpers.CustomHelper.GetAttendanceServerApi(location));
 
                 var content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
                     Encoding.UTF8, "application/json");

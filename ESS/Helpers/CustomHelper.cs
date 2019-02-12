@@ -11,12 +11,23 @@ namespace ESS.Helpers
 {
     public class CustomHelper
     {
-        private static readonly string RemoteServer = System.Configuration.ConfigurationManager.ConnectionStrings["RemoteConnection"].ConnectionString;
+        //private static readonly string RemoteServer = System.Configuration.ConfigurationManager.ConnectionStrings["RemoteConnection"].ConnectionString;
         private static readonly string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
-        public static string GetAttendanceServerApi()
+
+        public static string GetAttendanceServerApi(string location)
         {
-            return System.Configuration.ConfigurationManager.ConnectionStrings["AttendanceServerApi"].ConnectionString;
+            //return System.Configuration.ConfigurationManager.ConnectionStrings["AttendanceServerApi"].ConnectionString;
+            ApplicationDbContext context = new ApplicationDbContext();
+            var loc = context.Location.FirstOrDefault(c => c.Location == location);
+            return loc != null ? loc.AttendanceServerApi : "";
+        }
+
+        public static string GetRemoteServer(string location)
+        {
+            ApplicationDbContext context = new ApplicationDbContext();
+            var loc = context.Location.FirstOrDefault(c => c.Location == location);
+            return loc != null ? loc.RemoteConnection : "";
         }
 
         /// <summary>
@@ -27,11 +38,13 @@ namespace ESS.Helpers
         /// <param name="compCode"> Company Code</param>
         /// <param name="wrkGrp"> Work Group </param>
         /// <returns></returns>
-        public static List<DateTime> GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp)
+        public static List<DateTime> GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp, string location)
         {
             List<DateTime> holidays = new List<DateTime>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            string strRemoteServer = GetRemoteServer(location);
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -54,11 +67,13 @@ namespace ESS.Helpers
         }
 
 
-        public static List<HolidayDto> GetHolidays(string compCode, string wrkGrp, int tYear)
+        public static List<HolidayDto> GetHolidays(string compCode, string wrkGrp, int tYear, string location)
         {
             List<HolidayDto> holidays = new List<HolidayDto>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            string strRemoteServer = GetRemoteServer(location);
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select tDate, HlDesc from HolidayMast where " +
@@ -80,9 +95,10 @@ namespace ESS.Helpers
         }
 
 
-        public static bool GetOptionalHolidays(DateTime leaveDate)
+        public static bool GetOptionalHolidays(DateTime leaveDate, string location)
         {
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            string strRemoteServer = GetRemoteServer(location);
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select * from HolidayOptMast " +
@@ -94,12 +110,18 @@ namespace ESS.Helpers
             }
         }
 
+
         //Get weekly off day
         public static List<DateTime> GetWeeklyOff(DateTime fromDt, DateTime toDt, string empUnqId)
         {
             List<DateTime> weeklyOff = new List<DateTime>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            ApplicationDbContext context = new ApplicationDbContext();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            string strRemoteServer = GetRemoteServer(emp.Location);
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -122,9 +144,15 @@ namespace ESS.Helpers
         //Get Leave Balance
         public static List<LeaveBalanceDto> GetLeaveBalance(string empUnqId, int year)
         {
+
             List<LeaveBalanceDto> lDtoList = new List<LeaveBalanceDto>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            ApplicationDbContext context = new ApplicationDbContext();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            string strRemoteServer = GetRemoteServer(emp.Location);
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -173,28 +201,32 @@ namespace ESS.Helpers
         }
 
         //Sync Data from Remote server to this server
-        public static void SyncData()
+        public static void SyncData(string location)
         {
-            SyncCompany();
-            SyncWrkGrp();
-            SyncUnit();
-            SyncDept();
-            SyncStat();
+            List<DateTime> holidays = new List<DateTime>();
+
+            string strRemoteServer = GetRemoteServer(location);
+
+            SyncCompany(strRemoteServer);
+            SyncWrkGrp(strRemoteServer);
+            SyncUnit(strRemoteServer);
+            SyncDept(strRemoteServer);
+            SyncStat(strRemoteServer);
             //SyncSec();
-            SyncCatg();
-            SyncDesg();
-            SyncGrade();
-            SyncEmpType();
-            SyncEmp();
+            SyncCatg(strRemoteServer);
+            SyncDesg(strRemoteServer);
+            SyncGrade(strRemoteServer);
+            SyncEmpType(strRemoteServer);
+            SyncEmp(strRemoteServer, location);
         }
 
-        public static void SyncCompany()
+        public static void SyncCompany(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -255,13 +287,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncWrkGrp()
+        public static void SyncWrkGrp(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -324,13 +356,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncUnit()
+        public static void SyncUnit(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -396,13 +428,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncDept()
+        public static void SyncDept(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -470,13 +502,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncStat()
+        public static void SyncStat(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -547,13 +579,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncSec()
+        public static void SyncSec(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -626,13 +658,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncCatg()
+        public static void SyncCatg(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -698,13 +730,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncDesg()
+        public static void SyncDesg(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -770,13 +802,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncGrade()
+        public static void SyncGrade(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -842,13 +874,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncEmpType()
+        public static void SyncEmpType(string strRemoteServer)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -914,13 +946,13 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncEmp()
+        public static void SyncEmp(string strRemoteServer, string location)
         {
             #region tryblock
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(RemoteServer))
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -940,7 +972,8 @@ namespace ESS.Helpers
                         sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                               "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                               "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
-                              "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser " +
+                              "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
+                              "'" + location + "' as location " +
                               "from MastEmp ";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
@@ -971,6 +1004,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("IsAdmin", "IsAdmin");
                             bulk.ColumnMappings.Add("IsGpReleaser", "IsGpReleaser");
                             bulk.ColumnMappings.Add("IsSecUser", "IsSecUser");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -996,7 +1030,8 @@ namespace ESS.Helpers
                               "Target.EmpName = Source.EmpName, " +
                               "Target.FatherName = Source.FatherName, " +
                               "Target.OtFlag = Source.OtFlag," +
-                              "Target.Active = Source.Active " +
+                              "Target.Active = Source.Active, " +
+                              "Target.Location = Source.Location " +
                             //"Target.IsHod = Source.IsHod " +
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
@@ -1005,13 +1040,14 @@ namespace ESS.Helpers
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
-                              "isadmin, isgpreleaser, issecuser ) " +
+                              "isadmin, isgpreleaser, issecuser, location ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0); ";
+                              "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, " +
+                              "'" + location + "'); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -1031,7 +1067,6 @@ namespace ESS.Helpers
             #endregion
         }
 
-
         public static void UpdateOpenMonth()
         {
 
@@ -1043,17 +1078,24 @@ namespace ESS.Helpers
         /// <param name="empUnqId">Employee unique Id</param>
         /// <param name="year">Year</param>
         /// <returns>List of LeaveEntryDto</returns>
-        public static List<LeaveEntryDto> GetLeaveEntries(string empUnqId, int year)
+        public static List<LeaveEntryDto> GetLeaveEntries(string empUnqId)
         {
             List<LeaveEntryDto> leaves = new List<LeaveEntryDto>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            ApplicationDbContext context = new ApplicationDbContext();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+
+            string strRemoteServer = GetRemoteServer(emp.Location);
+
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
-                string sql = "select " +
+                string sql = "select top 20 " +
                              "tYear, EmpUnqId, CompCode, WrkGrp, FromDt, ToDt, " +
                              "LeaveTyp as LeaveTypeCode, TotDay, LeaveDed, LeaveHalf " +
-                             "from LeaveEntry where tyear=" + year + " and empUnqId = '" + empUnqId + "'";
+                             "from LeaveEntry where empUnqId = '" + empUnqId + "' " +
+                             "order by todt desc";
 
                 SqlCommand cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1090,7 +1132,10 @@ namespace ESS.Helpers
 
             var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            string strRemoteServer = GetRemoteServer(emp.Location);
+
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1154,8 +1199,9 @@ namespace ESS.Helpers
             ApplicationDbContext context = new ApplicationDbContext();
 
             var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1208,10 +1254,11 @@ namespace ESS.Helpers
                          ",[AdharNo]" +
                          " FROM [ATTENDANCE].[dbo].[MastEmp] where EmpUnqId = '" + empUnqId + "'";
 
-
             List<EmpDetailsDto> result = new List<EmpDetailsDto>();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1311,7 +1358,7 @@ namespace ESS.Helpers
             return result;
         }
 
-        public static List<EmpDetailsDto> GetEmpPerAddress()
+        public static List<EmpDetailsDto> GetEmpPerAddress(string location)
         {
             ApplicationDbContext context = new ApplicationDbContext();
 
@@ -1319,10 +1366,11 @@ namespace ESS.Helpers
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
                          " FROM [ATTENDANCE].[dbo].[MastEmp] where WRKGRP = 'COMP' and Active= 1 ";
 
+            string strRemoteServer = GetRemoteServer(location);
 
             List<EmpDetailsDto> result = new List<EmpDetailsDto>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1365,7 +1413,11 @@ namespace ESS.Helpers
 
             List<EmpEduDto> result = new List<EmpEduDto>();
 
-            using (SqlConnection cn = new SqlConnection(RemoteServer))
+            ApplicationDbContext context = new ApplicationDbContext();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            string strRemoteServer = GetRemoteServer(emp.Location);
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
