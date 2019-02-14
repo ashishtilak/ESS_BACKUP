@@ -367,8 +367,16 @@ namespace ESS.Controllers.Api
                     else
                     {
                         // Check if CO date is <= 7 days from WO day
-                        if (end.Subtract(start).TotalDays > 7)
-                            error.Add("Comp. Off can be taken within 3 days of Week Off.");
+                        if (emp.Location == Locations.Ipu)
+                        {
+                            if (end.Subtract(start).TotalDays > 7)
+                                error.Add("Comp. Off can be taken within 7 days.");
+                        }
+                        else
+                        {
+                            if (end.Subtract(start).TotalDays > 90)
+                                error.Add("Comp. Off can be taken within 90 days.");
+                        }
                     }
 
                     if (Helpers.CustomHelper.GetWeeklyOff(end, end, lDto.EmpUnqId).Count == 1)
