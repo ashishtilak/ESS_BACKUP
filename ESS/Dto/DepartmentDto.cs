@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string DeptCode { get; set; }
         public string DeptName { get; set; }
+        public string Location { get; set; }
     }
 }

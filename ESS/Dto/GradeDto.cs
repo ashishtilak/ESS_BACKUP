@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string GradeCode { get; set; }
         public string GradeName { get; set; }
+        public string Location { get; set; }
     }
 }

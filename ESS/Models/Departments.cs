@@ -28,5 +28,8 @@ namespace ESS.Models
 
         [StringLength(100)]
         public string DeptName { get; set; }
+
+        [StringLength(5)]
+        public string Location { get; set; }
     }
 }

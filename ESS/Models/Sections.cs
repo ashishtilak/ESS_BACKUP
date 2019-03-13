@@ -46,5 +46,8 @@ namespace ESS.Models
 
         [StringLength(100)]
         public string SecName { get; set; }
+
+        [StringLength(5)]
+        public string Location { get; set; }
     }
 }

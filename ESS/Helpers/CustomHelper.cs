@@ -207,20 +207,20 @@ namespace ESS.Helpers
 
             string strRemoteServer = GetRemoteServer(location);
 
-            SyncCompany(strRemoteServer);
-            SyncWrkGrp(strRemoteServer);
-            SyncUnit(strRemoteServer);
-            SyncDept(strRemoteServer);
-            SyncStat(strRemoteServer);
+            SyncCompany(strRemoteServer, location);
+            SyncWrkGrp(strRemoteServer, location);
+            SyncUnit(strRemoteServer, location);
+            SyncDept(strRemoteServer, location);
+            SyncStat(strRemoteServer, location);
             //SyncSec();
-            SyncCatg(strRemoteServer);
-            SyncDesg(strRemoteServer);
-            SyncGrade(strRemoteServer);
-            SyncEmpType(strRemoteServer);
+            SyncCatg(strRemoteServer, location);
+            SyncDesg(strRemoteServer, location);
+            SyncGrade(strRemoteServer, location);
+            SyncEmpType(strRemoteServer, location);
             SyncEmp(strRemoteServer, location);
         }
 
-        public static void SyncCompany(string strRemoteServer)
+        public static void SyncCompany(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -243,7 +243,10 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, CompName from MastComp";
+                        sql = "select CompCode, CompName, " +
+                              "'" + location + "' as location " +
+                              " from MastComp";
+
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -254,6 +257,7 @@ namespace ESS.Helpers
 
                             bulk.ColumnMappings.Add("CompCode", "CompCode");
                             bulk.ColumnMappings.Add("CompName", "CompName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -263,11 +267,13 @@ namespace ESS.Helpers
                         sql = "merge into Companies as target " +
                               "using #tmpCompanies as Source " +
                               "on " +
-                              "Target.CompCode = Source.CompCode " +
+                              "Target.CompCode = Source.CompCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.CompName = Source.CompName " +
                               "when not matched then " +
-                              "insert (compcode, compname) values (source.compcode, source.compname); ";
+                              "insert (compcode, compname, location) values (source.compcode, source.compname," +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -287,7 +293,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncWrkGrp(string strRemoteServer)
+        public static void SyncWrkGrp(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -310,7 +316,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, WrkGrpDesc from MastWorkGrp";
+                        sql = "select CompCode, WrkGrp, WrkGrpDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastWorkGrp";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -322,6 +330,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("CompCode", "CompCode");
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("WrkGrpDesc", "WrkGrpDesc");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -331,12 +340,15 @@ namespace ESS.Helpers
                         sql = "merge into WorkGroups as target " +
                               "using #tmpWrkGrp as Source " +
                               "on " +
-                              "Target.CompCode = Source.CompCode and Target.WrkGrp = Source.WrkGrp " +
+                              "Target.CompCode = Source.CompCode and " +
+                              "Target.WrkGrp = Source.WrkGrp and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.WrkGrpDesc = Source.WrkGrpDesc " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, WrkGrpDesc) " +
-                              "values (source.compcode, source.wrkgrp, source.wrkgrpdesc); ";
+                              "insert (compcode, wrkgrp, WrkGrpDesc, location) " +
+                              "values (source.compcode, source.wrkgrp, source.wrkgrpdesc," +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -356,7 +368,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncUnit(string strRemoteServer)
+        public static void SyncUnit(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -379,7 +391,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, UnitCode, UnitName from MastUnit";
+                        sql = "select CompCode, WrkGrp, UnitCode, UnitName, " +
+                              "'" + location + "' as location " +
+                              " from MastUnit";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -392,6 +406,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("UnitCode", "UnitCode");
                             bulk.ColumnMappings.Add("UnitName", "UnitName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -403,12 +418,14 @@ namespace ESS.Helpers
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
-                              "Target.UnitCode = Source.UnitCode " +
+                              "Target.UnitCode = Source.UnitCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.UnitName = Source.UnitName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, unitcode, unitname) " +
-                              "values (source.compcode, source.wrkgrp, source.unitcode, source.unitname); ";
+                              "insert (compcode, wrkgrp, unitcode, unitname, location) " +
+                              "values (source.compcode, source.wrkgrp, source.unitcode, source.unitname, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -428,7 +445,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncDept(string strRemoteServer)
+        public static void SyncDept(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -451,7 +468,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, UnitCode, DeptCode, DeptDesc from MastDept";
+                        sql = "select CompCode, WrkGrp, UnitCode, DeptCode, DeptDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastDept";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -465,6 +484,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("UnitCode", "UnitCode");
                             bulk.ColumnMappings.Add("DeptCode", "DeptCode");
                             bulk.ColumnMappings.Add("DeptDesc", "DeptName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -477,12 +497,14 @@ namespace ESS.Helpers
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
                               "Target.UnitCode = Source.UnitCode and " +
-                              "Target.DeptCode = Source.DeptCode " +
+                              "Target.DeptCode = Source.DeptCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.DeptName = Source.Deptname " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, unitcode, deptcode, deptname ) " +
-                              "values (source.compcode, source.wrkgrp, source.unitcode, source.deptcode, source.deptname); ";
+                              "insert (compcode, wrkgrp, unitcode, deptcode, deptname, location ) " +
+                              "values (source.compcode, source.wrkgrp, source.unitcode, source.deptcode, source.deptname, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -502,7 +524,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncStat(string strRemoteServer)
+        public static void SyncStat(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -525,7 +547,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, StatDesc from MastStat";
+                        sql = "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, StatDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastStat";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -540,6 +564,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("DeptCode", "DeptCode");
                             bulk.ColumnMappings.Add("StatCode", "StatCode");
                             bulk.ColumnMappings.Add("StatDesc", "StatName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -553,13 +578,14 @@ namespace ESS.Helpers
                               "Target.WrkGrp = Source.WrkGrp and " +
                               "Target.UnitCode = Source.UnitCode and " +
                               "Target.DeptCode = Source.DeptCode and " +
-                              "Target.StatCode = Source.StatCode " +
+                              "Target.StatCode = Source.StatCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.StatName = Source.StatName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, unitcode, deptcode, statcode, statname ) " +
+                              "insert (compcode, wrkgrp, unitcode, deptcode, statcode, statname, location ) " +
                               "values (source.compcode, source.wrkgrp, source.unitcode, source.deptcode, " +
-                              "        source.statcode, source.statname); ";
+                              "        source.statcode, source.statname, '" + location + "'  ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -579,7 +605,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncSec(string strRemoteServer)
+        public static void SyncSec(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -658,7 +684,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncCatg(string strRemoteServer)
+        public static void SyncCatg(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -681,7 +707,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, CatCode, CatDesc from MastCat";
+                        sql = "select CompCode, WrkGrp, CatCode, CatDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastCat";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -694,6 +722,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("CatCode", "CatCode");
                             bulk.ColumnMappings.Add("CatDesc", "CatName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -705,12 +734,14 @@ namespace ESS.Helpers
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
-                              "Target.CatCode = Source.CatCode " +
+                              "Target.CatCode = Source.CatCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.CatName = Source.CatName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, catcode, catname) " +
-                              "values (source.compcode, source.wrkgrp, source.catcode, source.catname); ";
+                              "insert (compcode, wrkgrp, catcode, catname, location) " +
+                              "values (source.compcode, source.wrkgrp, source.catcode, source.catname, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -730,7 +761,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncDesg(string strRemoteServer)
+        public static void SyncDesg(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -753,7 +784,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, DesgCode, DesgDesc from MastDesg";
+                        sql = "select CompCode, WrkGrp, DesgCode, DesgDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastDesg";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -766,6 +799,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("DesgCode", "DesgCode");
                             bulk.ColumnMappings.Add("DesgDesc", "DesgName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -777,12 +811,14 @@ namespace ESS.Helpers
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
-                              "Target.DesgCode = Source.DesgCode " +
+                              "Target.DesgCode = Source.DesgCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.DesgName = Source.DesgName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, desgcode, desgname) " +
-                              "values (source.compcode, source.wrkgrp, source.desgcode, source.desgname); ";
+                              "insert (compcode, wrkgrp, desgcode, desgname, location) " +
+                              "values (source.compcode, source.wrkgrp, source.desgcode, source.desgname, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -802,7 +838,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncGrade(string strRemoteServer)
+        public static void SyncGrade(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -825,7 +861,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, GradeCode, GradeDesc from MastGrade";
+                        sql = "select CompCode, WrkGrp, GradeCode, GradeDesc,  " +
+                              "'" + location + "' as location " +
+                              "from MastGrade";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -838,6 +876,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("GradeCode", "GradeCode");
                             bulk.ColumnMappings.Add("GradeDesc", "GradeName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -849,12 +888,14 @@ namespace ESS.Helpers
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
-                              "Target.GradeCode = Source.GradeCode " +
+                              "Target.GradeCode = Source.GradeCode and " +
+                              "Target.location = Source.location " +
                               "when matched then " +
                               "update set Target.GradeName = Source.GradeName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, gradecode, gradename) " +
-                              "values (source.compcode, source.wrkgrp, source.gradecode, source.gradename); ";
+                              "insert (compcode, wrkgrp, gradecode, gradename, location) " +
+                              "values (source.compcode, source.wrkgrp, source.gradecode, source.gradename, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -874,7 +915,7 @@ namespace ESS.Helpers
             #endregion
         }
 
-        public static void SyncEmpType(string strRemoteServer)
+        public static void SyncEmpType(string strRemoteServer, string location)
         {
             #region tryblock
 
@@ -897,7 +938,9 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, EmpTypeCode, EmpTypeDesc from MastEmpType";
+                        sql = "select CompCode, WrkGrp, EmpTypeCode, EmpTypeDesc, " +
+                              "'" + location + "' as location " +
+                              " from MastEmpType";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -910,6 +953,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("WrkGrp", "WrkGrp");
                             bulk.ColumnMappings.Add("EmpTypeCode", "EmpTypeCode");
                             bulk.ColumnMappings.Add("EmpTypeDesc", "EmpTypeName");
+                            bulk.ColumnMappings.Add("Location", "Location");
 
                             bulk.WriteToServer(dt);
                         }
@@ -921,12 +965,14 @@ namespace ESS.Helpers
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
                               "Target.WrkGrp = Source.WrkGrp and " +
-                              "Target.EmpTypeCode = Source.EmpTypeCode " +
+                              "Target.EmpTypeCode = Source.EmpTypeCode and " +
+                              "Target.Location = Source.Location " +
                               "when matched then " +
                               "update set Target.EmpTypeName = Source.EmpTypeName " +
                               "when not matched then " +
-                              "insert (compcode, wrkgrp, EmpTypeCode, EmpTypeName) " +
-                              "values (source.compcode, source.wrkgrp, source.EmpTypeCode, source.EmpTypeName); ";
+                              "insert (compcode, wrkgrp, EmpTypeCode, EmpTypeName, Location ) " +
+                              "values (source.compcode, source.wrkgrp, source.EmpTypeCode, source.EmpTypeName, " +
+                              "'" + location + "' ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -967,14 +1013,29 @@ namespace ESS.Helpers
                         SqlCommand cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
+                        if (location == Locations.Kjqtl || location == Locations.Kjsaw)
+                        {
+                            sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
+                                  "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
+                                  "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
+                                  "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
+                                  "'" + location + "' as location " +
+                                  "from MastEmp where active = 1 ";
 
-                        //get data from attendance server
-                        sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
-                              "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
-                              "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
-                              "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
-                              "'" + location + "' as location " +
-                              "from MastEmp ";
+                        }
+                        else
+                        {
+                            //get data from attendance server
+                            sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
+                                  "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
+                                  "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
+                                  "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
+                                  "'" + location + "' as location " +
+                                  "from MastEmp ";
+
+                        }
+
+
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -1148,7 +1209,7 @@ namespace ESS.Helpers
                              "[EarlyGoing],[LateCome] " +
                              "FROM [ATTENDANCE].[dbo].[AttdData] " +
                              "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
-                             "and compcode = '01' " +
+                    //"and compcode = '01' " +
                              "and wrkgrp  = '" + emp.WrkGrp + "' " +
                              "and empunqid = '" + empUnqId + "' " +
                              "and tdate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +

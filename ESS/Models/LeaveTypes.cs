@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Configuration;
 
 namespace ESS.Models
 {
@@ -30,9 +31,21 @@ namespace ESS.Models
         //ADDING STATIC MEMBERS TO ELIMINATE MAGIC STRINGS
         public static readonly string CasualLeave = "CL";
         public static readonly string SickLeave = "SL";
-        public static readonly string PaidLeave = "PL";
+
+        //take the PaidLeave string from web.config
+
+        //Remove static string:
+
+        //public static readonly string PaidLeave = ConfigurationManager.AppSettings["PaidLeave"];
+
+        //And add a property for getting from appsettings of web.config
+        public static string PaidLeave { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
+
         public static readonly string OptionalLeave = "OH";
         public static readonly string LeaveWithoutPay = "LW";
         public static readonly string CompOff = "CO";
+
+        //public static string NewType { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
+
     }
 }

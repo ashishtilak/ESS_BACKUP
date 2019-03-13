@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string SecCode { get; set; }
         public string SecName { get; set; }
+        public string Location { get; set; }
     }
 }

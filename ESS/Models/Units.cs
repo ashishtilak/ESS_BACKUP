@@ -24,5 +24,8 @@ namespace ESS.Models
 
         [StringLength(50)]
         public string UnitName { get; set; }
+
+        [StringLength(5)]
+        public string Location { get; set; }
     }
 }

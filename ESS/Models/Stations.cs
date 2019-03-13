@@ -36,5 +36,8 @@ namespace ESS.Models
 
         [StringLength(100)]
         public string StatName { get; set; }
+
+        [StringLength(5)]
+        public string Location { get; set; }
     }
 }

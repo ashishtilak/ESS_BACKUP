@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string CompCode { get; set; }
         public string CompName { get; set; }
+        public string Location { get; set; }
     }
 }

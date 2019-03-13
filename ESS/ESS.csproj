@@ -429,6 +429,10 @@
     <Compile Include="Migrations\201902140547119_LocationStaticFields.Designer.cs">
       <DependentUpon>201902140547119_LocationStaticFields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902191054293_AddLocationCodeInModels.cs" />
+    <Compile Include="Migrations\201902191054293_AddLocationCodeInModels.Designer.cs">
+      <DependentUpon>201902191054293_AddLocationCodeInModels.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -693,6 +697,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902140547119_LocationStaticFields.resx">
       <DependentUpon>201902140547119_LocationStaticFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902191054293_AddLocationCodeInModels.resx">
+      <DependentUpon>201902191054293_AddLocationCodeInModels.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

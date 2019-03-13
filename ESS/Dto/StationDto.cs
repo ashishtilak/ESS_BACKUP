@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string StatCode { get; set; }
         public string StatName { get; set; }
+        public string Location { get; set; }
     }
 }

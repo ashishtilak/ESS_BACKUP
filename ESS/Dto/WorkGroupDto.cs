@@ -9,5 +9,6 @@ namespace ESS.Dto
     {
         public string WrkGrp { get; set; }
         public string WrkGrpDesc { get; set; }
+        public string Location { get; set; }
     }
 }
