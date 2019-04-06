@@ -158,6 +158,15 @@ namespace ESS.Controllers.Api
                 if (details.LeaveTypeCode == LeaveTypes.CompOff)
                     details.TotalDays = 1;
 
+                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
+                {
+                    // Get weekly offs between the selected range
+                    List<DateTime> firstDayOff =
+                        ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.FromDt, lDto.EmpUnqId);
+                    if (firstDayOff.Count > 0)
+                        error.Add("You cannot take " + details.LeaveTypeCode + " on a week off.");
+                }
+
 
                 //break out of loop in case of LWP
                 if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay ||

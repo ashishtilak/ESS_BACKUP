@@ -465,6 +465,7 @@
     <Compile Include="Models\ReleaseStrategyLevels.cs" />
     <Compile Include="Models\Sections.cs" />
     <Compile Include="Models\Stations.cs" />
+    <Compile Include="Models\TaxDeclarations.cs" />
     <Compile Include="Models\Units.cs" />
     <Compile Include="Models\WorkGroups.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
