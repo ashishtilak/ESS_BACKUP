@@ -91,5 +91,11 @@ namespace ESS.Models
 
         [StringLength(5)]
         public string Location { get; set; }
+
+        [StringLength(12)]
+        public string SapId { get; set; }
+
+        public bool CompanyAcc { get; set; }
+
     }
 }

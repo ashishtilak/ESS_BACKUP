@@ -87,6 +87,28 @@ namespace ESS.Models
 
         public DbSet<Locations> Location { get; set; }
 
+        public DbSet<TaxDeclarations> TaxDeclarations { get; set; }
+
+        public DbSet<TaxDetailsInsurance> TaxDetailsInsurances { get; set; }
+
+        public DbSet<TaxDetailsMutualFunds> TaxDetailsMutualFundz { get; set; }
+
+        public DbSet<TaxDetailsNsc> TaxDetailsNscs { get; set; }
+
+        public DbSet<TaxDetailsPpf> TaxDetailsPpfs { get; set; }
+
+        public DbSet<TaxConfig> TaxConfig { get; set; }
+
+        public DbSet<Banks> Banks { get; set; }
+
+        public DbSet<TaxDetailsUlip> TaxDetailsUlips { get; set; }
+
+        public DbSet<TaxDetailsSukanya> TaxDetailsSukanyas { get; set; }
+
+        public DbSet<TaxDetailsBankDeposit> TaxDetailsBankDeposits { get; set; }
+
+        public DbSet<TaxDetailsRent> TaxDetailRents { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
@@ -147,14 +169,21 @@ namespace ESS.Models
 
                 listChanges.AddRange(
                     from propertyName in originalVal.PropertyNames
-                    let original = originalVal[propertyName]
-                    let current = currVal[propertyName]
+                    let original = originalVal[propertyName] == null ? "" : originalVal[propertyName]
+                    let current = currVal[propertyName] == null ? "" : currVal[propertyName]
                     where original != current
                     select "Changed " + propertyName + " From " + original.ToString() + " to " + current.ToString()
                     );
             }
+            try
+            {
+                return base.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
 
-            return base.SaveChanges();
         }
 
 

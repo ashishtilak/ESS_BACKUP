@@ -1019,7 +1019,8 @@ namespace ESS.Helpers
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
                                   "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
-                                  "'" + location + "' as location " +
+                                  "'" + location + "' as location, " +
+                                  "EmpUnqId as SapId, 0 as CompanyAcc " +
                                   "from MastEmp where active = 1 ";
 
                         }
@@ -1030,7 +1031,8 @@ namespace ESS.Helpers
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
                                   "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
-                                  "'" + location + "' as location " +
+                                  "'" + location + "' as location, " +
+                                  "SapId as SapId, 0 as CompanyAcc " +
                                   "from MastEmp ";
 
                         }
@@ -1066,6 +1068,8 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("IsGpReleaser", "IsGpReleaser");
                             bulk.ColumnMappings.Add("IsSecUser", "IsSecUser");
                             bulk.ColumnMappings.Add("Location", "Location");
+                            bulk.ColumnMappings.Add("SapId", "SapId");
+                            bulk.ColumnMappings.Add("CompanyAcc", "CompanyAcc");
 
                             bulk.WriteToServer(dt);
                         }
@@ -1092,7 +1096,8 @@ namespace ESS.Helpers
                               "Target.FatherName = Source.FatherName, " +
                               "Target.OtFlag = Source.OtFlag," +
                               "Target.Active = Source.Active, " +
-                              "Target.Location = Source.Location " +
+                              "Target.Location = Source.Location, " +
+                              "Target.SapId = Source.SapId " +
                             //"Target.IsHod = Source.IsHod " +
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
@@ -1101,14 +1106,14 @@ namespace ESS.Helpers
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
-                              "isadmin, isgpreleaser, issecuser, location ) " +
+                              "isadmin, isgpreleaser, issecuser, location, sapid, companyacc ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
                               "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, " +
-                              "'" + location + "'); ";
+                              "'" + location + "', source.SapId, 0 ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -1207,7 +1212,7 @@ namespace ESS.Helpers
                 string sql = "SELECT [tYear],[tDate],[EmpUnqID],[ScheDuleShift],[ConsShift],[ConsIN],[ConsOut]," +
                              "[ConsWrkHrs],[ConsOverTime],[Status],[HalfDay],[LeaveTyp],[LeaveHalf],[Earlycome]," +
                              "[EarlyGoing],[LateCome] " +
-                             "FROM [ATTENDANCE].[dbo].[AttdData] " +
+                             "FROM [AttdData] " +
                              "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
                     //"and compcode = '01' " +
                              "and wrkgrp  = '" + emp.WrkGrp + "' " +
@@ -1271,9 +1276,9 @@ namespace ESS.Helpers
 
 
 
-                string sql = "SELECT [PunchDate],[EmpUnqId],a.[IOFlg],a.[MachineIP],b.[MachineDesc] " +
-                             "FROM [ATTENDANCE].[dbo].[AttdLunchGate] a " +
-                             "LEFT JOIN [ATTENDANCE].[dbo].[ReaderConFig] b on a.[MachineIP] = b.MachineIP " +
+                string sql = "SELECT [PunchDate],[EmpUnqId],a.[IOFlg],a.[MachineIP], isnull(b.[MachineDesc], 'TRIPOD') as MachineDesc " +
+                             "FROM [AttdLunchGate] a " +
+                             "LEFT JOIN [ReaderConFig] b on a.[MachineIP] = b.MachineIP " +
                              "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
                              "and empunqid = '" + empUnqId + "' " +
                              "and PunchDate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
@@ -1313,7 +1318,7 @@ namespace ESS.Helpers
                          ",[IDPRF1],[IDPRF1NO],[IDPRF1EXPON],[IDPRF2],[IDPRF2NO],[IDPRF2EXPON],[IDPRF3],[IDPRF3NO],[IDPRF3EXPON]" +
                          ",[RELIGION],[CATAGORY],[SAPID],[JoinDT],[BankAcNo],[BankName],[BankIFSCCode]" +
                          ",[AdharNo]" +
-                         " FROM [ATTENDANCE].[dbo].[MastEmp] where EmpUnqId = '" + empUnqId + "'";
+                         " FROM [MastEmp] where EmpUnqId = '" + empUnqId + "'";
 
             List<EmpDetailsDto> result = new List<EmpDetailsDto>();
             var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
@@ -1425,7 +1430,7 @@ namespace ESS.Helpers
 
             string sql = "SELECT [EmpUnqID]" +
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
-                         " FROM [ATTENDANCE].[dbo].[MastEmp] where WRKGRP = 'COMP' and Active= 1 ";
+                         " FROM [MastEmp] where WRKGRP = 'COMP' and Active= 1 ";
 
             string strRemoteServer = GetRemoteServer(location);
 
@@ -1469,7 +1474,7 @@ namespace ESS.Helpers
         {
             string sql =
                 "SELECT [EmpUnqID],[Sr],[PassingYear],[EduName],[Subject],[University],[Per],[OtherInfo] " +
-                "FROM [ATTENDANCE].[dbo].[MastEmpEDU] where EmpUnqId = '" + empUnqId + "'";
+                "FROM [MastEmpEDU] where EmpUnqId = '" + empUnqId + "'";
 
 
             List<EmpEduDto> result = new List<EmpEduDto>();

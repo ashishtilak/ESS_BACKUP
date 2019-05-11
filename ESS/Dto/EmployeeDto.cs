@@ -73,6 +73,9 @@ namespace ESS.Dto
 
         public string Location { get; set; }
 
+        public string SapId { get; set; }
+        public bool CompanyAcc { get; set; }
+
         //public CompanyDto Company { get; set; }
         //public WorkGroupDto WorkGroup { get; set; }
         //public UnitDto Units { get; set; }

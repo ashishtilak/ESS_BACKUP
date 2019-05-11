@@ -88,6 +88,10 @@ namespace ESS.Controllers.Api
 
             foreach (var details in lDto.LeaveApplicationDetails)
             {
+
+                if (details.TotalDays <= 0)
+                    error.Add("Leave days less then zero????");
+
                 //check if leave type is there in balance table
                 bool leaveExist = leaveBalDto.Any(l => l.LeaveTypeCode == details.LeaveTypeCode);
 
@@ -394,7 +398,6 @@ namespace ESS.Controllers.Api
                     }
                 }
             }
-
 
             // DONE. If there's no error, return success
             if (error.Count == 0)

@@ -207,6 +207,7 @@
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
+    <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
     <Compile Include="Controllers\DepartmentsController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\StationsController.cs" />
     <Compile Include="Dto\ApplReleaseStatusDto.cs" />
+    <Compile Include="Dto\BankDto.cs" />
     <Compile Include="Dto\CategoryDto.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
     <Compile Include="Dto\DepartmentDto.cs" />
@@ -243,6 +245,16 @@
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
     <Compile Include="Dto\StationDto.cs" />
+    <Compile Include="Dto\TaxDetailsBankDepositDto.cs" />
+    <Compile Include="Dto\TaxDeclarationDto.cs" />
+    <Compile Include="Dto\TaxDetailsRentDto.cs" />
+    <Compile Include="Dto\TaxDetailsSukanyaDto.cs" />
+    <Compile Include="Dto\TaxDeclReportDto.cs" />
+    <Compile Include="Dto\TaxDetailsInsuranceDto.cs" />
+    <Compile Include="Dto\TaxDetailsMutualFundsDto.cs" />
+    <Compile Include="Dto\TaxDetailsNscDto.cs" />
+    <Compile Include="Dto\TaxDetailsPpfDto.cs" />
+    <Compile Include="Dto\TaxDetailsUlipDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
     <Compile Include="Dto\WorkGroupDto.cs" />
     <Compile Include="Global.asax.cs">
@@ -433,9 +445,58 @@
     <Compile Include="Migrations\201902191054293_AddLocationCodeInModels.Designer.cs">
       <DependentUpon>201902191054293_AddLocationCodeInModels.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904220905541_TaxDeclarationTables.cs" />
+    <Compile Include="Migrations\201904220905541_TaxDeclarationTables.Designer.cs">
+      <DependentUpon>201904220905541_TaxDeclarationTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904241125538_AddFieldsInTaxDeclaratoin.cs" />
+    <Compile Include="Migrations\201904241125538_AddFieldsInTaxDeclaratoin.Designer.cs">
+      <DependentUpon>201904241125538_AddFieldsInTaxDeclaratoin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904270502577_AddTaxConfig.cs" />
+    <Compile Include="Migrations\201904270502577_AddTaxConfig.Designer.cs">
+      <DependentUpon>201904270502577_AddTaxConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904270519044_AddSapIdinEmployee.cs" />
+    <Compile Include="Migrations\201904270519044_AddSapIdinEmployee.Designer.cs">
+      <DependentUpon>201904270519044_AddSapIdinEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904270616460_AddCompAccInEmployee.cs" />
+    <Compile Include="Migrations\201904270616460_AddCompAccInEmployee.Designer.cs">
+      <DependentUpon>201904270616460_AddCompAccInEmployee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905011218254_AddBanks.cs" />
+    <Compile Include="Migrations\201905011218254_AddBanks.Designer.cs">
+      <DependentUpon>201905011218254_AddBanks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905011227070_ChangeBankNameLength.cs" />
+    <Compile Include="Migrations\201905011227070_ChangeBankNameLength.Designer.cs">
+      <DependentUpon>201905011227070_ChangeBankNameLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905020418162_AddSSfieldInTaxDeclaration.cs" />
+    <Compile Include="Migrations\201905020418162_AddSSfieldInTaxDeclaration.Designer.cs">
+      <DependentUpon>201905020418162_AddSSfieldInTaxDeclaration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905060500550_MoreTaxDetailsAdded.cs" />
+    <Compile Include="Migrations\201905060500550_MoreTaxDetailsAdded.Designer.cs">
+      <DependentUpon>201905060500550_MoreTaxDetailsAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905060524210_ChangesInTaxDetails.cs" />
+    <Compile Include="Migrations\201905060524210_ChangesInTaxDetails.Designer.cs">
+      <DependentUpon>201905060524210_ChangesInTaxDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905080550478_AddTaxDetailsRent.cs" />
+    <Compile Include="Migrations\201905080550478_AddTaxDetailsRent.Designer.cs">
+      <DependentUpon>201905080550478_AddTaxDetailsRent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905101157501_AddFieldsInTaxDeclarationheader.cs" />
+    <Compile Include="Migrations\201905101157501_AddFieldsInTaxDeclarationheader.Designer.cs">
+      <DependentUpon>201905101157501_AddFieldsInTaxDeclarationheader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
+    <Compile Include="Models\Banks.cs" />
     <Compile Include="Models\Categories.cs" />
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\Contractors.cs" />
@@ -465,7 +526,16 @@
     <Compile Include="Models\ReleaseStrategyLevels.cs" />
     <Compile Include="Models\Sections.cs" />
     <Compile Include="Models\Stations.cs" />
+    <Compile Include="Models\TaxConfig.cs" />
     <Compile Include="Models\TaxDeclarations.cs" />
+    <Compile Include="Models\TaxDetailsBankDeposit.cs" />
+    <Compile Include="Models\TaxDetailsInsurance.cs" />
+    <Compile Include="Models\TaxDetailsMutualFunds.cs" />
+    <Compile Include="Models\TaxDetailsNsc.cs" />
+    <Compile Include="Models\TaxDetailsPpf.cs" />
+    <Compile Include="Models\TaxDetailsRent.cs" />
+    <Compile Include="Models\TaxDetailsSukanya.cs" />
+    <Compile Include="Models\TaxDetailsUlip.cs" />
     <Compile Include="Models\Units.cs" />
     <Compile Include="Models\WorkGroups.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -701,6 +771,42 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902191054293_AddLocationCodeInModels.resx">
       <DependentUpon>201902191054293_AddLocationCodeInModels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904220905541_TaxDeclarationTables.resx">
+      <DependentUpon>201904220905541_TaxDeclarationTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904241125538_AddFieldsInTaxDeclaratoin.resx">
+      <DependentUpon>201904241125538_AddFieldsInTaxDeclaratoin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904270502577_AddTaxConfig.resx">
+      <DependentUpon>201904270502577_AddTaxConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904270519044_AddSapIdinEmployee.resx">
+      <DependentUpon>201904270519044_AddSapIdinEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904270616460_AddCompAccInEmployee.resx">
+      <DependentUpon>201904270616460_AddCompAccInEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905011218254_AddBanks.resx">
+      <DependentUpon>201905011218254_AddBanks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905011227070_ChangeBankNameLength.resx">
+      <DependentUpon>201905011227070_ChangeBankNameLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905020418162_AddSSfieldInTaxDeclaration.resx">
+      <DependentUpon>201905020418162_AddSSfieldInTaxDeclaration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905060500550_MoreTaxDetailsAdded.resx">
+      <DependentUpon>201905060500550_MoreTaxDetailsAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905060524210_ChangesInTaxDetails.resx">
+      <DependentUpon>201905060524210_ChangesInTaxDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905080550478_AddTaxDetailsRent.resx">
+      <DependentUpon>201905080550478_AddTaxDetailsRent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905101157501_AddFieldsInTaxDeclarationheader.resx">
+      <DependentUpon>201905101157501_AddFieldsInTaxDeclarationheader.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

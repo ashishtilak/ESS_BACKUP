@@ -22,7 +22,6 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
-
         //get /api/employee
         public IHttpActionResult GetEmployees(string location)
         {
@@ -65,7 +64,9 @@ namespace ESS.Controllers.Api
                         IsReleaser = e.IsReleaser,
                         Email = e.Email,
 
-                        Location = e.Location
+                        Location = e.Location,
+                        SapId = e.SapId,
+                        CompanyAcc = e.CompanyAcc
 
                     }
                 )
@@ -160,7 +161,9 @@ namespace ESS.Controllers.Api
                         IsReleaser = e.IsReleaser,
                         Email = e.Email,
 
-                        Location = e.Location
+                        Location = e.Location,
+                        SapId = e.SapId,
+                        CompanyAcc = e.CompanyAcc
                     }
                 )
                 .Where(e => e.EmpUnqId == empUnqId)
@@ -171,7 +174,6 @@ namespace ESS.Controllers.Api
 
             return Ok(employee);
         }
-
 
         [HttpGet]
         [ActionName("GetEmpDetails")]
@@ -371,7 +373,6 @@ namespace ESS.Controllers.Api
             public string Pass { get; set; }
         }
 
-
         [HttpPost]
         [ActionName("changepassword")]
         public IHttpActionResult ChangePassword([FromBody] object requestData)
@@ -389,7 +390,6 @@ namespace ESS.Controllers.Api
 
             return Ok();
         }
-
 
         [HttpPost]
         [ActionName("updateemail")]

@@ -51,6 +51,37 @@ namespace ESS.App_Start
             CreateMap<GpReleaseStrategies, GpReleaseStrategyDto>();
             CreateMap<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>();
 
+            CreateMap<TaxDeclarations, TaxDeclarationDto>();
+            CreateMap<TaxDeclarationDto, TaxDeclarations>();
+
+            CreateMap<TaxDetailsInsurance, TaxDetailsInsuranceDto>();
+            CreateMap<TaxDetailsInsuranceDto, TaxDetailsInsurance>();
+
+            CreateMap<TaxDetailsMutualFunds, TaxDetailsMutualFundsDto>();
+            CreateMap<TaxDetailsMutualFundsDto, TaxDetailsMutualFunds>();
+
+            CreateMap<TaxDetailsNsc, TaxDetailsNscDto>();
+            CreateMap<TaxDetailsNscDto, TaxDetailsNsc>();
+
+            CreateMap<TaxDetailsPpf, TaxDetailsPpfDto>();
+            CreateMap<TaxDetailsPpfDto, TaxDetailsPpf>();
+
+            CreateMap<Banks, BankDto>();
+
+            CreateMap<TaxDetailsBankDeposit, TaxDetailsBankDepositDto>();
+            CreateMap<TaxDetailsBankDepositDto, TaxDetailsBankDeposit>();
+
+            CreateMap<TaxDetailsUlip, TaxDetailsUlipDto>();
+            CreateMap<TaxDetailsUlipDto, TaxDetailsUlip>();
+
+            CreateMap<TaxDetailsSukanya, TaxDetailsSukanyaDto>();
+            CreateMap<TaxDetailsSukanyaDto, TaxDetailsSukanya>();
+
+            CreateMap<TaxDetailsRent, TaxDetailsRentDto>();
+            CreateMap<TaxDetailsRentDto, TaxDetailsRent>();
+
+
+
         }
     }
 }
