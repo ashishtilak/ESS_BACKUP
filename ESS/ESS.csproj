@@ -493,6 +493,18 @@
     <Compile Include="Migrations\201905101157501_AddFieldsInTaxDeclarationheader.Designer.cs">
       <DependentUpon>201905101157501_AddFieldsInTaxDeclarationheader.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905200626275_AddCloseFlagInTaxConfig.cs" />
+    <Compile Include="Migrations\201905200626275_AddCloseFlagInTaxConfig.Designer.cs">
+      <DependentUpon>201905200626275_AddCloseFlagInTaxConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905210915519_AddTaxDeclarationHistory.cs" />
+    <Compile Include="Migrations\201905210915519_AddTaxDeclarationHistory.Designer.cs">
+      <DependentUpon>201905210915519_AddTaxDeclarationHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905210941264_AddTaxDeclarationHistoryKey.cs" />
+    <Compile Include="Migrations\201905210941264_AddTaxDeclarationHistoryKey.Designer.cs">
+      <DependentUpon>201905210941264_AddTaxDeclarationHistoryKey.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -527,6 +539,7 @@
     <Compile Include="Models\Sections.cs" />
     <Compile Include="Models\Stations.cs" />
     <Compile Include="Models\TaxConfig.cs" />
+    <Compile Include="Models\TaxDeclarationHistory.cs" />
     <Compile Include="Models\TaxDeclarations.cs" />
     <Compile Include="Models\TaxDetailsBankDeposit.cs" />
     <Compile Include="Models\TaxDetailsInsurance.cs" />
@@ -807,6 +820,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905101157501_AddFieldsInTaxDeclarationheader.resx">
       <DependentUpon>201905101157501_AddFieldsInTaxDeclarationheader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905200626275_AddCloseFlagInTaxConfig.resx">
+      <DependentUpon>201905200626275_AddCloseFlagInTaxConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905210915519_AddTaxDeclarationHistory.resx">
+      <DependentUpon>201905210915519_AddTaxDeclarationHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905210941264_AddTaxDeclarationHistoryKey.resx">
+      <DependentUpon>201905210941264_AddTaxDeclarationHistoryKey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

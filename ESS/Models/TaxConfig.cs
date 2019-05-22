@@ -15,5 +15,6 @@ namespace ESS.Models
         public bool ActualFlag { get; set; }
         public DateTime StartDt { get; set; }
         public DateTime EndDt { get; set; }
+        public bool CloseFlag { get; set; }
     }
 }

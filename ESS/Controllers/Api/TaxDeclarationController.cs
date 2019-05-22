@@ -256,6 +256,11 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult CreateTaxDeclaration([FromBody] object requestData)
         {
+            var config = _context.TaxConfig.FirstOrDefault();
+            if (config == null) return BadRequest("Configuration not found");
+
+            //if (config.CloseFlag) return BadRequest("Posting is closed. Contact finance department.");
+
             var sentData = JsonConvert.DeserializeObject<TaxDeclarationDto>(requestData.ToString());
 
             if (!ModelState.IsValid)
@@ -281,6 +286,8 @@ namespace ESS.Controllers.Api
                               t.ActualFlag == sentData.ActualFlag);
             }
 
+            TaxDeclarationHistory history = new TaxDeclarationHistory();
+
             var tmp = Mapper.Map<TaxDeclarationDto, TaxDeclarations>(sentData);
 
             foreach (PropertyInfo prop in tmp.GetType().GetProperties())
@@ -289,7 +296,21 @@ namespace ESS.Controllers.Api
 
                 object value = prop.GetValue(tmp, null);
                 prop.SetValue(taxDeclaration, value);
+
             }
+
+
+            var tmpH = Mapper.Map<TaxDeclarationDto, TaxDeclarationHistory>(sentData);
+
+            foreach (PropertyInfo prop in tmpH.GetType().GetProperties())
+            {
+                if (!prop.CanRead) continue;            //if property is readable... 
+
+                object value = prop.GetValue(tmpH, null);
+                prop.SetValue(history, value);
+
+            }
+
 
             if (taxDeclaration == null) return BadRequest("Error!!!");
 
@@ -403,6 +424,8 @@ namespace ESS.Controllers.Api
                 _context.TaxDeclarations.Add(taxDeclaration);
                 _context.Entry(taxDeclaration).State = EntityState.Added;
             }
+
+            _context.TaxDeclarationHistories.Add(history);
 
             _context.SaveChanges();
             return Ok(Mapper.Map<TaxDeclarations, TaxDeclarationDto>(taxDeclaration));

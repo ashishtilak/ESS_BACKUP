@@ -7,20 +7,18 @@ using System.Web;
 
 namespace ESS.Models
 {
-    public class TaxDeclarations
+    public class TaxDeclarationHistory
     {
         [Key, Column(Order = 0)]
+        public int Id { get; set; }
+
         public int YearMonth { get; set; }                  //201920
 
-        [Key, Column(Order = 1)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
 
-        [Key, Column(Order = 2)]
         public bool ActualFlag { get; set; }                      //Provisional v/s Actual
 
-
-        public virtual ICollection<TaxDetailsRent> RentDetails { get; set; }
         public float TotalRentPaid { get; set; }
 
         [StringLength(200)]
@@ -33,26 +31,18 @@ namespace ESS.Models
         public float PrevCompSalary { get; set; }
         public float PrevCompTds { get; set; }
 
-        public virtual ICollection<TaxDetailsPpf> PpfDetails { get; set; }
         public float TotalPpfAmt { get; set; }              //Details in table TaxDetailsPpf
 
-        public virtual ICollection<TaxDetailsBankDeposit> BankDeposits { get; set; }
         public float TotalBankDepositAmount { get; set; }
 
-        public virtual ICollection<TaxDetailsInsurance> InsuranceDetails { get; set; }
         public float TotalInsurancePremium { get; set; }    //Deatils in table TaxDetailsInsurance
 
-        public virtual ICollection<TaxDetailsNsc> NscDetails { get; set; }
         public float TotalNscAmount { get; set; }           //Deatils in table TaxDetailsNsc
 
-        public virtual ICollection<TaxDetailsMutualFunds> MutualFundDetails { get; set; }
         public float TotalMutualFund { get; set; }          //Deatils in table TaxDetailsMutualFunds
 
-        public virtual ICollection<TaxDetailsUlip> UlipDetails { get; set; }
         public float TotalUlip { get; set; }
 
-
-        public virtual ICollection<TaxDetailsSukanya> SukanyaDetails { get; set; }
         public float TotalSukanya { get; set; }      //sukanya samriddhi 1
 
         public float HouseLoanPrincipal { get; set; }
@@ -118,7 +108,6 @@ namespace ESS.Models
         [StringLength(50)]
         public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
-
 
         [StringLength(8)]
         public string UpdateUserId { get; set; }

@@ -109,6 +109,8 @@ namespace ESS.Models
 
         public DbSet<TaxDetailsRent> TaxDetailRents { get; set; }
 
+        public DbSet<TaxDeclarationHistory> TaxDeclarationHistories { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
@@ -181,6 +183,7 @@ namespace ESS.Models
             }
             catch (Exception ex)
             {
+                throw;
                 return 0;
             }
 

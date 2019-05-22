@@ -79,6 +79,7 @@ namespace ESS.Dto
         public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
+        public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
 
         public List<TaxDetailsPpfDto> PpfDetails { get; set; }

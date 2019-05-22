@@ -54,6 +54,9 @@ namespace ESS.App_Start
             CreateMap<TaxDeclarations, TaxDeclarationDto>();
             CreateMap<TaxDeclarationDto, TaxDeclarations>();
 
+            CreateMap<TaxDeclarationHistory, TaxDeclarationDto>();
+            CreateMap<TaxDeclarationDto, TaxDeclarationHistory>();
+
             CreateMap<TaxDetailsInsurance, TaxDetailsInsuranceDto>();
             CreateMap<TaxDetailsInsuranceDto, TaxDetailsInsurance>();
 
