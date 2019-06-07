@@ -111,6 +111,12 @@ namespace ESS.Models
 
         public DbSet<TaxDeclarationHistory> TaxDeclarationHistories { get; set; }
 
+        public DbSet<Roles> Role { get; set; }
+
+        public DbSet<RoleAuth> RoleAuths { get; set; }
+
+        public DbSet<RoleUsers> RoleUser { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

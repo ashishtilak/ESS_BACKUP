@@ -76,16 +76,6 @@ namespace ESS.Dto
         public string SapId { get; set; }
         public bool CompanyAcc { get; set; }
 
-        //public CompanyDto Company { get; set; }
-        //public WorkGroupDto WorkGroup { get; set; }
-        //public UnitDto Units { get; set; }
-        //public DepartmentDto Departments { get; set; }
-        //public StationDto Stations { get; set; }
-
-        //public CategoryDto Categories { get; set; }
-        //public EmpTypeDto EmpTypes { get; set; }
-
-        //public GradeDto Grades { get; set; }
-        //public DesignationDto Designations { get; set; }
+        public int RoleId { get; set; }
     }
 }

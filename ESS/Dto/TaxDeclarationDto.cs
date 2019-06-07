@@ -82,6 +82,8 @@ namespace ESS.Dto
         public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
 
+        public bool LockEntry { get; set; }
+
         public List<TaxDetailsPpfDto> PpfDetails { get; set; }
         public List<TaxDetailsInsuranceDto> InsuranceDetails { get; set; }
         public List<TaxDetailsNscDto> NscDetails { get; set; }

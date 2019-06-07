@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using Newtonsoft.Json;
@@ -78,6 +79,12 @@ namespace ESS.Controllers.Api
 
             if (employeeDto.Count == 0)
                 return BadRequest("Incorrect password/employee code.");
+
+            foreach (var emp in employeeDto)
+            {
+                var roleId = _context.RoleUser.FirstOrDefault(e => e.EmpUnqId == emp.EmpUnqId);
+                emp.RoleId = roleId == null ? 1 : roleId.RoleId;
+            }
 
             return Ok(employeeDto);
 

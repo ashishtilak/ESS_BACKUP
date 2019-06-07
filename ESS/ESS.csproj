@@ -205,6 +205,7 @@
     <Compile Include="Controllers\Api\ManageLeaveController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
+    <Compile Include="Controllers\Api\RolesController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="Dto\ReleaseGroupDto.cs" />
     <Compile Include="Dto\ReleaseStrategyDto.cs" />
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />
+    <Compile Include="Dto\RoleAuthDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
     <Compile Include="Dto\StationDto.cs" />
     <Compile Include="Dto\TaxDetailsBankDepositDto.cs" />
@@ -505,6 +507,14 @@
     <Compile Include="Migrations\201905210941264_AddTaxDeclarationHistoryKey.Designer.cs">
       <DependentUpon>201905210941264_AddTaxDeclarationHistoryKey.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905280336068_AddRoles.cs" />
+    <Compile Include="Migrations\201905280336068_AddRoles.Designer.cs">
+      <DependentUpon>201905280336068_AddRoles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905300944281_AddLockedFlaginTaxDeclaration.cs" />
+    <Compile Include="Migrations\201905300944281_AddLockedFlaginTaxDeclaration.Designer.cs">
+      <DependentUpon>201905300944281_AddLockedFlaginTaxDeclaration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -536,6 +546,9 @@
     <Compile Include="Models\ReleaseStatus.cs" />
     <Compile Include="Models\ReleaseStrategies.cs" />
     <Compile Include="Models\ReleaseStrategyLevels.cs" />
+    <Compile Include="Models\RoleAuth.cs" />
+    <Compile Include="Models\Roles.cs" />
+    <Compile Include="Models\RoleUsers.cs" />
     <Compile Include="Models\Sections.cs" />
     <Compile Include="Models\Stations.cs" />
     <Compile Include="Models\TaxConfig.cs" />
@@ -829,6 +842,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905210941264_AddTaxDeclarationHistoryKey.resx">
       <DependentUpon>201905210941264_AddTaxDeclarationHistoryKey.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905280336068_AddRoles.resx">
+      <DependentUpon>201905280336068_AddRoles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905300944281_AddLockedFlaginTaxDeclaration.resx">
+      <DependentUpon>201905300944281_AddLockedFlaginTaxDeclaration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -83,7 +83,7 @@ namespace ESS.App_Start
             CreateMap<TaxDetailsRent, TaxDetailsRentDto>();
             CreateMap<TaxDetailsRentDto, TaxDetailsRent>();
 
-
+            CreateMap<RoleAuth, RoleAuthDto>();
 
         }
     }

@@ -151,7 +151,48 @@ namespace ESS.Controllers.Api
                     empRec.BankPan = prov.LoanBankPan;
                     empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
-                    empRec.RentPaidAprilPro = prov.RentDetails.Count > 0 ? prov.RentDetails[0].April : 0;
+
+                    //Average out rent
+
+                    if (prov.RentDetails.Count > 0)
+                    {
+                        int months = 0;
+
+                        if (prov.RentDetails[0].April > 0) months++;
+                        if (prov.RentDetails[0].May > 0) months++;
+                        if (prov.RentDetails[0].June > 0) months++;
+                        if (prov.RentDetails[0].July > 0) months++;
+                        if (prov.RentDetails[0].August > 0) months++;
+                        if (prov.RentDetails[0].September > 0) months++;
+                        if (prov.RentDetails[0].October > 0) months++;
+                        if (prov.RentDetails[0].November > 0) months++;
+                        if (prov.RentDetails[0].December > 0) months++;
+                        if (prov.RentDetails[0].January > 0) months++;
+                        if (prov.RentDetails[0].February > 0) months++;
+                        if (prov.RentDetails[0].March > 0) months++;
+
+                        if (months == 0) empRec.RentPaidAprilPro = 0;
+                        else
+                        {
+                            var totalRent = prov.RentDetails[0].April +
+                                            prov.RentDetails[0].May +
+                                            prov.RentDetails[0].June +
+                                            prov.RentDetails[0].July +
+                                            prov.RentDetails[0].August +
+                                            prov.RentDetails[0].September +
+                                            prov.RentDetails[0].October +
+                                            prov.RentDetails[0].November +
+                                            prov.RentDetails[0].December +
+                                            prov.RentDetails[0].January +
+                                            prov.RentDetails[0].February +
+                                            prov.RentDetails[0].March;
+
+                            // ReSharper disable once PossibleLossOfFraction
+                            empRec.RentPaidAprilPro = totalRent / months;
+                        }
+                    }
+
+                    //empRec.RentPaidAprilPro = prov.RentDetails.Count > 0 ? prov.RentDetails[0].April : 0;
                     empRec.RentPaidPro = prov.TotalRentPaid;
                     empRec.LandLordName = prov.LandLordName;
                     empRec.LandLordPan = prov.LandLordPan;
@@ -222,7 +263,48 @@ namespace ESS.Controllers.Api
                     empRec.BankPan = act.LoanBankPan;
                     empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
-                    empRec.RentPaidAprilAct = act.RentDetails.Count > 0 ? act.RentDetails[0].April : 0;
+
+                    //Average out rent
+
+                    if (act.RentDetails.Count > 0)
+                    {
+                        int months = 0;
+
+                        if (act.RentDetails[0].April > 0) months++;
+                        if (act.RentDetails[0].May > 0) months++;
+                        if (act.RentDetails[0].June > 0) months++;
+                        if (act.RentDetails[0].July > 0) months++;
+                        if (act.RentDetails[0].August > 0) months++;
+                        if (act.RentDetails[0].September > 0) months++;
+                        if (act.RentDetails[0].October > 0) months++;
+                        if (act.RentDetails[0].November > 0) months++;
+                        if (act.RentDetails[0].December > 0) months++;
+                        if (act.RentDetails[0].January > 0) months++;
+                        if (act.RentDetails[0].February > 0) months++;
+                        if (act.RentDetails[0].March > 0) months++;
+
+                        if (months == 0) empRec.RentPaidAprilPro = 0;
+                        else
+                        {
+                            var totalRent = act.RentDetails[0].April +
+                                            act.RentDetails[0].May +
+                                            act.RentDetails[0].June +
+                                            act.RentDetails[0].July +
+                                            act.RentDetails[0].August +
+                                            act.RentDetails[0].September +
+                                            act.RentDetails[0].October +
+                                            act.RentDetails[0].November +
+                                            act.RentDetails[0].December +
+                                            act.RentDetails[0].January +
+                                            act.RentDetails[0].February +
+                                            act.RentDetails[0].March;
+
+                            // ReSharper disable once PossibleLossOfFraction
+                            empRec.RentPaidAprilAct = totalRent / months;
+                        }
+                    }
+
+                    //empRec.RentPaidAprilAct = act.RentDetails.Count > 0 ? act.RentDetails[0].April : 0;
                     empRec.RentPaidAct = act.TotalRentPaid;
                     empRec.LandLordName = act.LandLordName;
                     empRec.LandLordPan = act.LandLordPan;
@@ -280,10 +362,16 @@ namespace ESS.Controllers.Api
             }
             else
             {
+
                 taxDeclaration = _context.TaxDeclarations
                     .FirstOrDefault(t => t.EmpUnqId == sentData.EmpUnqId &&
                               t.YearMonth == sentData.YearMonth &&
                               t.ActualFlag == sentData.ActualFlag);
+
+                if (taxDeclaration != null && taxDeclaration.LockEntry)
+                {
+                    return BadRequest("Entry is locked for you sir.");
+                }
             }
 
             TaxDeclarationHistory history = new TaxDeclarationHistory();

@@ -123,5 +123,7 @@ namespace ESS.Models
         [StringLength(8)]
         public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
+
+        public bool LockEntry { get; set; }
     }
 }

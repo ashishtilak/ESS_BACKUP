@@ -164,9 +164,19 @@ namespace ESS.Controllers.Api
                         // CHECK IF TIME IS BETWEEN 8:00 PM AND 8:00 AM ...
                         DateTime today = DateTime.Now;
 
-                        DateTime fromEight = DateTime.Today.AddHours(20);
-                        DateTime toEight = DateTime.Today.AddHours(28);
+                        TimeSpan start = new TimeSpan(0, 0, 1); //12 Oclock
+                        TimeSpan end = new TimeSpan(8, 0, 0); //8 Oclock
 
+
+                        DateTime fromEight = today.Date.AddHours(20);
+                        DateTime toEight = today.Date.AddHours(32);
+
+                        //if time is between night 12 to morning 8, subtract one day 
+                        if (today.TimeOfDay > start && today.TimeOfDay < end)
+                        {
+                            fromEight = today.AddDays(-1).Date.AddHours(20);
+                            toEight = today.AddDays(-1).Date.AddHours(32);
+                        }
 
                         if (today >= fromEight && today <= toEight)
                         {
