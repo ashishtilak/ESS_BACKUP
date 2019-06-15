@@ -203,7 +203,7 @@ namespace ESS.Controllers.Api
                     empRec.MedicalPreventiveHealthCheckup = prov.MedicalPreventiveHealthCheckup;
                     empRec.PhysicalDisability = prov.PhysicalDisability;
                     empRec.SevereDisability = prov.SevereDisability;
-
+                    empRec.LockEntry = prov.LockEntry;
                 }
 
 
@@ -315,7 +315,7 @@ namespace ESS.Controllers.Api
                     empRec.MedicalPreventiveHealthCheckup = act.MedicalPreventiveHealthCheckup;
                     empRec.PhysicalDisability = act.PhysicalDisability;
                     empRec.SevereDisability = act.SevereDisability;
-
+                    empRec.LockEntry = act.LockEntry;
                 }
 
                 report.Add(empRec);

@@ -415,6 +415,7 @@ namespace ESS.Controllers.Api
             var leave = _context.LeaveApplicationDetails
                 .FirstOrDefault(l => l.LeaveApplication.EmpUnqId == empUnqId &&
                                      (dt >= l.FromDt && dt <= l.ToDt) &&
+                                     l.Cancelled == false &&
                                      l.LeaveApplication.ReleaseStatusCode != ReleaseStatus.ReleaseRejected);
 
             return leave != null ? leave.LeaveTypeCode : "";

@@ -83,5 +83,7 @@ namespace ESS.Dto
         public float PhysicalDisability { get; set; }
         public float SevereDisability { get; set; }
 
+        public bool LockEntry { get; set; }
+
     }
 }
