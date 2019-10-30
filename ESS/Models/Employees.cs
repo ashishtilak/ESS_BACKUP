@@ -79,6 +79,8 @@ namespace ESS.Models
 
         public bool IsGpReleaser { get; set; }
 
+        public bool IsGaReleaser { get; set; }
+
         public bool IsSecUser { get; set; }
 
         public bool IsAdmin { get; set; }

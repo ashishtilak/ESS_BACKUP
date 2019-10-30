@@ -19,5 +19,6 @@ namespace ESS.Models
         public static readonly string InRelease = "I";
         public static readonly string PartiallyReleased = "P";
         public static readonly string ReleaseRejected = "R";
+        public static readonly string Closed = "C";                 //used in GpAdvice when store has posted the same
     }
 }

@@ -20,6 +20,8 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -194,6 +196,7 @@
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
     <Compile Include="Controllers\Api\GateInOutController.cs" />
     <Compile Include="Controllers\Api\GatePassController.cs" />
+    <Compile Include="Controllers\Api\GpAdviceController.cs" />
     <Compile Include="Controllers\Api\HolidayController.cs" />
     <Compile Include="Controllers\Api\LeaveApplicationController.cs" />
     <Compile Include="Controllers\Api\LeaveBalanceController.cs" />
@@ -203,6 +206,7 @@
     <Compile Include="Controllers\Api\LeaveValidateController.cs" />
     <Compile Include="Controllers\Api\LoginController.cs" />
     <Compile Include="Controllers\Api\ManageLeaveController.cs" />
+    <Compile Include="Controllers\Api\MasterUploadController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\RolesController.cs" />
@@ -227,7 +231,11 @@
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
+    <Compile Include="Dto\GaReleaseStrategyDto.cs" />
+    <Compile Include="Dto\GaReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\GatePassDto.cs" />
+    <Compile Include="Dto\GpAdviceDetailsDto.cs" />
+    <Compile Include="Dto\GpAdviceDto.cs" />
     <Compile Include="Dto\GpReleaseStrategyDto.cs" />
     <Compile Include="Dto\GpReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\GradeDto.cs" />
@@ -239,6 +247,7 @@
     <Compile Include="Dto\LeavePostingDto.cs" />
     <Compile Include="Dto\LeaveTypeDto.cs" />
     <Compile Include="Dto\LoginDto.cs" />
+    <Compile Include="Dto\MaterialDto.cs" />
     <Compile Include="Dto\PerfAttdDto.cs" />
     <Compile Include="Dto\PerfPunchDto.cs" />
     <Compile Include="Dto\ReleaseGroupDto.cs" />
@@ -258,6 +267,7 @@
     <Compile Include="Dto\TaxDetailsPpfDto.cs" />
     <Compile Include="Dto\TaxDetailsUlipDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
+    <Compile Include="Dto\VendorDto.cs" />
     <Compile Include="Dto\WorkGroupDto.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -515,6 +525,54 @@
     <Compile Include="Migrations\201905300944281_AddLockedFlaginTaxDeclaration.Designer.cs">
       <DependentUpon>201905300944281_AddLockedFlaginTaxDeclaration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201908010419268_AddGatePassAdvice.cs" />
+    <Compile Include="Migrations\201908010419268_AddGatePassAdvice.Designer.cs">
+      <DependentUpon>201908010419268_AddGatePassAdvice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908010637256_AddGaReleaseStrategy.cs" />
+    <Compile Include="Migrations\201908010637256_AddGaReleaseStrategy.Designer.cs">
+      <DependentUpon>201908010637256_AddGaReleaseStrategy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908011010578_ChangeInGpAdvice.cs" />
+    <Compile Include="Migrations\201908011010578_ChangeInGpAdvice.Designer.cs">
+      <DependentUpon>201908011010578_ChangeInGpAdvice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908051038291_ChangeInGpAdvice1.cs" />
+    <Compile Include="Migrations\201908051038291_ChangeInGpAdvice1.Designer.cs">
+      <DependentUpon>201908051038291_ChangeInGpAdvice1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908060607267_AddedPostingFieldsinGpAdvice.cs" />
+    <Compile Include="Migrations\201908060607267_AddedPostingFieldsinGpAdvice.Designer.cs">
+      <DependentUpon>201908060607267_AddedPostingFieldsinGpAdvice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908170823139_AddedFieldsinGpAdvice.cs" />
+    <Compile Include="Migrations\201908170823139_AddedFieldsinGpAdvice.Designer.cs">
+      <DependentUpon>201908170823139_AddedFieldsinGpAdvice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908190819061_AddMaterialMaster.cs" />
+    <Compile Include="Migrations\201908190819061_AddMaterialMaster.Designer.cs">
+      <DependentUpon>201908190819061_AddMaterialMaster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908200539032_AddFieldInMaterialMaster.cs" />
+    <Compile Include="Migrations\201908200539032_AddFieldInMaterialMaster.Designer.cs">
+      <DependentUpon>201908200539032_AddFieldInMaterialMaster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908200858438_AddedVendorMaster.cs" />
+    <Compile Include="Migrations\201908200858438_AddedVendorMaster.Designer.cs">
+      <DependentUpon>201908200858438_AddedVendorMaster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908210358412_AddHsnInMaterialMaster.cs" />
+    <Compile Include="Migrations\201908210358412_AddHsnInMaterialMaster.Designer.cs">
+      <DependentUpon>201908210358412_AddHsnInMaterialMaster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908210437111_test.cs" />
+    <Compile Include="Migrations\201908210437111_test.Designer.cs">
+      <DependentUpon>201908210437111_test.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908230532294_AddGaReleaserFlaginEmpMast.cs" />
+    <Compile Include="Migrations\201908230532294_AddGaReleaserFlaginEmpMast.Designer.cs">
+      <DependentUpon>201908230532294_AddGaReleaserFlaginEmpMast.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -528,7 +586,11 @@
     <Compile Include="Models\Employees.cs" />
     <Compile Include="Models\EmpTypes.cs" />
     <Compile Include="Models\EmpUniform.cs" />
+    <Compile Include="Models\GaReleaseStrategies.cs" />
+    <Compile Include="Models\GaReleaseStrategyLevels.cs" />
     <Compile Include="Models\GatePass.cs" />
+    <Compile Include="Models\GpAdviceDetails.cs" />
+    <Compile Include="Models\GpAdvices.cs" />
     <Compile Include="Models\GpReleaseStrategies.cs" />
     <Compile Include="Models\GpReleaseStrategyLevels.cs" />
     <Compile Include="Models\Grades.cs" />
@@ -540,6 +602,7 @@
     <Compile Include="Models\LeaveTypes.cs" />
     <Compile Include="Models\Locations.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Materials.cs" />
     <Compile Include="Models\OpenMonth.cs" />
     <Compile Include="Models\ReleaseAuth.cs" />
     <Compile Include="Models\ReleaseGroups.cs" />
@@ -563,6 +626,7 @@
     <Compile Include="Models\TaxDetailsSukanya.cs" />
     <Compile Include="Models\TaxDetailsUlip.cs" />
     <Compile Include="Models\Units.cs" />
+    <Compile Include="Models\Vendors.cs" />
     <Compile Include="Models\WorkGroups.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -848,6 +912,42 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905300944281_AddLockedFlaginTaxDeclaration.resx">
       <DependentUpon>201905300944281_AddLockedFlaginTaxDeclaration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908010419268_AddGatePassAdvice.resx">
+      <DependentUpon>201908010419268_AddGatePassAdvice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908010637256_AddGaReleaseStrategy.resx">
+      <DependentUpon>201908010637256_AddGaReleaseStrategy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908011010578_ChangeInGpAdvice.resx">
+      <DependentUpon>201908011010578_ChangeInGpAdvice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908051038291_ChangeInGpAdvice1.resx">
+      <DependentUpon>201908051038291_ChangeInGpAdvice1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908060607267_AddedPostingFieldsinGpAdvice.resx">
+      <DependentUpon>201908060607267_AddedPostingFieldsinGpAdvice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908170823139_AddedFieldsinGpAdvice.resx">
+      <DependentUpon>201908170823139_AddedFieldsinGpAdvice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908190819061_AddMaterialMaster.resx">
+      <DependentUpon>201908190819061_AddMaterialMaster.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908200539032_AddFieldInMaterialMaster.resx">
+      <DependentUpon>201908200539032_AddFieldInMaterialMaster.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908200858438_AddedVendorMaster.resx">
+      <DependentUpon>201908200858438_AddedVendorMaster.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908210358412_AddHsnInMaterialMaster.resx">
+      <DependentUpon>201908210358412_AddHsnInMaterialMaster.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908210437111_test.resx">
+      <DependentUpon>201908210437111_test.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908230532294_AddGaReleaserFlaginEmpMast.resx">
+      <DependentUpon>201908230532294_AddGaReleaserFlaginEmpMast.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

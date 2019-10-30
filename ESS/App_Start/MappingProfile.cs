@@ -85,6 +85,20 @@ namespace ESS.App_Start
 
             CreateMap<RoleAuth, RoleAuthDto>();
 
+            CreateMap<GpAdvices, GpAdviceDto>();
+            CreateMap<GpAdviceDto, GpAdvices>();
+            CreateMap<GpAdviceDetails, GpAdviceDetailsDto>();
+            CreateMap<GpAdviceDetailsDto, GpAdviceDetails>();
+            CreateMap<GaReleaseStrategies, GaReleaseStrategyDto>();
+            CreateMap<GaReleaseStrategyDto, GaReleaseStrategies>();
+            CreateMap<GaReleaseStrategyLevels, GaReleaseStrategyLevelDto>();
+            CreateMap<GaReleaseStrategyLevelDto, GaReleaseStrategyLevels>();
+
+            CreateMap<Materials, MaterialDto>();
+            CreateMap<MaterialDto, Materials>();
+
+            CreateMap<Vendors, VendorDto>();
+            CreateMap<VendorDto, Vendors>();
         }
     }
 }

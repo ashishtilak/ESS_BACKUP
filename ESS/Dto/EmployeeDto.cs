@@ -32,6 +32,7 @@ namespace ESS.Dto
         public bool IsHrUser { get; set; }
         public bool IsHod { get; set; }
         public bool IsGpReleaser { get; set; }
+        public bool IsGaReleaser { get; set; }
         public bool IsSecUser { get; set; }
         public bool IsAdmin { get; set; }
         public string Email { get; set; }

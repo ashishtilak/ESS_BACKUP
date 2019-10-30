@@ -111,6 +111,32 @@ namespace ESS.Helpers
         }
 
 
+        public static List<HolidayDto> GetOptionalHolidays(int tYear, string location)
+        {
+
+            List<HolidayDto> holidays = new List<HolidayDto>();
+
+            string strRemoteServer = GetRemoteServer(location);
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            {
+                cn.Open();
+                string sql = "select * from HolidayOptMast " +
+                             "where tYear = " + tYear + "";
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                    holidays.Add(new HolidayDto
+                    {
+                        HolidayDate = DateTime.Parse(dr["tDate"].ToString()),
+                        HolidayName = dr["HlDesc"].ToString()
+                    });
+
+                return holidays;
+            }
+        }
+
+
         //Get weekly off day
         public static List<DateTime> GetWeeklyOff(DateTime fromDt, DateTime toDt, string empUnqId)
         {
@@ -1018,7 +1044,7 @@ namespace ESS.Helpers
                             sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
-                                  "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
+                                  "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
                                   "EmpUnqId as SapId, 0 as CompanyAcc " +
                                   "from MastEmp where active = 1 ";
@@ -1030,7 +1056,7 @@ namespace ESS.Helpers
                             sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
-                                  "0 as IsAdmin, 0 as IsGpReleaser, 0 as IsSecUser, " +
+                                  "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
                                   "SapId as SapId, 0 as CompanyAcc " +
                                   "from MastEmp ";
@@ -1066,6 +1092,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("OtFlag", "OtFlag");
                             bulk.ColumnMappings.Add("IsAdmin", "IsAdmin");
                             bulk.ColumnMappings.Add("IsGpReleaser", "IsGpReleaser");
+                            bulk.ColumnMappings.Add("IsGaReleaser", "IsGaReleaser");
                             bulk.ColumnMappings.Add("IsSecUser", "IsSecUser");
                             bulk.ColumnMappings.Add("Location", "Location");
                             bulk.ColumnMappings.Add("SapId", "SapId");
@@ -1106,13 +1133,13 @@ namespace ESS.Helpers
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
-                              "isadmin, isgpreleaser, issecuser, location, sapid, companyacc ) " +
+                              "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
-                              "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, " +
+                              "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, 0, " +
                               "'" + location + "', source.SapId, 0 ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);

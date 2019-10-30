@@ -30,7 +30,6 @@ namespace ESS.Controllers.Api
 
             foreach (var empUnqId in employees)
             {
-
                 //get leave balance from attendance server
                 //note this will not have leaves that are not posted.
 
@@ -87,10 +86,10 @@ namespace ESS.Controllers.Api
                                         else
                                             l.Availed += details.TotalDays;
                                     }
+
                                     //else
                                     //    l.Availed += details.TotalDays;
                                 }
-
                             }
                         }
                         catch
@@ -111,30 +110,48 @@ namespace ESS.Controllers.Api
             }
 
             return Ok(result);
-
         }
 
         public IHttpActionResult GetLeaveBalance(string empUnqId, int yearMonth)
         {
-
             //get leave balance from attendance server
             //note this will not have leaves that are not posted.
 
             var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(empUnqId, yearMonth);
 
             //now get applied and released leaves that are not posted
+            var allLeaveAppIds = _context.LeaveApplications
+                .Where(l => l.EmpUnqId == empUnqId &&
+                            l.ReleaseStatusCode == ReleaseStatus.FullyReleased)
+                .Select(l => l.LeaveAppId)
+                .ToArray();
+
+
+            var leavAppIds = _context.LeaveApplicationDetails
+                .Where(d =>
+                    (
+                        d.Cancelled == true
+                        || (d.IsPosted == LeaveApplicationDetails.NotPosted ||
+                            d.IsPosted == LeaveApplicationDetails.PartiallyPosted)) &&
+                    allLeaveAppIds.Contains(d.LeaveAppId) &&
+                    d.IsCancellationPosted == false
+                )
+                .Select(l=> l.LeaveAppId)
+                .ToArray();
+
 
             var leaveAppDtl = _context.LeaveApplications
                 .Where(l =>
                     l.EmpUnqId == empUnqId &&
                     l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
-                    l.LeaveApplicationDetails.Any(d =>
-                            (
-                                (d.IsPosted == LeaveApplicationDetails.NotPosted ||
-                                 d.IsPosted == LeaveApplicationDetails.PartiallyPosted)
-                            || d.Cancelled == true) &&
-                            d.IsCancellationPosted == false
-                        )
+                    leavAppIds.Contains(l.LeaveAppId)
+//                    l.LeaveApplicationDetails.Any(d =>
+//                        (
+//                            (d.IsPosted == LeaveApplicationDetails.NotPosted ||
+//                             d.IsPosted == LeaveApplicationDetails.PartiallyPosted)
+//                            || d.Cancelled == true) &&
+//                        d.IsCancellationPosted == false
+//                    )
                 )
                 .Include(l => l.LeaveApplicationDetails)
                 .ToList();
@@ -173,10 +190,9 @@ namespace ESS.Controllers.Api
                                     else
                                         l.Availed += details.TotalDays;
                                 }
-                                //else
-                                //    l.Availed += details.TotalDays;
+                                else
+                                    l.Availed += details.TotalDays;
                             }
-
                         }
                     }
                     catch
@@ -197,7 +213,6 @@ namespace ESS.Controllers.Api
 
         public IHttpActionResult GetLeaveBalance(string empUnqId, int yearMonth, bool flag)
         {
-
             //get leave balance from attendance server
             //note this will not have leaves that are not posted.
 

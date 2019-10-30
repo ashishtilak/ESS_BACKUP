@@ -460,6 +460,7 @@ namespace ESS.Controllers.Api
 
                 using (var transaction = _context.Database.BeginTransaction())
                 {
+                    List<ApplReleaseStatusDto> result = new List<ApplReleaseStatusDto>();
 
                     List<GatePass> gps = new List<GatePass>();
 
@@ -550,8 +551,10 @@ namespace ESS.Controllers.Api
 
                             //add to collection
                             apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
+                            result.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
 
                             _context.ApplReleaseStatus.Add(appRelStat);
+                            
                         }
 
                         _context.GatePass.Add(newGp);
@@ -561,7 +564,7 @@ namespace ESS.Controllers.Api
 
                     transaction.Commit();
 
-                    return Ok();
+                    return Ok(result);
                 }
             }
             catch (Exception exception)

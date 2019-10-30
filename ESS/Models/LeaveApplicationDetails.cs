@@ -69,5 +69,7 @@ namespace ESS.Models
         public static readonly string FullyPosted = "F";
         public static readonly string PartiallyPosted = "P";
         public static readonly string PostingRejected = "R";
+        public static readonly string ForcefullyPosted = "O";
+
     }
 }

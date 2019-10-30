@@ -28,7 +28,7 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest(ex.ToString());
             }
-            return Ok("Record synchronization completed.");
+            return Ok("Record synchronization completed successfully.");
         }
     }
 }

@@ -162,17 +162,19 @@ namespace ESS.Controllers.Api
                 if (details.LeaveTypeCode == LeaveTypes.CompOff)
                     details.TotalDays = 1;
 
-                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
-                {
-                    // Get weekly offs between the selected range
-                    List<DateTime> firstDayOff =
-                        ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.FromDt, lDto.EmpUnqId);
-                    if (firstDayOff.Count > 0)
-                        error.Add("You cannot take " + details.LeaveTypeCode + " on a week off.");
-                }
+
+                // Check disabled on 26.06.2019
+                //if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
+                //{
+                //    // Get weekly offs between the selected range
+                //    List<DateTime> firstDayOff =
+                //        ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.FromDt, lDto.EmpUnqId);
+                //    if (firstDayOff.Count > 0)
+                //        error.Add("You cannot take " + details.LeaveTypeCode + " on a week off.");
+                //}
 
 
-                //break out of loop in case of LWP
+                //break out of loop in case of LWP                                                                                            
                 if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay ||
                     details.LeaveTypeCode == LeaveTypes.CompOff)
                     continue;
@@ -249,7 +251,67 @@ namespace ESS.Controllers.Api
                             error.Add("You've already taken OH on previous day.");
                         }
                     }
+
+                    //Added by ashish on 13.08.2019
+                    //Check for Bellary and Kosi
+                    //OH should not be clubbed with SL
+
+                    if (emp.Location == Locations.Bellary || emp.Location == Locations.Kjsaw || emp.Location == Locations.Kjqtl)
+                    {
+                        DateTime prevDayOfOh = details.FromDt.AddDays(-1);
+                        DateTime nextDayOfOh = details.FromDt.AddDays(+1);
+                        Dictionary<DateTime, string> beforeOh =
+                            new Dictionary<DateTime, string> { { prevDayOfOh, GetLeaveOnDate(prevDayOfOh, lDto.EmpUnqId) } };
+                        Dictionary<DateTime, string> afterOh =
+                            new Dictionary<DateTime, string> { { nextDayOfOh, GetLeaveOnDate(nextDayOfOh, lDto.EmpUnqId) } };
+
+                        if (!string.IsNullOrEmpty(beforeOh[prevDayOfOh]))
+                        {
+                            if (beforeOh[prevDayOfOh] == LeaveTypes.SickLeave)
+                            {
+                                error.Add("You've already taken SL on previous day.");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(afterOh[nextDayOfOh]))
+                        {
+                            if (afterOh[nextDayOfOh] == LeaveTypes.SickLeave)
+                            {
+                                error.Add("You've already taken SL on next day.");
+                            }
+                        }
+                    }
                 }
+
+
+                //Added by ashish on 13.08.2019
+                //Check for Bellary and Kosi
+                //OH should not be clubbed with SL
+                if (details.LeaveTypeCode == LeaveTypes.SickLeave &&
+                    (emp.Location == Locations.Kjqtl || emp.Location == Locations.Kjsaw || emp.Location == Locations.Bellary) )
+                {
+                    DateTime prevDayOfSl = details.FromDt.AddDays(-1);
+                    DateTime nextDayOfSl = details.FromDt.AddDays(+1);
+                    Dictionary<DateTime, string> beforeSl =
+                        new Dictionary<DateTime, string> { { prevDayOfSl, GetLeaveOnDate(prevDayOfSl, lDto.EmpUnqId) } };
+                    Dictionary<DateTime, string> afterSl =
+                        new Dictionary<DateTime, string> { { nextDayOfSl, GetLeaveOnDate(nextDayOfSl, lDto.EmpUnqId) } };
+
+                    if (!string.IsNullOrEmpty(beforeSl[prevDayOfSl]))
+                    {
+                        if (beforeSl[prevDayOfSl] == LeaveTypes.OptionalLeave)
+                        {
+                            error.Add("You've already taken OH on previous day.");
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(afterSl[nextDayOfSl]))
+                    {
+                        if (afterSl[nextDayOfSl] == LeaveTypes.OptionalLeave)
+                        {
+                            error.Add("You've already taken OH on next day.");
+                        }
+                    }
+                }
+                ////
 
 
                 //Checks involving previous days leaves.

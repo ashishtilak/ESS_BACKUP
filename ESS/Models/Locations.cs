@@ -23,5 +23,6 @@ namespace ESS.Models
         public static readonly string Nkp = "NKP";
         public static readonly string Kjsaw = "KJSAW";
         public static readonly string Kjqtl = "KJQTL";
+        public static readonly string Bellary = "BEL";
     }
 }

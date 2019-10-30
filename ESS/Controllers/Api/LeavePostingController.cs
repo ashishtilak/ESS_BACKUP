@@ -5,6 +5,7 @@ using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
@@ -14,13 +15,12 @@ namespace ESS.Controllers.Api
 {
     public class LeavePostingController : ApiController
     {
-        private ApplicationDbContext _context;
-
-
+        private readonly ApplicationDbContext _context;
 
         public LeavePostingController()
         {
             _context = new ApplicationDbContext();
+            _context.Database.Log = s => Debug.WriteLine(s);
         }
 
         //this will give pending leaves for posting
@@ -39,27 +39,26 @@ namespace ESS.Controllers.Api
                 .Include(l => l.LeaveApplicationDetails)
                 .Where(
                     l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
-                        l.LeaveApplicationDetails.Any(ld =>
-                                (
-                                    ld.IsPosted == LeaveApplicationDetails.NotPosted ||
-                                    ld.IsPosted == LeaveApplicationDetails.PartiallyPosted ||
-                                    (
-                                        ld.IsPosted == LeaveApplicationDetails.FullyPosted
-                                          &&
-                                          (
-                                              ld.IsCancellationPosted == false ||
-                                              ld.IsCancellationPosted == null
-                                          ) &&
-                                          ld.Cancelled == true
-                                    )
-
-                                ) &&
-                                (
-                                    (ld.FromDt <= toDt && ld.ToDt >= fromDt) ||
-                                    (ld.FromDt >= toDt && ld.ToDt <= fromDt)
-                                )
-                            )
-                        )
+                         l.LeaveApplicationDetails.Any(ld =>
+                             (
+                                 ld.IsPosted == LeaveApplicationDetails.NotPosted ||
+                                 ld.IsPosted == LeaveApplicationDetails.PartiallyPosted ||
+                                 (
+                                     ld.IsPosted == LeaveApplicationDetails.FullyPosted
+                                     &&
+                                     (
+                                         ld.IsCancellationPosted == false ||
+                                         ld.IsCancellationPosted == null
+                                     ) &&
+                                     ld.Cancelled == true
+                                 )
+                             ) &&
+                             (
+                                 (ld.FromDt <= toDt && ld.ToDt >= fromDt) ||
+                                 (ld.FromDt >= toDt && ld.ToDt <= fromDt)
+                             )
+                         )
+                ).AsEnumerable()
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
                 .ToList();
 
@@ -80,7 +79,7 @@ namespace ESS.Controllers.Api
                         l.ReleaseGroupCode == lApp.ReleaseGroupCode &&
                         l.ApplicationId == lApp.LeaveAppId &&
                         l.IsFinalRelease
-                        )
+                    )
                     .ToList()
                     .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
@@ -97,6 +96,12 @@ namespace ESS.Controllers.Api
         //this will give pending leaves for posting
         public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt, string postingFlg)
         {
+            var leaveIds = _context.LeaveApplicationDetails
+                .Where(d => ((d.FromDt <= toDt && d.ToDt >= fromDt) || (d.FromDt >= toDt && d.ToDt <= fromDt))
+                            && d.IsPosted == postingFlg)
+                .Select(l => l.LeaveAppId)
+                .ToArray();
+
             var leaveAppDto = _context.LeaveApplications
                 .Include(e => e.Employee)
                 .Include(c => c.Company)
@@ -108,30 +113,54 @@ namespace ESS.Controllers.Api
                 .Include(r => r.ReleaseGroup)
                 .Include(rs => rs.RelStrategy)
                 .Include(l => l.LeaveApplicationDetails)
-                .Where(l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
-                            l.Cancelled == false &&
-                            l.LeaveApplicationDetails.Any(
-                                (d =>
-                                    (
-                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
-                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
-                                    ) && d.IsPosted == postingFlg
-                                )
-                            )
-                            ||
-                            l.ReleaseStatusCode == ReleaseStatus.ReleaseRejected &&
-                            l.Cancelled == false &&
-                            l.LeaveApplicationDetails.Any(
-                                (d =>
-                                    (
-                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
-                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
-                                    ) && d.IsPosted == postingFlg
-                                )
-                            )
-                )
+                .Where(l =>
+                    (l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                     l.Cancelled == false &&
+                     leaveIds.Contains(l.LeaveAppId)) ||
+                    (l.ReleaseStatusCode == ReleaseStatus.ReleaseRejected &&
+                     l.Cancelled == false &&
+                     leaveIds.Contains(l.LeaveAppId)
+                    )
+                ).AsEnumerable()
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
                 .ToList();
+
+
+            //            var leaveAppDto = _context.LeaveApplications
+            //                .Include(e => e.Employee)
+            //                .Include(c => c.Company)
+            //                .Include(cat => cat.Categories)
+            //                .Include(w => w.WorkGroup)
+            //                .Include(d => d.Departments)
+            //                .Include(s => s.Stations)
+            //                .Include(u => u.Units)
+            //                .Include(r => r.ReleaseGroup)
+            //                .Include(rs => rs.RelStrategy)
+            //                .Include(l => l.LeaveApplicationDetails)
+            //                .Where(l => l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+            //                            l.Cancelled == false &&
+            //                            l.LeaveApplicationDetails.Any(
+            //                                (d =>
+            //                                    (
+            //                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
+            //                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
+            //                                    ) && d.IsPosted == postingFlg
+            //                                )
+            //                            )
+            //                            ||
+            //                            l.ReleaseStatusCode == ReleaseStatus.ReleaseRejected &&
+            //                            l.Cancelled == false &&
+            //                            l.LeaveApplicationDetails.Any(
+            //                                (d =>
+            //                                    (
+            //                                        (d.FromDt <= toDt && d.ToDt >= fromDt) ||
+            //                                        (d.FromDt >= toDt && d.ToDt <= fromDt)
+            //                                    ) && d.IsPosted == postingFlg
+            //                                )
+            //                            )
+            //                ).AsEnumerable()
+            //                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
+            //                .ToList();
 
 
             foreach (var lApp in leaveAppDto)
@@ -216,30 +245,30 @@ namespace ESS.Controllers.Api
 
 
             List<Leaves> leaves = (from appHdr in leaveAppDto
-                                   from appDtl in appHdr.LeaveApplicationDetails
-                                   select new Leaves
-                                   {
-                                       LeaveAppId = appHdr.LeaveAppId,
-                                       EmpUnqId = appHdr.EmpUnqId,
-                                       EmpName = appHdr.Employee.EmpName,
-                                       FatherName = appHdr.Employee.FatherName,
-                                       WrkGrpDesc = appHdr.WorkGroup.WrkGrpDesc,
-                                       CatName = appHdr.CatCode,
-                                       DeptName = appHdr.Departments.DeptName,
-                                       StatName = appHdr.Stations.StatName,
-                                       Remarks = appHdr.Remarks,
-                                       Lcoation = appHdr.Employee.Location,
-                                       LeaveTypeCode = appDtl.LeaveTypeCode,
-                                       FromDt = appDtl.FromDt,
-                                       ToDt = appDtl.ToDt,
-                                       TotalDays = appDtl.TotalDays,
-                                       HalfDayFlag = appDtl.HalfDayFlag,
-                                       LeaveReason = appDtl.Remarks,
-                                       IsPosted = appDtl.IsPosted,
-                                       Cancelled = appDtl.Cancelled,
-                                       ParentId = appDtl.ParentId,
-                                       IsCancellationPosted = appDtl.IsCancellationPosted
-                                   }).ToList();
+                from appDtl in appHdr.LeaveApplicationDetails
+                select new Leaves
+                {
+                    LeaveAppId = appHdr.LeaveAppId,
+                    EmpUnqId = appHdr.EmpUnqId,
+                    EmpName = appHdr.Employee.EmpName,
+                    FatherName = appHdr.Employee.FatherName,
+                    WrkGrpDesc = appHdr.WorkGroup.WrkGrpDesc,
+                    CatName = appHdr.CatCode,
+                    DeptName = appHdr.Departments.DeptName,
+                    StatName = appHdr.Stations.StatName,
+                    Remarks = appHdr.Remarks,
+                    Lcoation = appHdr.Employee.Location,
+                    LeaveTypeCode = appDtl.LeaveTypeCode,
+                    FromDt = appDtl.FromDt,
+                    ToDt = appDtl.ToDt,
+                    TotalDays = appDtl.TotalDays,
+                    HalfDayFlag = appDtl.HalfDayFlag,
+                    LeaveReason = appDtl.Remarks,
+                    IsPosted = appDtl.IsPosted,
+                    Cancelled = appDtl.Cancelled,
+                    ParentId = appDtl.ParentId,
+                    IsCancellationPosted = appDtl.IsCancellationPosted
+                }).ToList();
 
 
             // FOR EDUCATION PURPOSE ONLY:
@@ -275,7 +304,6 @@ namespace ESS.Controllers.Api
             //        leaves.Add(l);
             //    }
             //}
-
 
 
             return Ok(leaves);
@@ -384,19 +412,17 @@ namespace ESS.Controllers.Api
                                 {
                                     //UPDATE POSTED FLAGE
 
-                                    if (leaveApplication.LeaveTypeCode == LeaveTypes.SickLeave && leaveApplication.TotalDays > 3)
+                                    if (leaveApplication.LeaveTypeCode == LeaveTypes.SickLeave &&
+                                        leaveApplication.TotalDays > 3)
                                     {
-
                                         int slcount = 1;
                                         DateTime dt = leaveApplication.FromDt ?? DateTime.Now;
 
                                         // loop for each day
                                         while (dt <= leaveApplication.ToDt)
                                         {
-
                                             if (slcount > 3)
                                             {
-
                                                 // post remaining days as lwp
 
                                                 // this day is not holiday/week off
@@ -405,7 +431,8 @@ namespace ESS.Controllers.Api
 
                                                 // if this day is holiday/week off, then skip this day
                                                 List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp, l.Employee.Location);
+                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp,
+                                                        l.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -430,11 +457,13 @@ namespace ESS.Controllers.Api
                                                         EmpUnqID = l.EmpUnqId,
                                                         FromDate = dt, //will cause error if dates are null
                                                         ToDate = leaveApplication.ToDt ??
-                                                                 DateTime.Now.AddDays(-1), //will cause error if dates are null
+                                                                 DateTime.Now
+                                                                     .AddDays(-1), //will cause error if dates are null
                                                         LeaveTyp = LeaveTypes.LeaveWithoutPay,
                                                         HalfDay = false,
                                                         PostedFlg = false,
-                                                        AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
+                                                        AttdUser = dto
+                                                            .UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
                                                         Remarks = leaveApplication.Remarks,
                                                         ERROR = "",
                                                         Location = emp.Location
@@ -450,7 +479,6 @@ namespace ESS.Controllers.Api
 
                                                 if (!result)
                                                 {
-
                                                     leaveApplication.IsPosted = dto1.IsPosted;
                                                     leaveApplication.PostUser = dto1.UserId;
                                                     leaveApplication.PostedDt = DateTime.Now;
@@ -469,7 +497,8 @@ namespace ESS.Controllers.Api
                                             {
                                                 // if this day is holiday/week off, then skip this day
                                                 List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp, l.Employee.Location);
+                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp,
+                                                        l.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -503,12 +532,15 @@ namespace ESS.Controllers.Api
                                                         {
                                                             AppID = leaveApplication.LeaveAppId,
                                                             EmpUnqID = l.EmpUnqId,
-                                                            FromDate = leaveApplication.FromDt ?? DateTime.Now, //will cause error if dates are null
+                                                            FromDate = leaveApplication.FromDt ??
+                                                                       DateTime
+                                                                           .Now, //will cause error if dates are null
                                                             ToDate = dt,
                                                             LeaveTyp = leaveApplication.LeaveTypeCode,
                                                             HalfDay = leaveApplication.HalfDayFlag,
                                                             PostedFlg = false,
-                                                            AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
+                                                            AttdUser = dto
+                                                                .UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
                                                             Remarks = leaveApplication.Remarks,
                                                             ERROR = "",
                                                             Location = emp.Location
@@ -516,7 +548,8 @@ namespace ESS.Controllers.Api
 
                                                     bool result;
 
-                                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
+                                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location,
+                                                        out result);
 
                                                     // if there was error in leave posting,
                                                     // save partial  posting flag in ESS
@@ -542,7 +575,6 @@ namespace ESS.Controllers.Api
                                             slcount++;
                                             dt = dt.AddDays(1);
                                         }
-
                                     }
 
                                     leaveApplication.IsPosted = dto1.IsPosted;
@@ -551,6 +583,19 @@ namespace ESS.Controllers.Api
                                     //l.UpdUser = dto1.UserId;
                                     //l.UpdDt = DateTime.Now;
                                 }
+                                //added on 14.08.2019 by Ashish
+                                //for forcefully "full" post partially posted SLs
+                                //Algorythm:
+                                // at the time of partially posting total leave of n days,
+                                // 3 SL and (n-3) LWP are posted in attendance, ESS shows total n SLs
+                                // Now here, reduce the days of SL to 3 working days
+                                // and create new leave app line item with (n-3) LWP
+                                // This will also set "Posted flag for both lines"
+                                else if (dto.IsPosted == LeaveApplicationDetails.ForcefullyPosted)
+                                {
+                                }
+                                //End of change on 14.08.2019
+
                                 else
                                 {
                                     //POST LEAVE IN ATTENDANCE SERVER.
@@ -623,13 +668,11 @@ namespace ESS.Controllers.Api
                                         {
                                             leaveApplication.IsCancellationPosted = true;
                                         }
-
                                     }
                                     else
                                     {
                                         return BadRequest("Error: " + attdLeaveObj.ERROR);
                                     }
-
                                 }
                             }
                         }
@@ -656,7 +699,6 @@ namespace ESS.Controllers.Api
 
         private AttdLeavePost AttdPostLeave(AttdLeavePost attdLeaveObj, string location, out bool output)
         {
-
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(Helpers.CustomHelper.GetAttendanceServerApi(location));
@@ -678,7 +720,6 @@ namespace ESS.Controllers.Api
                     var attdLeave = readTask.Result;
 
                     return attdLeave;
-
                 }
                 else
                 {
@@ -692,8 +733,6 @@ namespace ESS.Controllers.Api
                     return attdLeave;
                 }
             }
-
         }
-
     }
 }

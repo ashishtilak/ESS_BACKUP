@@ -57,6 +57,7 @@ namespace ESS.Controllers.Api
                         IsHod = e.IsHod,
                         IsSecUser = e.IsSecUser,
                         IsGpReleaser = e.IsGpReleaser,
+                        IsGaReleaser = e.IsGaReleaser,
                         IsAdmin = e.IsAdmin,
 
                         CompName = e.Company.CompName,

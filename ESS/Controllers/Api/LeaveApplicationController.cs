@@ -133,7 +133,7 @@ namespace ESS.Controllers.Api
                     lv.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
                     lv.ParentId == 0 &&
                     lv.Cancelled == false &&
-                    lv.LeaveApplicationDetails.Any(la => la.ToDt >= reqDate))
+                    lv.LeaveApplicationDetails.Any(la => la.ToDt >= reqDate)).AsEnumerable()
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
                 .ToList();
 

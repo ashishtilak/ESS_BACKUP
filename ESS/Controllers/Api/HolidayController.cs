@@ -10,16 +10,34 @@ namespace ESS.Controllers.Api
 {
     public class HolidayController : ApiController
     {
-        public IHttpActionResult GetHolidays(string compCode, string wrkGrp, int tYear, string location)
+        public IHttpActionResult GetHolidays(string compCode, string wrkGrp, int tYear, string location, bool optionalFlg)
         {
-            try
+
+            if (!optionalFlg)
             {
-                List<HolidayDto> holidays = Helpers.CustomHelper.GetHolidays(compCode, wrkGrp, tYear, location);
-                return Ok(holidays);
+                try
+                {
+                    List<HolidayDto> holidays = Helpers.CustomHelper.GetHolidays(compCode, wrkGrp, tYear, location);
+                    return Ok(holidays);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.ToString());
+                }
+
             }
-            catch (Exception e)
+            else
             {
-                return BadRequest(e.ToString());
+                try
+                {
+                    List<HolidayDto> holidays = Helpers.CustomHelper.GetOptionalHolidays(tYear, location);
+                    return Ok(holidays);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.ToString());
+                }
+
             }
         }
 

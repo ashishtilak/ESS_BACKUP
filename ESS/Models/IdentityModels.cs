@@ -117,6 +117,15 @@ namespace ESS.Models
 
         public DbSet<RoleUsers> RoleUser { get; set; }
 
+        public DbSet<GpAdvices> GpAdvices { get; set; }
+        public DbSet<GpAdviceDetails> GpAdviceDetails { get; set; }
+        public DbSet<GaReleaseStrategies> GaReleaseStrategies { get; set; }
+        public DbSet<GaReleaseStrategyLevels> GaReleaseStrategyLevels { get; set; }
+
+        public DbSet<Materials> Materials { get; set; }
+
+        public DbSet<Vendors> Vendors { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
