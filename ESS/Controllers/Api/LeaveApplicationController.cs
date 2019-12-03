@@ -106,6 +106,9 @@ namespace ESS.Controllers.Api
 
                 foreach (var applReleaseStatusDto in app)
                 {
+                    applReleaseStatusDto.ReleaserName = _context.Employees
+                        .FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)
+                        .EmpName;
                     lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
             }

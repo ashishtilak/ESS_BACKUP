@@ -18,5 +18,7 @@ namespace ESS.Dto
         public string ReleaseAuth { get; set; }
         public bool IsFinalRelease { get; set; }
         public string Remarks { get; set; }
+
+        public string ReleaserName { get; set; }
     }
 }

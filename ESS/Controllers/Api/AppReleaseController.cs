@@ -263,13 +263,15 @@ namespace ESS.Controllers.Api
                             foreach (var auth in relCode)
                             {
                                 if (auth.EmpUnqId == empUnqId)
+                                {
                                     applReleaseStatusDto.ReleaseAuth = empUnqId;
+                                    dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
+                                    {
+                                        applReleaseStatusDto
+                                    };
+                                }
                             }
-
-                            dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
-                            {
-                                applReleaseStatusDto
-                            };
+                            
                         }
 
 

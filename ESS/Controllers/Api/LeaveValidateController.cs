@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using Newtonsoft.Json;
@@ -25,12 +21,12 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult IsValid([FromBody] object requestData)
         {
-            List<string> error = new List<string>();
+            var error = new List<string>();
 
-            LeaveApplicationDto lDto;
+            LeaveApplicationDto leaveApplicationDto;
             try
             {
-                lDto = JsonConvert.DeserializeObject<LeaveApplicationDto>(requestData.ToString());
+                leaveApplicationDto = JsonConvert.DeserializeObject<LeaveApplicationDto>(requestData.ToString());
             }
             catch (Exception e)
             {
@@ -39,25 +35,25 @@ namespace ESS.Controllers.Api
 
             //get leave balance each leave wise for current year
 
-            var emp = _context.Employees.Single(e => e.EmpUnqId == lDto.EmpUnqId);
+            Employees emp = _context.Employees.Single(e => e.EmpUnqId == leaveApplicationDto.EmpUnqId);
 
             int yearMonth = _context.OpenMonth.Select(t => t.YearMonth).Single();
             int year = _context.OpenMonth.Select(t => t.OpenYear).Single();
 
-            var monthFirst = DateTime.ParseExact(
+            DateTime monthFirst = DateTime.ParseExact(
                 String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2),
                     "01"),
                 "yyyy-MM-dd", null).AddMonths(-1);
 
-            var monthLast = DateTime.ParseExact(
+            DateTime monthLast = DateTime.ParseExact(
                 String.Format("{0}-{1}-{2}", yearMonth.ToString().Substring(0, 4), yearMonth.ToString().Substring(4, 2),
                     "01"),
                 "yyyy-MM-dd", null).AddMonths(4).AddDays(-1);
 
-            // Reject if any leave is pending for release
 
+            // CHECK 1 Reject if any leave is pending for release
             var pendingLeave = _context.LeaveApplications
-                .Where(l => l.EmpUnqId == lDto.EmpUnqId &&
+                .Where(l => l.EmpUnqId == leaveApplicationDto.EmpUnqId &&
                             (l.ReleaseStatusCode == ReleaseStatus.PartiallyReleased ||
                              l.ReleaseStatusCode == ReleaseStatus.NotReleased))
                 .ToList();
@@ -67,10 +63,11 @@ namespace ESS.Controllers.Api
                 error.Add("Cannot take leave if any application is pending for release.");
                 return Content(HttpStatusCode.BadRequest, error);
             }
+            // CHECK 1 OVER
 
 
             // Use helper class to get leavebalance form attendance server
-            var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(lDto.EmpUnqId, year);
+            var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(leaveApplicationDto.EmpUnqId, year);
 
 
             //
@@ -86,13 +83,15 @@ namespace ESS.Controllers.Api
 
             #region ForEach_on_leaveAppDetails
 
-            foreach (var details in lDto.LeaveApplicationDetails)
+            foreach (LeaveApplicationDetailDto details in leaveApplicationDto.LeaveApplicationDetails)
             {
-
                 if (details.TotalDays <= 0)
+                {
                     error.Add("Leave days less then zero????");
+                    continue;
+                }
 
-                //check if leave type is there in balance table
+                //check2: check if leave type is there in balance table
                 bool leaveExist = leaveBalDto.Any(l => l.LeaveTypeCode == details.LeaveTypeCode);
 
                 if (!leaveExist &&
@@ -102,23 +101,32 @@ namespace ESS.Controllers.Api
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
                 }
+                //check2 over
 
-                //Check if dates are within open month
+                //Check3 if dates are within open month
                 if (details.FromDt < monthFirst || details.ToDt > monthLast)
                     error.Add(details.LeaveTypeCode + " leave date must be within open month: "
-                              + monthFirst.ToShortDateString() + " - " + monthLast.ToShortDateString());
+                                                    + monthFirst.ToShortDateString() + " - " +
+                                                    monthLast.ToShortDateString());
+                //check3 over
 
                 // Re calculate days because, days passed from client are from grid
                 // which are actual days (total days - holidays - weekoffs)
                 // which are again deducted
-                // Added on 09/07/2018 by Ashish 
 
                 details.TotalDays = details.HalfDayFlag ? 0.5f : (details.ToDt - details.FromDt).Days + 1;
 
-                //check that the date should not overlap with existing leave taken
+                // for CO, Take days == 1 only, as 
+                // start date will be Week Off date,
+                // End date will be date of CO.
+
+                if (details.LeaveTypeCode == LeaveTypes.CompOff)
+                    details.TotalDays = 1;
+
+                //check4 that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails
                     .Where(l =>
-                        l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
+                        l.LeaveApplication.EmpUnqId == leaveApplicationDto.EmpUnqId &&
                         ((l.FromDt <= details.ToDt && l.ToDt >= details.FromDt) ||
                          (l.ToDt <= details.FromDt && l.FromDt >= details.ToDt)) &&
                         l.LeaveApplication.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
@@ -126,63 +134,23 @@ namespace ESS.Controllers.Api
                     )
                     .ToList();
 
-                if (existingLeave.Count > 0 && details.LeaveTypeCode != LeaveTypes.CompOff)
-                    error.Add(details.LeaveTypeCode + " leave date must not overlap with leave already taken. ");
-
-                //Check that previous leave should not be CL the day before this leave app's date
-                //this check is for leaves other than LWP
-
-                if ((details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay) &&
-                    (details.LeaveTypeCode != LeaveTypes.OptionalLeave) &&
-                    (details.LeaveTypeCode != LeaveTypes.CasualLeave) &&
-                    (details.LeaveTypeCode != LeaveTypes.CompOff)
-                )
+                if (existingLeave.Count > 0)
                 {
-                    var detailsFromDt = details.FromDt.AddDays(-1);
-                    existingLeave = _context.LeaveApplicationDetails
-                        .Where(l =>
-                            l.LeaveApplication.EmpUnqId == lDto.EmpUnqId &&
-                            l.Cancelled == false &&
-                            l.IsPosted != LeaveApplicationDetails.PostingRejected &&
-                            l.ToDt == detailsFromDt
-                        )
-                        .ToList();
-                    if (existingLeave.Count > 0)
-                    {
-                        if (existingLeave.Any(x => x.LeaveTypeCode == LeaveTypes.CasualLeave))
-                            error.Add("You have taken CL on previous day! Can't take this leave.");
-                    }
+                    error.Add(details.LeaveTypeCode + " leave date must not overlap with leave already taken. ");
+                    continue;
                 }
 
-
-                // Take days == 1 only, as 
-                // start date will be Week Off date,
-                // End date will be date of CO.
-
-                if (details.LeaveTypeCode == LeaveTypes.CompOff)
-                    details.TotalDays = 1;
-
-
-                // Check disabled on 26.06.2019
-                //if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
-                //{
-                //    // Get weekly offs between the selected range
-                //    List<DateTime> firstDayOff =
-                //        ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.FromDt, lDto.EmpUnqId);
-                //    if (firstDayOff.Count > 0)
-                //        error.Add("You cannot take " + details.LeaveTypeCode + " on a week off.");
-                //}
-
+                //check4 over
 
                 //break out of loop in case of LWP                                                                                            
-                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay ||
-                    details.LeaveTypeCode == LeaveTypes.CompOff)
+                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
                     continue;
 
 
-                //now get holidays between from/to date and add them to off days
+                // Get holidays between from/to date and add them to off days
                 List<DateTime> holidays =
-                    ESS.Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, lDto.CompCode, lDto.WrkGrp, emp.Location);
+                    ESS.Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, leaveApplicationDto.CompCode,
+                        leaveApplicationDto.WrkGrp, emp.Location);
 
                 details.TotalDays -= holidays.Count;
 
@@ -191,11 +159,9 @@ namespace ESS.Controllers.Api
 
                 offDays += holidays.Count;
 
-
                 // Get weekly offs between the selected range
                 List<DateTime> weekOffs =
-                    ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, lDto.EmpUnqId);
-
+                    ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, leaveApplicationDto.EmpUnqId);
 
                 //Check if weekoff is on holiday. If it is, then remove it.
                 if (holidays.Count > 0)
@@ -211,23 +177,159 @@ namespace ESS.Controllers.Api
                 offDays += weekOffs.Count;
 
 
-                // CL can't be more than 3 days
-                if (details.LeaveTypeCode == LeaveTypes.CasualLeave &&
-                    details.TotalDays > 3)
-                    error.Add("CL cannot be more than 3 days");
-
-                // EL Must be at least 3 days
-                if (details.LeaveTypeCode == LeaveTypes.PaidLeave &&
-                    details.TotalDays < 3)
-                    error.Add("EL cannot be less than 3 days");
-
-
-                //check leave balance
+                //CHECK6: check leave balance
                 LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
                 float bal = lb.Opening - lb.Availed - lb.Encashed;
 
                 if (bal < details.TotalDays)
                     error.Add("Insufficient balance of " + details.LeaveTypeCode + ". Current Balance is: " + bal);
+
+                //CHECK6 OVER
+
+
+                //Checks involving previous and next days leaves
+                //Get previous 6 days data in dictionary
+
+                var prevLeave = new Dictionary<DateTime, string>();
+                DateTime d = details.FromDt.AddDays(-1);
+                string strPrevLeave = "";
+                while (d >= details.FromDt.AddDays(-6))
+                {
+                    prevLeave.Add(d, GetLeaveOnDate(d, leaveApplicationDto.EmpUnqId));
+
+                    if (!string.IsNullOrEmpty(prevLeave[d]))
+                        strPrevLeave += prevLeave[d] + ",";
+                    else
+                    {
+                        if (ESS.Helpers.CustomHelper.GetWeeklyOff(d, d, leaveApplicationDto.EmpUnqId).Count > 0)
+                            strPrevLeave += "WO,";
+                        else if (ESS.Helpers.CustomHelper.GetHolidays(d, d, leaveApplicationDto.CompCode,
+                                     leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
+                            strPrevLeave += "HL,";
+                        else
+                            strPrevLeave += prevLeave[d] + ",";
+                    }
+
+                    d = d.AddDays(-1);
+                }
+                //got data in array along with WO
+
+
+                //Get next 6 days data in dictionary
+                var nextLeave = new Dictionary<DateTime, string>();
+                d = details.FromDt.AddDays(1);
+                string strNextLeave = "";
+                while (d <= details.FromDt.AddDays(6))
+                {
+                    nextLeave.Add(d, GetLeaveOnDate(d, leaveApplicationDto.EmpUnqId));
+
+
+                    if (!string.IsNullOrEmpty(nextLeave[d]))
+                        strNextLeave += nextLeave[d] + ",";
+                    else
+                    {
+                        if (ESS.Helpers.CustomHelper.GetWeeklyOff(d, d, leaveApplicationDto.EmpUnqId).Count > 0)
+                            strNextLeave += "WO,";
+                        else if (ESS.Helpers.CustomHelper.GetHolidays(d, d, leaveApplicationDto.CompCode,
+                                     leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
+                            strNextLeave += "HL,";
+                        else
+                            strNextLeave += nextLeave[d] + ",";
+                    }
+
+                    d = d.AddDays(1);
+                }
+                //got data in array along with WO
+
+
+                //Get leave rules for both prev & next
+                LeaveRules prevLeaveRules = _context.LeaveRules
+                    .FirstOrDefault(l =>
+                        strPrevLeave.StartsWith(l.LeaveRule) && details.LeaveTypeCode == l.LeaveTypeCode);
+
+                LeaveRules nextLeaveRules = _context.LeaveRules
+                    .FirstOrDefault(l =>
+                        strNextLeave.StartsWith(l.LeaveRule) && details.LeaveTypeCode == l.LeaveTypeCode);
+
+
+                // *****************************************
+                //  LEAVE TYPE WISE CHECKS................
+                // *****************************************
+
+                //CHECKS FOR CL
+                if (details.LeaveTypeCode == LeaveTypes.CasualLeave)
+                {
+                    // CL can't be more than 3 days
+                    if (details.TotalDays > 3)
+                        error.Add("CL cannot be more than 3 days");
+
+                    // If some leave rule is found for prev/next leaves, check it here...
+
+                    if (prevLeaveRules != null && prevLeaveRules.Active)
+                        if (details.TotalDays > prevLeaveRules.DaysAllowed)
+                            error.Add("Cannot take this CL. Check leaves taken on previous days.");
+
+                    if (nextLeaveRules != null && nextLeaveRules.Active)
+                        if (details.TotalDays > nextLeaveRules.DaysAllowed)
+                            error.Add("Cannot take this CL. Check leaves taken on next days.");
+                }
+
+                //CHECKS FOR EL/PL
+                if (details.LeaveTypeCode == LeaveTypes.PaidLeave)
+                {
+                    // EL Must be at least 3 days
+                    if (details.TotalDays < 3)
+                        error.Add("EL cannot be less than 3 days");
+
+                    // If some leave rule is found for prev/next leaves, check it here...
+
+                    if (prevLeaveRules != null && prevLeaveRules.Active)
+                        if (details.TotalDays > prevLeaveRules.DaysAllowed || !prevLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this EL. Check leaves taken on previous days.");
+
+                    if (nextLeaveRules != null && nextLeaveRules.Active)
+                        if (details.TotalDays > nextLeaveRules.DaysAllowed || !nextLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this EL. Check leaves taken on next days.");
+                }
+
+                //CHECKS FOR SL
+                if (details.LeaveTypeCode == LeaveTypes.SickLeave)
+                {
+                    // If some leave rule is found for prev/next leaves, check it here...
+                    if (prevLeaveRules != null && prevLeaveRules.Active)
+                        if (details.TotalDays > prevLeaveRules.DaysAllowed || !prevLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this SL. Check leaves taken on previous days.");
+
+                    if (nextLeaveRules != null && nextLeaveRules.Active)
+                        if (details.TotalDays > nextLeaveRules.DaysAllowed || !nextLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this SL. Check leaves taken on next days.");
+                }
+
+
+                //Check that previous leave should not be CL the day before this leave app's date
+                //this check is for leaves other than LWP
+
+                //if ((details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay) &&
+                //    (details.LeaveTypeCode != LeaveTypes.OptionalLeave) &&
+                //    (details.LeaveTypeCode != LeaveTypes.CasualLeave) &&
+                //    (details.LeaveTypeCode != LeaveTypes.CompOff)
+                //)
+                //{
+                //    var detailsFromDt = details.FromDt.AddDays(-1);
+                //    existingLeave = _context.LeaveApplicationDetails
+                //        .Where(l =>
+                //            l.LeaveApplication.EmpUnqId == leaveApplicationDto.EmpUnqId &&
+                //            l.Cancelled == false &&
+                //            l.IsPosted != LeaveApplicationDetails.PostingRejected &&
+                //            l.ToDt == detailsFromDt
+                //        )
+                //        .ToList();
+                //    if (existingLeave.Count > 0)
+                //    {
+                //        if (existingLeave.Any(x => x.LeaveTypeCode == LeaveTypes.CasualLeave))
+                //            error.Add("You have taken CL on previous day! Can't take this leave.");
+                //    }
+                //}
 
                 if (details.LeaveTypeCode == LeaveTypes.OptionalLeave)
                 {
@@ -240,128 +342,102 @@ namespace ESS.Controllers.Api
                     if (!Helpers.CustomHelper.GetOptionalHolidays(details.FromDt, emp.Location))
                         error.Add("Invalid Optional holiday. Pl verify date.");
 
-                    DateTime ohd = details.FromDt.AddDays(-1);
-                    Dictionary<DateTime, string> prevoh =
-                        new Dictionary<DateTime, string> { { ohd, GetLeaveOnDate(ohd, lDto.EmpUnqId) } };
 
-                    if (!string.IsNullOrEmpty(prevoh[ohd]))
-                    {
-                        if (prevoh[ohd] == LeaveTypes.OptionalLeave)
-                        {
-                            error.Add("You've already taken OH on previous day.");
-                        }
-                    }
+                    // If some leave rule is found for prev/next leaves, check it here...
+                    if (prevLeaveRules != null && prevLeaveRules.Active)
+                        if (details.TotalDays > prevLeaveRules.DaysAllowed || !prevLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this OL. Check leaves taken on previous days.");
 
-                    //Added by ashish on 13.08.2019
-                    //Check for Bellary and Kosi
-                    //OH should not be clubbed with SL
+                    if (nextLeaveRules != null && nextLeaveRules.Active)
+                        if (details.TotalDays > nextLeaveRules.DaysAllowed || !nextLeaveRules.LeaveAllowed)
+                            error.Add("Cannot take this OL. Check leaves taken on next days.");
 
-                    if (emp.Location == Locations.Bellary || emp.Location == Locations.Kjsaw || emp.Location == Locations.Kjqtl)
-                    {
-                        DateTime prevDayOfOh = details.FromDt.AddDays(-1);
-                        DateTime nextDayOfOh = details.FromDt.AddDays(+1);
-                        Dictionary<DateTime, string> beforeOh =
-                            new Dictionary<DateTime, string> { { prevDayOfOh, GetLeaveOnDate(prevDayOfOh, lDto.EmpUnqId) } };
-                        Dictionary<DateTime, string> afterOh =
-                            new Dictionary<DateTime, string> { { nextDayOfOh, GetLeaveOnDate(nextDayOfOh, lDto.EmpUnqId) } };
+                    //DateTime ohd = details.FromDt.AddDays(-1);
+                    //Dictionary<DateTime, string> prevoh =
+                    //    new Dictionary<DateTime, string> { { ohd, GetLeaveOnDate(ohd, leaveApplicationDto.EmpUnqId) } };
 
-                        if (!string.IsNullOrEmpty(beforeOh[prevDayOfOh]))
-                        {
-                            if (beforeOh[prevDayOfOh] == LeaveTypes.SickLeave)
-                            {
-                                error.Add("You've already taken SL on previous day.");
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(afterOh[nextDayOfOh]))
-                        {
-                            if (afterOh[nextDayOfOh] == LeaveTypes.SickLeave)
-                            {
-                                error.Add("You've already taken SL on next day.");
-                            }
-                        }
-                    }
+                    //if (!string.IsNullOrEmpty(prevoh[ohd]))
+                    //{
+                    //    if (prevoh[ohd] == LeaveTypes.OptionalLeave)
+                    //    {
+                    //        error.Add("You've already taken OH on previous day.");
+                    //    }
+                    //}
+
+                    ////Added by ashish on 13.08.2019
+                    ////Check for Bellary and Kosi
+                    ////OH should not be clubbed with SL
+
+                    //if (emp.Location == Locations.Bellary || emp.Location == Locations.Kjsaw || emp.Location == Locations.Kjqtl)
+                    //{
+                    //    DateTime prevDayOfOh = details.FromDt.AddDays(-1);
+                    //    DateTime nextDayOfOh = details.FromDt.AddDays(+1);
+                    //    Dictionary<DateTime, string> beforeOh =
+                    //        new Dictionary<DateTime, string> { { prevDayOfOh, GetLeaveOnDate(prevDayOfOh, leaveApplicationDto.EmpUnqId) } };
+                    //    Dictionary<DateTime, string> afterOh =
+                    //        new Dictionary<DateTime, string> { { nextDayOfOh, GetLeaveOnDate(nextDayOfOh, leaveApplicationDto.EmpUnqId) } };
+
+                    //    if (!string.IsNullOrEmpty(beforeOh[prevDayOfOh]))
+                    //    {
+                    //        if (beforeOh[prevDayOfOh] == LeaveTypes.SickLeave)
+                    //        {
+                    //            error.Add("You've already taken SL on previous day.");
+                    //        }
+                    //    }
+                    //    if (!string.IsNullOrEmpty(afterOh[nextDayOfOh]))
+                    //    {
+                    //        if (afterOh[nextDayOfOh] == LeaveTypes.SickLeave)
+                    //        {
+                    //            error.Add("You've already taken SL on next day.");
+                    //        }
+                    //    }
+                    //}
                 }
 
 
                 //Added by ashish on 13.08.2019
                 //Check for Bellary and Kosi
                 //OH should not be clubbed with SL
-                if (details.LeaveTypeCode == LeaveTypes.SickLeave &&
-                    (emp.Location == Locations.Kjqtl || emp.Location == Locations.Kjsaw || emp.Location == Locations.Bellary) )
-                {
-                    DateTime prevDayOfSl = details.FromDt.AddDays(-1);
-                    DateTime nextDayOfSl = details.FromDt.AddDays(+1);
-                    Dictionary<DateTime, string> beforeSl =
-                        new Dictionary<DateTime, string> { { prevDayOfSl, GetLeaveOnDate(prevDayOfSl, lDto.EmpUnqId) } };
-                    Dictionary<DateTime, string> afterSl =
-                        new Dictionary<DateTime, string> { { nextDayOfSl, GetLeaveOnDate(nextDayOfSl, lDto.EmpUnqId) } };
-
-                    if (!string.IsNullOrEmpty(beforeSl[prevDayOfSl]))
-                    {
-                        if (beforeSl[prevDayOfSl] == LeaveTypes.OptionalLeave)
-                        {
-                            error.Add("You've already taken OH on previous day.");
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(afterSl[nextDayOfSl]))
-                    {
-                        if (afterSl[nextDayOfSl] == LeaveTypes.OptionalLeave)
-                        {
-                            error.Add("You've already taken OH on next day.");
-                        }
-                    }
-                }
-                ////
 
 
-                //Checks involving previous days leaves.
-                //Get previous 5 days data in dictionary
+                //if (details.LeaveTypeCode == LeaveTypes.SickLeave &&
+                //    (emp.Location == Locations.Kjqtl || emp.Location == Locations.Kjsaw || emp.Location == Locations.Bellary) )
+                //{
+                //    DateTime prevDayOfSl = details.FromDt.AddDays(-1);
+                //    DateTime nextDayOfSl = details.FromDt.AddDays(+1);
+                //    Dictionary<DateTime, string> beforeSl =
+                //        new Dictionary<DateTime, string> { { prevDayOfSl, GetLeaveOnDate(prevDayOfSl, leaveApplicationDto.EmpUnqId) } };
+                //    Dictionary<DateTime, string> afterSl =
+                //        new Dictionary<DateTime, string> { { nextDayOfSl, GetLeaveOnDate(nextDayOfSl, leaveApplicationDto.EmpUnqId) } };
 
-                Dictionary<DateTime, string> prevLeave = new Dictionary<DateTime, string>();
-                DateTime d = details.FromDt.AddDays(-1);
-                string strLeave = "";
-                while (d >= details.FromDt.AddDays(-5))
-                {
-                    prevLeave.Add(d, GetLeaveOnDate(d, lDto.EmpUnqId));
-
-
-                    if (!string.IsNullOrEmpty(prevLeave[d]))
-                        strLeave += prevLeave[d] + ",";
-                    else
-                    {
-                        if (ESS.Helpers.CustomHelper.GetWeeklyOff(d, d, lDto.EmpUnqId).Count > 0)
-                            strLeave += "WO,";
-                        else
-                            strLeave += prevLeave[d] + ",";
-                    }
-                    d = d.AddDays(-1);
-                }
-                //got data in array along with WO
-
-
-                // 1st simple check... if current leave is CL
-                var leaveRules = _context.LeaveRules
-                    .FirstOrDefault(l => strLeave.StartsWith(l.LeaveRule));
-
-                if (details.LeaveTypeCode == LeaveTypes.CasualLeave)
-                {
-                    if (leaveRules != null)
-                        if (details.TotalDays > leaveRules.AllowedCl)
-                            error.Add("Cannot take this CL. Check previous leaves.");
-                }
-                else
-                {
-                    //For other types of leaves.
-                }
+                //    if (!string.IsNullOrEmpty(beforeSl[prevDayOfSl]))
+                //    {
+                //        if (beforeSl[prevDayOfSl] == LeaveTypes.OptionalLeave)
+                //        {
+                //            error.Add("You've already taken OH on previous day.");
+                //        }
+                //    }
+                //    if (!string.IsNullOrEmpty(afterSl[nextDayOfSl]))
+                //    {
+                //        if (afterSl[nextDayOfSl] == LeaveTypes.OptionalLeave)
+                //        {
+                //            error.Add("You've already taken OH on next day.");
+                //        }
+                //    }
+                //}
+                //////
             }
 
             #endregion
 
+            //CHECKS FOR WHOLE LEAVE OBJECTS COMBINING LEAVE DETAIL DATA
+
             //if there are multiple leaves and one of them is CL, throw error
-            if (lDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CasualLeave)
-                && lDto.LeaveApplicationDetails.Count > 1)
+            if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CasualLeave)
+                && leaveApplicationDto.LeaveApplicationDetails.Count > 1)
             {
-                var leaves = lDto.LeaveApplicationDetails.Where(x => x.LeaveTypeCode != LeaveTypes.CasualLeave);
+                var leaves =
+                    leaveApplicationDto.LeaveApplicationDetails.Where(x => x.LeaveTypeCode != LeaveTypes.CasualLeave);
 
                 //find if there's a leave type other than LWP
                 bool found = leaves.Any(d => d.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
@@ -372,38 +448,55 @@ namespace ESS.Controllers.Api
             }
 
 
+            foreach (var leaveType in leaveApplicationDto.LeaveApplicationDetails.Select(l => l.LeaveTypeCode)
+                .Distinct())
+            {
+                if (leaveType != LeaveTypes.CasualLeave && leaveType != LeaveTypes.SickLeave &&
+                    leaveType != LeaveTypes.PaidLeave)
+                    continue;
+
+                float leaveCount = leaveApplicationDto.LeaveApplicationDetails
+                    .Where(detail => detail.LeaveTypeCode == leaveType).Sum(detail => detail.TotalDays);
+
+                if (leaveCount > 3 && leaveType == LeaveTypes.CasualLeave)
+                    error.Add("CL cannot be more than 3 days");
+
+                LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == leaveType);
+                float bal = lb.Opening - lb.Availed - lb.Encashed;
+
+                if (bal < leaveCount)
+                    error.Add("Insufficient balance of " + leaveType + ". Current Balance is: " + bal);
+            }
+
+
             //throw error if multiple CL are applied in the same application:
-            if (lDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.CasualLeave) > 1)
+            if (leaveApplicationDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.CasualLeave) > 1)
             {
                 //check for half CL...
-                bool found = lDto.LeaveApplicationDetails.Any(detail => detail.HalfDayFlag);
+                bool found = leaveApplicationDto.LeaveApplicationDetails.Any(detail => detail.HalfDayFlag);
 
                 bool findOptional =
-                    lDto.LeaveApplicationDetails.Any(detail => detail.LeaveTypeCode == LeaveTypes.OptionalLeave);
+                    leaveApplicationDto.LeaveApplicationDetails.Any(detail =>
+                        detail.LeaveTypeCode == LeaveTypes.OptionalLeave);
 
                 if (!found)
                 {
                     if (!findOptional)
                         error.Add("Cannot take multiple CLs in single Leave Application.");
                 }
-
-
-                float countCl = lDto.LeaveApplicationDetails
-                    .Where(detail => detail.LeaveTypeCode == LeaveTypes.CasualLeave).Sum(detail => detail.TotalDays);
-                if (countCl > 3)
-                    error.Add("CL cannot be more than 3 days");
             }
 
-            //throw error if multiple CL are applied in the same application:
-            if (lDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.OptionalLeave) > 1)
+            //throw error if multiple OH are applied in the same application:
+            if (leaveApplicationDto.LeaveApplicationDetails.Count(x => x.LeaveTypeCode == LeaveTypes.OptionalLeave) > 1)
             {
                 error.Add("Cannot take multiple Optional Leaves in single Leave Application.");
             }
 
             //Date range check
-            DateTime start = lDto.LeaveApplicationDetails.Select(x => x.FromDt).Min();
-            DateTime end = lDto.LeaveApplicationDetails.Select(x => x.ToDt).Max();
-            double total = lDto.LeaveApplicationDetails.Select(x => (x.ToDt.Subtract(x.FromDt).TotalDays + 1)).Sum();
+            DateTime start = leaveApplicationDto.LeaveApplicationDetails.Select(x => x.FromDt).Min();
+            DateTime end = leaveApplicationDto.LeaveApplicationDetails.Select(x => x.ToDt).Max();
+            double total = leaveApplicationDto.LeaveApplicationDetails
+                .Select(x => (x.ToDt.Subtract(x.FromDt).TotalDays + 1)).Sum();
 
             //subtract off days (w/offs + holidays) from above total
             total -= offDays;
@@ -413,29 +506,29 @@ namespace ESS.Controllers.Api
 
 
             //Check if ranges overlap skip in case of CO
-            if (lDto.LeaveApplicationDetails.All(x => x.LeaveTypeCode != LeaveTypes.CompOff))
+            if (leaveApplicationDto.LeaveApplicationDetails.All(x => x.LeaveTypeCode != LeaveTypes.CompOff))
             {
-                var overlaps = lDto.LeaveApplicationDetails.SelectMany(
-                        x1 => lDto.LeaveApplicationDetails,
-                        (x1, x2) => new { x1, x2 })
+                var overlaps = leaveApplicationDto.LeaveApplicationDetails.SelectMany(
+                        x1 => leaveApplicationDto.LeaveApplicationDetails,
+                        (x1, x2) => new {x1, x2})
                     .Where(t => !(Equals(t.x1, t.x2)))
                     .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
                     .Select(t => t.x2);
 
                 if (overlaps.Any())
                     error.Add("Date ranges must be consicutive, should not overlap.");
-
             }
 
 
             // CHECKS FOR COMP OFF ( CO )
 
             // check if start date is a Holiday
-            if (lDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
+            if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
                 if (start != end)
                 {
-                    if (Helpers.CustomHelper.GetHolidays(start, start, lDto.CompCode, lDto.WrkGrp, emp.Location).Count != 1)
+                    if (Helpers.CustomHelper.GetHolidays(start, start, leaveApplicationDto.CompCode,
+                            leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
                     {
                         error.Add("Date selected is not Holiday.");
                     }
@@ -447,6 +540,11 @@ namespace ESS.Controllers.Api
                             if (end.Subtract(start).TotalDays > 7)
                                 error.Add("Comp. Off can be taken within 7 days.");
                         }
+                        else if (emp.Location == Locations.Jfl)
+                        {
+                            if (end.Subtract(start).TotalDays > 30)
+                                error.Add("Comp. Off can be taken within 30 days.");
+                        }
                         else
                         {
                             if (end.Subtract(start).TotalDays > 90)
@@ -454,7 +552,7 @@ namespace ESS.Controllers.Api
                         }
                     }
 
-                    if (Helpers.CustomHelper.GetWeeklyOff(end, end, lDto.EmpUnqId).Count == 1)
+                    if (Helpers.CustomHelper.GetWeeklyOff(end, end, leaveApplicationDto.EmpUnqId).Count == 1)
                     {
                         error.Add("Comp. Off cannot be taken on Week Off day.");
                     }
@@ -463,7 +561,7 @@ namespace ESS.Controllers.Api
 
             // DONE. If there's no error, return success
             if (error.Count == 0)
-                return Ok(lDto);
+                return Ok(leaveApplicationDto);
 
 
             return Content(HttpStatusCode.BadRequest, error);

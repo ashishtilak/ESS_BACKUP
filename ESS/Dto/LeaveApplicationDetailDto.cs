@@ -30,7 +30,11 @@ namespace ESS.Dto
         public int ParentId { get; set; }
 
         public string PostUser { get; set; }
-        public DateTime PostedDt { get; set; }
+        public DateTime? PostedDt { get; set; }
+
+        public string CoMode { get; set; }          // W, H, E
+        public DateTime? CoDate1 { get; set; }
+        public DateTime? CoDate2 { get; set; }
 
         public bool IsCancellationPosted { get; set; }
 

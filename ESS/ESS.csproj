@@ -61,10 +61,6 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web.DynamicData" />
-    <Reference Include="System.Web.Entity" />
-    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -76,22 +72,16 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.EnterpriseServices" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
     </Reference>
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -573,6 +563,14 @@
     <Compile Include="Migrations\201908230532294_AddGaReleaserFlaginEmpMast.Designer.cs">
       <DependentUpon>201908230532294_AddGaReleaserFlaginEmpMast.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911270911271_CoffDateAdded.cs" />
+    <Compile Include="Migrations\201911270911271_CoffDateAdded.Designer.cs">
+      <DependentUpon>201911270911271_CoffDateAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911290632331_ChangeInLeaveRules.cs" />
+    <Compile Include="Migrations\201911290632331_ChangeInLeaveRules.Designer.cs">
+      <DependentUpon>201911290632331_ChangeInLeaveRules.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -948,6 +946,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201908230532294_AddGaReleaserFlaginEmpMast.resx">
       <DependentUpon>201908230532294_AddGaReleaserFlaginEmpMast.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911270911271_CoffDateAdded.resx">
+      <DependentUpon>201911270911271_CoffDateAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911290632331_ChangeInLeaveRules.resx">
+      <DependentUpon>201911290632331_ChangeInLeaveRules.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
