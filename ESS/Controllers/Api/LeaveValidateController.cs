@@ -217,9 +217,9 @@ namespace ESS.Controllers.Api
 
                 //Get next 6 days data in dictionary
                 var nextLeave = new Dictionary<DateTime, string>();
-                d = details.FromDt.AddDays(1);
+                d = details.ToDt.AddDays(1);
                 string strNextLeave = "";
-                while (d <= details.FromDt.AddDays(6))
+                while (d <= details.ToDt.AddDays(6))
                 {
                     nextLeave.Add(d, GetLeaveOnDate(d, leaveApplicationDto.EmpUnqId));
 

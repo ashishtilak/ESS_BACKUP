@@ -61,7 +61,7 @@ namespace ESS.Controllers.Api
                 .ToList();
 
 
-            foreach (var dto in lv)
+            foreach (LeaveApplicationDto dto in lv)
             {
                 var appl = _context.ApplReleaseStatus
                     .Where(l =>
@@ -71,23 +71,22 @@ namespace ESS.Controllers.Api
                     .ToList()
                     .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
-                foreach (var applReleaseStatusDto in appl)
+                foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
                 {
                     var relCode = _context.ReleaseAuth
                         .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
                         .ToList();
 
-                    foreach (var auth in relCode)
+                    foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                     {
-                        if (auth.EmpUnqId == empUnqId)
-                            applReleaseStatusDto.ReleaseAuth = empUnqId;
+                        applReleaseStatusDto.ReleaseAuth = empUnqId;
                     }
 
                     dto.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
 
 
-                var employeeDto = _context.Employees
+                EmployeeDto employeeDto = _context.Employees
                     .Select(e => new EmployeeDto
                     {
                         EmpUnqId = e.EmpUnqId,
@@ -139,13 +138,12 @@ namespace ESS.Controllers.Api
                     .Where(r => r.EmpUnqId == empUnqId)
                     .ToList();
 
-                List<GatePassDto> outputGp = new List<GatePassDto>();
+                var outputGp = new List<GatePassDto>();
 
 
-                foreach (var rAuth in relAuth)
+                foreach (ReleaseAuth rAuth in relAuth)
                 {
-                    List<ApplReleaseStatus> app = new List<ApplReleaseStatus>();
-
+                    var app = new List<ApplReleaseStatus>();
 
                     if (rAuth.IsGpNightReleaser)
                     {
@@ -191,23 +189,20 @@ namespace ESS.Controllers.Api
                                 .Where(r => vRelLvl.Contains(r.GpReleaseStrategy))
                                 .ToList();
 
+                            var vEmp = new List<string>();
 
-                            List<String> vEmp = new List<string>();
-
-                            foreach (var relObj in vRelStr)
-                            {
-                                var vEmptmp = _context.Employees
-                                    .Where(
-                                        e =>
+                            foreach (
+                                    var vEmptmp in vRelStr.Select(relObj => _context.Employees
+                                    .Where(e =>
                                             e.CompCode == relObj.CompCode &&
                                             e.WrkGrp == relObj.WrkGrp &&
                                             e.UnitCode == relObj.UnitCode &&
                                             e.DeptCode == relObj.DeptCode &&
-                                            e.StatCode == relObj.StatCode
-                                    )
+                                            e.StatCode == relObj.StatCode)
                                     .Select(e => e.EmpUnqId)
-                                    .ToList();
-
+                                    .ToList())
+                                    )
+                            {
                                 vEmp.AddRange(vEmptmp);
                             }
 
@@ -244,7 +239,7 @@ namespace ESS.Controllers.Api
                         .ToList();
 
 
-                    foreach (var dto in gp)
+                    foreach (GatePassDto dto in gp)
                     {
                         var appl = _context.ApplReleaseStatus
                             .Where(l =>
@@ -254,28 +249,43 @@ namespace ESS.Controllers.Api
                             .ToList()
                             .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
-                        foreach (var applReleaseStatusDto in appl)
+                        foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
                         {
+                            Employees vEmp = _context.Employees
+                                .FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseStrategy);
+
+                            GpReleaseStrategies vRelStr = _context.GpReleaseStrategy
+                                .FirstOrDefault(e => e.CompCode == vEmp.CompCode &&
+                                                     e.WrkGrp == vEmp.WrkGrp &&
+                                                     e.UnitCode == vEmp.UnitCode &&
+                                                     e.DeptCode == vEmp.DeptCode &&
+                                                     e.StatCode == vEmp.StatCode);
+                            if (vRelStr ==null) continue;
+
+                            var vRelStrLvl = _context.GpReleaseStrategyLevels
+                                .Where(g => g.GpReleaseStrategy == vRelStr.GpReleaseStrategy);
+
+                            var vRelCodes = vRelStrLvl.Select(g => g.ReleaseCode);
+
                             var relCode = _context.ReleaseAuth
-                                .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                                .Where(r => vRelCodes.Contains(r.ReleaseCode))
                                 .ToList();
 
-                            foreach (var auth in relCode)
+                            foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                             {
-                                if (auth.EmpUnqId == empUnqId)
+                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                                applReleaseStatusDto.ReleaseStrategy = vRelStr.GpReleaseStrategy;
+                                applReleaseStatusDto.ReleaseCode = auth.ReleaseCode;
+                                    
+                                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
                                 {
-                                    applReleaseStatusDto.ReleaseAuth = empUnqId;
-                                    dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
-                                    {
-                                        applReleaseStatusDto
-                                    };
-                                }
+                                    applReleaseStatusDto
+                                };
                             }
-                            
                         }
 
 
-                        var employeeDto = _context.Employees
+                        EmployeeDto employeeDto = _context.Employees
                             .Select(e => new EmployeeDto
                             {
                                 EmpUnqId = e.EmpUnqId,
@@ -335,12 +345,12 @@ namespace ESS.Controllers.Api
                     .Where(r => r.EmpUnqId == empUnqId)
                     .ToList();
 
-                List<GpAdviceDto> outputGp = new List<GpAdviceDto>();
+                var outputGp = new List<GpAdviceDto>();
 
                 //for each release auth
-                foreach (var rAuth in relAuth)
+                foreach (ReleaseAuth rAuth in relAuth)
                 {
-                    List<ApplReleaseStatus> app = new List<ApplReleaseStatus>();
+                    var app = new List<ApplReleaseStatus>();
 
                     // get list of all application release status
                     // which are in release
@@ -365,7 +375,7 @@ namespace ESS.Controllers.Api
                         .Select(Mapper.Map<GpAdvices, GpAdviceDto>).ToList();
 
                     // now for all gate pass advices,
-                    foreach (var dto in gp)
+                    foreach (GpAdviceDto dto in gp)
                     {
                         //get relevant app release object 
                         var appl = app
@@ -379,27 +389,24 @@ namespace ESS.Controllers.Api
                             .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
                         //for each app release lines
-                        foreach (var applReleaseStatusDto in appl)
+                        foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
                         {
                             var relCode = _context.ReleaseAuth
                                 .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
                                 .ToList();
 
-                            foreach (var auth in relCode)
+                            foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                             {
-                                if (auth.EmpUnqId == empUnqId)
+                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
                                 {
-                                    applReleaseStatusDto.ReleaseAuth = empUnqId;
-                                    dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
-                                    {
-                                        applReleaseStatusDto
-                                    };
-                                }
+                                    applReleaseStatusDto
+                                };
                             }
                         }
 
 
-                        var employeeDto = _context.Employees
+                        EmployeeDto employeeDto = _context.Employees
                             .Select(e => new EmployeeDto
                             {
                                 EmpUnqId = e.EmpUnqId,
@@ -595,6 +602,7 @@ namespace ESS.Controllers.Api
                             leaveApplication.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
                         }
                     }
+                    applicationDetail.ReleaseDate = today;
                 }
                 else if (releaseStatusCode == ReleaseStatus.FullyReleased)
                 {
@@ -738,9 +746,26 @@ namespace ESS.Controllers.Api
             //first verfy if release code is correct based on the relase code
             DateTime today = DateTime.Now;
 
+//          DateTime fromEight = DateTime.Today.AddHours(20);
+//          DateTime toEight = DateTime.Today.AddHours(28);
+//          TimeSpan fromEight = new TimeSpan(20,00,00);
+//          TimeSpan toEight = new TimeSpan(07,59,59);
+//          DateTime today = DateTime.Now;
 
-            DateTime fromEight = DateTime.Today.AddHours(20);
-            DateTime toEight = DateTime.Today.AddHours(28);
+            TimeSpan start = new TimeSpan(0, 0, 1); //12 Oclock
+            TimeSpan end = new TimeSpan(8, 0, 0); //8 Oclock
+            
+            DateTime fromEight = today.Date.AddHours(20);
+            DateTime toEight = today.Date.AddHours(32);
+
+            //if time is between night 12 to morning 8, subtract one day 
+            if (today.TimeOfDay > start && today.TimeOfDay < end)
+            {
+                fromEight = today.AddDays(-1).Date.AddHours(20);
+                toEight = today.AddDays(-1).Date.AddHours(32);
+            }
+
+
 
 
             ReleaseAuth relAuth;

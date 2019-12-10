@@ -396,6 +396,7 @@ namespace ESS.Controllers.Api
                                     foreach (var b in appRelStat)
                                     {
                                         b.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                                        b.ReleaseDate = DateTime.Now;
                                     }
 
                                     leaveApplication.IsPosted = LeaveApplicationDetails.PostingRejected;
