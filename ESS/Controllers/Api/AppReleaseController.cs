@@ -271,6 +271,12 @@ namespace ESS.Controllers.Api
                                 .Where(r => vRelCodes.Contains(r.ReleaseCode))
                                 .ToList();
 
+                            var relCodeDay = _context.ReleaseAuth
+                                .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                                .ToList();
+
+                            relCode.AddRange(relCodeDay);
+
                             foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                             {
                                 applReleaseStatusDto.ReleaseAuth = empUnqId;
