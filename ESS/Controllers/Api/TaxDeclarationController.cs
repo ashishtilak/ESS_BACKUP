@@ -55,6 +55,21 @@ namespace ESS.Controllers.Api
                 .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth && t.ActualFlag == actualFlag)
                 .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
                 .ToList();
+            if (taxDetails.Count == 0)
+            {
+                taxDetails = _context.TaxDeclarations
+                    .Include(i => i.InsuranceDetails)
+                    .Include(m => m.MutualFundDetails)
+                    .Include(n => n.NscDetails)
+                    .Include(p => p.PpfDetails)
+                    .Include(b => b.BankDeposits)
+                    .Include(s => s.SukanyaDetails)
+                    .Include(u => u.UlipDetails)
+                    .Include(r => r.RentDetails)
+                    .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth && t.ActualFlag == false)
+                    .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
+                    .ToList();
+            }
 
             return Ok(taxDetails);
         }

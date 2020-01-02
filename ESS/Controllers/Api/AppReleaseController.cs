@@ -25,8 +25,6 @@ namespace ESS.Controllers.Api
         [ActionName("getapplreleasestatus")]
         public IHttpActionResult GetApplReleaseStatus(string empUnqId)
         {
-            //TODO: Remove magic string "I"
-
             var relAuth = _context.ReleaseAuth
                 .Where(r => r.EmpUnqId == empUnqId)
                 .Select(r => r.ReleaseCode)
@@ -36,7 +34,7 @@ namespace ESS.Controllers.Api
             var app = _context.ApplReleaseStatus
                 .Where(l =>
                     relAuth.Contains(l.ReleaseCode) &&
-                    l.ReleaseStatusCode == "I" &&
+                    l.ReleaseStatusCode == ReleaseStatus.InRelease &&
                     l.ReleaseGroupCode == ReleaseGroups.LeaveApplication
                 )
                 .ToList();
@@ -100,7 +98,6 @@ namespace ESS.Controllers.Api
                         UnitCode = e.UnitCode,
                         DeptCode = e.DeptCode,
                         StatCode = e.StatCode,
-                        //SecCode = e.SecCode,
                         CatCode = e.CatCode,
                         EmpTypeCode = e.EmpTypeCode,
                         GradeCode = e.GradeCode,
@@ -225,7 +222,7 @@ namespace ESS.Controllers.Api
                     else
                     {
                         app = _context.ApplReleaseStatus
-                            .Where(l => rAuth.ReleaseCode == l.ReleaseCode && l.ReleaseStatusCode == "I")
+                            .Where(l => rAuth.ReleaseCode == l.ReleaseCode && l.ReleaseStatusCode == ReleaseStatus.InRelease)
                             .ToList();
                     }
 
@@ -305,7 +302,6 @@ namespace ESS.Controllers.Api
                                 UnitCode = e.UnitCode,
                                 DeptCode = e.DeptCode,
                                 StatCode = e.StatCode,
-                                //SecCode = e.SecCode,
                                 CatCode = e.CatCode,
                                 EmpTypeCode = e.EmpTypeCode,
                                 GradeCode = e.GradeCode,
@@ -426,7 +422,6 @@ namespace ESS.Controllers.Api
                                 UnitCode = e.UnitCode,
                                 DeptCode = e.DeptCode,
                                 StatCode = e.StatCode,
-                                //SecCode = e.SecCode,
                                 CatCode = e.CatCode,
                                 EmpTypeCode = e.EmpTypeCode,
                                 GradeCode = e.GradeCode,

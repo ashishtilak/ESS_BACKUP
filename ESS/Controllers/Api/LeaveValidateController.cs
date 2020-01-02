@@ -67,8 +67,7 @@ namespace ESS.Controllers.Api
 
 
             // Use helper class to get leavebalance form attendance server
-            var leaveBalDto = ESS.Helpers.CustomHelper.GetLeaveBalance(leaveApplicationDto.EmpUnqId, year);
-
+            var leaveBalDto = Helpers.CustomHelper.GetLeaveBalance(leaveApplicationDto.EmpUnqId, year);
 
             //
             // Raag Bhoopali:
@@ -148,8 +147,8 @@ namespace ESS.Controllers.Api
 
 
                 // Get holidays between from/to date and add them to off days
-                List<DateTime> holidays =
-                    ESS.Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, leaveApplicationDto.CompCode,
+                var holidays =
+                    Helpers.CustomHelper.GetHolidays(details.FromDt, details.ToDt, leaveApplicationDto.CompCode,
                         leaveApplicationDto.WrkGrp, emp.Location);
 
                 details.TotalDays -= holidays.Count;
@@ -160,8 +159,8 @@ namespace ESS.Controllers.Api
                 offDays += holidays.Count;
 
                 // Get weekly offs between the selected range
-                List<DateTime> weekOffs =
-                    ESS.Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, leaveApplicationDto.EmpUnqId);
+                var weekOffs =
+                    Helpers.CustomHelper.GetWeeklyOff(details.FromDt, details.ToDt, leaveApplicationDto.EmpUnqId);
 
                 //Check if weekoff is on holiday. If it is, then remove it.
                 if (holidays.Count > 0)
@@ -177,13 +176,16 @@ namespace ESS.Controllers.Api
                 offDays += weekOffs.Count;
 
 
-                //CHECK6: check leave balance
-                LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
-                float bal = lb.Opening - lb.Availed - lb.Encashed;
+                //CHECK6: check leave balance other than CO
 
-                if (bal < details.TotalDays)
-                    error.Add("Insufficient balance of " + details.LeaveTypeCode + ". Current Balance is: " + bal);
+                if (details.LeaveTypeCode != LeaveTypes.CompOff)
+                {
+                    LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
+                    float bal = lb.Opening - lb.Availed - lb.Encashed;
 
+                    if (bal < details.TotalDays)
+                        error.Add("Insufficient balance of " + details.LeaveTypeCode + ". Current Balance is: " + bal);
+                }
                 //CHECK6 OVER
 
 
@@ -569,10 +571,10 @@ namespace ESS.Controllers.Api
 
         private string GetLeaveOnDate(DateTime dt, string empUnqId)
         {
-            if (ESS.Helpers.CustomHelper.GetWeeklyOff(dt, dt, empUnqId).Count > 0)
+            if (Helpers.CustomHelper.GetWeeklyOff(dt, dt, empUnqId).Count > 0)
                 return "WO";
 
-            var leave = _context.LeaveApplicationDetails
+            LeaveApplicationDetails leave = _context.LeaveApplicationDetails
                 .FirstOrDefault(l => l.LeaveApplication.EmpUnqId == empUnqId &&
                                      (dt >= l.FromDt && dt <= l.ToDt) &&
                                      l.Cancelled == false &&

@@ -244,7 +244,7 @@ namespace ESS.Controllers.Api
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>);
 
 
-            List<Leaves> leaves = (from appHdr in leaveAppDto
+            var leaves = (from appHdr in leaveAppDto
                 from appDtl in appHdr.LeaveApplicationDetails
                 select new Leaves
                 {
@@ -328,33 +328,34 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult PostLeaves([FromBody] object requestData)
         {
-            var leavePosting = JsonConvert.DeserializeObject<List<LeavePostingDto>>(requestData.ToString());
+            var leavePostingDtos = JsonConvert.DeserializeObject<List<LeavePostingDto>>(requestData.ToString());
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                using (var transaction = _context.Database.BeginTransaction())
+                using (DbContextTransaction transaction = _context.Database.BeginTransaction())
                 {
-                    foreach (var dto in leavePosting)
+                    foreach (LeavePostingDto dto in leavePostingDtos)
                     {
-                        var dto1 = dto;
-                        var leave = _context.LeaveApplications
+                        LeavePostingDto dto1 = dto;
+                        var leaveApplications = _context.LeaveApplications
                             .Include(l => l.LeaveApplicationDetails)
                             .Where(l => l.LeaveAppId == dto1.LeaveAppId && l.YearMonth == dto1.YearMonth)
                             .ToList();
 
-                        foreach (var l in leave)
+                        foreach (LeaveApplications leaveApplication in leaveApplications)
                         {
-                            var emp = _context.Employees.Single(e => e.EmpUnqId == l.EmpUnqId);
+                            Employees emp = _context.Employees.Single(e => e.EmpUnqId == leaveApplication.EmpUnqId);
 
-                            foreach (var leaveApplication in l.LeaveApplicationDetails)
+                            foreach (LeaveApplicationDetails leaveApplicationDetails in leaveApplication
+                                .LeaveApplicationDetails.ToList())
                             {
                                 // IF does not match then skip line
 
-                                if (leaveApplication.LeaveAppId != dto1.LeaveAppId ||
-                                    leaveApplication.LeaveAppItem != dto1.LeaveAppItem ||
-                                    leaveApplication.YearMonth != dto1.YearMonth) continue;
+                                if (leaveApplicationDetails.LeaveAppId != dto1.LeaveAppId ||
+                                    leaveApplicationDetails.LeaveAppItem != dto1.LeaveAppItem ||
+                                    leaveApplicationDetails.YearMonth != dto1.YearMonth) continue;
 
                                 // CHECK IF HR USER HAS REJECTED THE LEAVE
                                 // IF SO, SET STATUS TO REJECT WITH REMARKS
@@ -362,65 +363,64 @@ namespace ESS.Controllers.Api
 
                                 if (dto1.IsPosted == LeaveApplicationDetails.PostingRejected)
                                 {
-                                    l.Remarks = "HR: " + dto1.Remarks;
-                                    if (l.ReleaseStatusCode == ReleaseStatus.NotReleased)
+                                    leaveApplication.Remarks = "HR: " + dto1.Remarks;
+                                    if (leaveApplication.ReleaseStatusCode == ReleaseStatus.NotReleased)
                                     {
-                                        if ((l.Cancelled ?? true) || l.ParentId != 0)
+                                        if ((leaveApplication.Cancelled ?? true) || leaveApplication.ParentId != 0)
                                         {
                                             return BadRequest("Self Cancellation of cancelled leave not allowed.");
                                         }
 
-                                        l.Remarks = "Cancelled by Self.";
+                                        leaveApplication.Remarks = "Cancelled by Self.";
                                     }
 
 
                                     //Change release status to "R"
 
-                                    l.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                                    leaveApplication.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
                                     //l.UpdUser = dto1.UserId;
                                     //l.UpdDt = DateTime.Now;
 
-                                    leaveApplication.PostUser = dto1.UserId;
-                                    leaveApplication.PostedDt = DateTime.Now;
+                                    leaveApplicationDetails.PostUser = dto1.UserId;
+                                    leaveApplicationDetails.PostedDt = DateTime.Now;
 
                                     var appRelStat = _context.ApplReleaseStatus
                                         .Where(
                                             la =>
-                                                la.YearMonth == l.YearMonth &&
-                                                la.ReleaseGroupCode == l.ReleaseGroupCode &&
-                                                la.ApplicationId == l.LeaveAppId
+                                                la.YearMonth == leaveApplication.YearMonth &&
+                                                la.ReleaseGroupCode == leaveApplication.ReleaseGroupCode &&
+                                                la.ApplicationId == leaveApplication.LeaveAppId
                                         )
                                         .ToList();
 
                                     //also update app release table
-                                    foreach (var b in appRelStat)
+                                    foreach (ApplReleaseStatus b in appRelStat)
                                     {
                                         b.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
                                         b.ReleaseDate = DateTime.Now;
                                     }
 
-                                    leaveApplication.IsPosted = LeaveApplicationDetails.PostingRejected;
+                                    leaveApplicationDetails.IsPosted = LeaveApplicationDetails.PostingRejected;
 
                                     //now skip this loop
                                     continue;
                                 }
 
-
+                                
                                 //if partial posted, then do not post in attendance
                                 //only post fully posted leaves in attendance server.
-
                                 if (dto.IsPosted == LeaveApplicationDetails.PartiallyPosted)
                                 {
                                     //UPDATE POSTED FLAGE
 
-                                    if (leaveApplication.LeaveTypeCode == LeaveTypes.SickLeave &&
-                                        leaveApplication.TotalDays > 3)
+                                    if (leaveApplicationDetails.LeaveTypeCode == LeaveTypes.SickLeave &&
+                                        leaveApplicationDetails.TotalDays > 3)
                                     {
                                         int slcount = 1;
-                                        DateTime dt = leaveApplication.FromDt ?? DateTime.Now;
+                                        DateTime dt = leaveApplicationDetails.FromDt ?? DateTime.Now;
 
                                         // loop for each day
-                                        while (dt <= leaveApplication.ToDt)
+                                        while (dt <= leaveApplicationDetails.ToDt)
                                         {
                                             if (slcount > 3)
                                             {
@@ -431,9 +431,10 @@ namespace ESS.Controllers.Api
 
 
                                                 // if this day is holiday/week off, then skip this day
-                                                List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp,
-                                                        l.Employee.Location);
+                                                var holidays =
+                                                    Helpers.CustomHelper.GetHolidays(dt, dt,
+                                                        leaveApplication.CompCode, leaveApplication.WrkGrp,
+                                                        leaveApplication.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -441,8 +442,9 @@ namespace ESS.Controllers.Api
                                                 }
 
 
-                                                List<DateTime> weekOffs =
-                                                    ESS.Helpers.CustomHelper.GetWeeklyOff(dt, dt, l.EmpUnqId);
+                                                var weekOffs =
+                                                    Helpers.CustomHelper.GetWeeklyOff(dt, dt,
+                                                        leaveApplication.EmpUnqId);
                                                 if (weekOffs.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -454,25 +456,23 @@ namespace ESS.Controllers.Api
                                                 AttdLeavePost attdLeaveObj =
                                                     new AttdLeavePost
                                                     {
-                                                        AppID = leaveApplication.LeaveAppId,
-                                                        EmpUnqID = l.EmpUnqId,
+                                                        AppID = leaveApplicationDetails.LeaveAppId,
+                                                        EmpUnqID = leaveApplication.EmpUnqId,
                                                         FromDate = dt, //will cause error if dates are null
-                                                        ToDate = leaveApplication.ToDt ??
+                                                        ToDate = leaveApplicationDetails.ToDt ??
                                                                  DateTime.Now
                                                                      .AddDays(-1), //will cause error if dates are null
                                                         LeaveTyp = LeaveTypes.LeaveWithoutPay,
                                                         HalfDay = false,
                                                         PostedFlg = false,
                                                         AttdUser = dto
-                                                            .UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
-                                                        Remarks = leaveApplication.Remarks,
+                                                            .UserId,
+                                                        Remarks = leaveApplicationDetails.Remarks,
                                                         ERROR = "",
                                                         Location = emp.Location
                                                     };
 
-                                                bool result;
-
-                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
+                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out var result);
 
                                                 // if there was error in leave posting,
                                                 // save partial  posting flag in ESS
@@ -480,9 +480,9 @@ namespace ESS.Controllers.Api
 
                                                 if (!result)
                                                 {
-                                                    leaveApplication.IsPosted = dto1.IsPosted;
-                                                    leaveApplication.PostUser = dto1.UserId;
-                                                    leaveApplication.PostedDt = DateTime.Now;
+                                                    leaveApplicationDetails.IsPosted = dto1.IsPosted;
+                                                    leaveApplicationDetails.PostUser = dto1.UserId;
+                                                    leaveApplicationDetails.PostedDt = DateTime.Now;
 
                                                     //l.UpdUser = dto1.UserId;
                                                     //l.UpdDt = DateTime.Now;
@@ -492,14 +492,15 @@ namespace ESS.Controllers.Api
                                                     return BadRequest("Error: " + attdLeaveObj.ERROR);
                                                 }
 
-                                                dt = leaveApplication.ToDt ?? DateTime.Now;
+                                                dt = leaveApplicationDetails.ToDt ?? DateTime.Now;
                                             }
                                             else
                                             {
                                                 // if this day is holiday/week off, then skip this day
-                                                List<DateTime> holidays =
-                                                    ESS.Helpers.CustomHelper.GetHolidays(dt, dt, l.CompCode, l.WrkGrp,
-                                                        l.Employee.Location);
+                                                var holidays =
+                                                    Helpers.CustomHelper.GetHolidays(dt, dt,
+                                                        leaveApplication.CompCode, leaveApplication.WrkGrp,
+                                                        leaveApplication.Employee.Location);
                                                 if (holidays.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -507,8 +508,9 @@ namespace ESS.Controllers.Api
                                                 }
 
 
-                                                List<DateTime> weekOffs =
-                                                    ESS.Helpers.CustomHelper.GetWeeklyOff(dt, dt, l.EmpUnqId);
+                                                var weekOffs =
+                                                    Helpers.CustomHelper.GetWeeklyOff(dt, dt,
+                                                        leaveApplication.EmpUnqId);
                                                 if (weekOffs.Count != 0)
                                                 {
                                                     dt = dt.AddDays(1);
@@ -520,7 +522,7 @@ namespace ESS.Controllers.Api
                                                 // if this is first SL, set the date as from date
                                                 if (slcount == 1)
                                                 {
-                                                    leaveApplication.FromDt = dt;
+                                                    leaveApplicationDetails.FromDt = dt;
                                                 }
 
 
@@ -531,26 +533,24 @@ namespace ESS.Controllers.Api
                                                     AttdLeavePost attdLeaveObj =
                                                         new AttdLeavePost
                                                         {
-                                                            AppID = leaveApplication.LeaveAppId,
-                                                            EmpUnqID = l.EmpUnqId,
-                                                            FromDate = leaveApplication.FromDt ??
+                                                            AppID = leaveApplicationDetails.LeaveAppId,
+                                                            EmpUnqID = leaveApplication.EmpUnqId,
+                                                            FromDate = leaveApplicationDetails.FromDt ??
                                                                        DateTime
                                                                            .Now, //will cause error if dates are null
                                                             ToDate = dt,
-                                                            LeaveTyp = leaveApplication.LeaveTypeCode,
-                                                            HalfDay = leaveApplication.HalfDayFlag,
+                                                            LeaveTyp = leaveApplicationDetails.LeaveTypeCode,
+                                                            HalfDay = leaveApplicationDetails.HalfDayFlag,
                                                             PostedFlg = false,
                                                             AttdUser = dto
-                                                                .UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
-                                                            Remarks = leaveApplication.Remarks,
+                                                                .UserId,
+                                                            Remarks = leaveApplicationDetails.Remarks,
                                                             ERROR = "",
                                                             Location = emp.Location
                                                         };
 
-                                                    bool result;
-
                                                     attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location,
-                                                        out result);
+                                                        out var result);
 
                                                     // if there was error in leave posting,
                                                     // save partial  posting flag in ESS
@@ -558,9 +558,9 @@ namespace ESS.Controllers.Api
 
                                                     if (!result)
                                                     {
-                                                        leaveApplication.IsPosted = dto1.IsPosted;
-                                                        leaveApplication.PostUser = dto1.UserId;
-                                                        leaveApplication.PostedDt = DateTime.Now;
+                                                        leaveApplicationDetails.IsPosted = dto1.IsPosted;
+                                                        leaveApplicationDetails.PostUser = dto1.UserId;
+                                                        leaveApplicationDetails.PostedDt = DateTime.Now;
 
                                                         //l.UpdUser = dto1.UserId;
                                                         //l.UpdDt = DateTime.Now;
@@ -578,9 +578,9 @@ namespace ESS.Controllers.Api
                                         }
                                     }
 
-                                    leaveApplication.IsPosted = dto1.IsPosted;
-                                    leaveApplication.PostUser = dto1.UserId;
-                                    leaveApplication.PostedDt = DateTime.Now;
+                                    leaveApplicationDetails.IsPosted = dto1.IsPosted;
+                                    leaveApplicationDetails.PostUser = dto1.UserId;
+                                    leaveApplicationDetails.PostedDt = DateTime.Now;
                                     //l.UpdUser = dto1.UserId;
                                     //l.UpdDt = DateTime.Now;
                                 }
@@ -594,6 +594,108 @@ namespace ESS.Controllers.Api
                                 // This will also set "Posted flag for both lines"
                                 else if (dto.IsPosted == LeaveApplicationDetails.ForcefullyPosted)
                                 {
+                                    //this applies to only SLs...
+                                    if (leaveApplicationDetails.LeaveTypeCode != LeaveTypes.SickLeave) continue;
+                                    //Count SL days...
+                                    int slCount = 1;
+                                    DateTime dt = leaveApplicationDetails.FromDt ?? DateTime.Now;
+
+                                    //loop for each days:
+                                    while (dt <= leaveApplicationDetails.ToDt)
+                                    {
+                                        if (slCount <= 3)
+                                        {
+                                            // If this day is a holiday or week off, skip this day from count
+                                            var holidays =
+                                                Helpers.CustomHelper.GetHolidays(dt, dt,
+                                                    leaveApplication.CompCode, leaveApplication.WrkGrp,
+                                                    leaveApplication.Employee.Location);
+                                            if (holidays.Count != 0)
+                                            {
+                                                dt = dt.AddDays(1);
+                                                continue;
+                                            }
+
+                                            var weekOffs =
+                                                Helpers.CustomHelper.GetWeeklyOff(dt, dt,
+                                                    leaveApplication.EmpUnqId);
+                                            if (weekOffs.Count != 0)
+                                            {
+                                                dt = dt.AddDays(1);
+                                                continue;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // Post remaining days as LWP:
+
+                                            // if this day is holiday/week off, then skip this day
+                                            var holidays =
+                                                Helpers.CustomHelper.GetHolidays(dt, dt,
+                                                    leaveApplication.CompCode, leaveApplication.WrkGrp,
+                                                    leaveApplication.Employee.Location);
+                                            if (holidays.Count != 0)
+                                            {
+                                                dt = dt.AddDays(1);
+                                                continue;
+                                            }
+
+                                            var weekOffs =
+                                                Helpers.CustomHelper.GetWeeklyOff(dt, dt,
+                                                    leaveApplication.EmpUnqId);
+                                            if (weekOffs.Count != 0)
+                                            {
+                                                dt = dt.AddDays(1);
+                                                continue;
+                                            }
+                                            // this day is not holiday/week off
+                                            // so post LWP on this day...
+
+                                            //GET TEMP LEAVE APP DETAIL OBJECT FROM CONTEXT
+                                            //TO APPEND NEW ITEM TO IT....
+                                            //CAN'T USE THIS OBJECT BECAUSE IT'LL BREAK THE LOOP
+
+                                            LeaveApplications tmpLd = _context.LeaveApplications
+                                                .FirstOrDefault(l => l.YearMonth == leaveApplicationDetails.YearMonth && 
+                                                                     l.LeaveAppId == leaveApplicationDetails.LeaveAppId);
+
+                                            int maxDetailId =
+                                                tmpLd.LeaveApplicationDetails.Max(d => d.LeaveAppItem);
+
+                                            LeaveApplicationDetails newDetail = new LeaveApplicationDetails
+                                            {
+                                                YearMonth = leaveApplicationDetails.YearMonth,
+                                                LeaveAppId = leaveApplicationDetails.LeaveAppId,
+                                                LeaveAppItem = maxDetailId + 1,
+                                                CompCode = leaveApplicationDetails.CompCode,
+                                                WrkGrp = leaveApplicationDetails.WrkGrp,
+                                                LeaveTypeCode = LeaveTypes.LeaveWithoutPay,
+                                                FromDt = dt,
+                                                ToDt = leaveApplicationDetails.ToDt,
+                                                HalfDayFlag = false,
+                                                TotalDays = leaveApplicationDetails.TotalDays - 3,
+                                                IsPosted = LeaveApplicationDetails.FullyPosted,
+                                                Remarks = "Forcefully posted",
+                                                Cancelled = false,
+                                                ParentId = 0,
+                                                IsCancellationPosted = false,
+                                                PostUser = dto1.UserId,
+                                                PostedDt = DateTime.Now
+                                            };
+
+                                            tmpLd.LeaveApplicationDetails.Add(newDetail);
+
+                                            // shorten the leave application TO date of this SL 
+                                            leaveApplicationDetails.ToDt = dt.AddDays(-1);
+                                            leaveApplicationDetails.TotalDays = 3;
+                                            leaveApplicationDetails.IsPosted = LeaveApplicationDetails.FullyPosted;
+
+                                            dt = newDetail.ToDt??DateTime.Today;
+                                        }
+
+                                        slCount++;
+                                        dt = dt.AddDays(1);
+                                    }
                                 }
                                 //End of change on 14.08.2019
 
@@ -604,14 +706,15 @@ namespace ESS.Controllers.Api
                                     // 
 
                                     //DO NOT POST If full leave is cancelled and is being posted.
-                                    if (leaveApplication.Cancelled == true && leaveApplication.ParentId == 0)
+                                    if (leaveApplicationDetails.Cancelled == true &&
+                                        leaveApplicationDetails.ParentId == 0)
                                     {
-                                        leaveApplication.IsPosted = dto1.IsPosted;
-                                        leaveApplication.PostUser = dto1.UserId;
-                                        leaveApplication.PostedDt = DateTime.Now;
+                                        leaveApplicationDetails.IsPosted = dto1.IsPosted;
+                                        leaveApplicationDetails.PostUser = dto1.UserId;
+                                        leaveApplicationDetails.PostedDt = DateTime.Now;
                                         //l.UpdUser = dto1.UserId;
                                         //l.UpdDt = DateTime.Now;
-                                        leaveApplication.IsCancellationPosted = true;
+                                        leaveApplicationDetails.IsCancellationPosted = true;
                                         continue;
                                     }
 
@@ -620,19 +723,19 @@ namespace ESS.Controllers.Api
                                     AttdLeavePost attdLeaveObj =
                                         new AttdLeavePost
                                         {
-                                            AppID = leaveApplication.LeaveAppId,
-                                            EmpUnqID = l.EmpUnqId,
+                                            AppID = leaveApplicationDetails.LeaveAppId,
+                                            EmpUnqID = leaveApplication.EmpUnqId,
                                             FromDate =
-                                                leaveApplication.FromDt ??
+                                                leaveApplicationDetails.FromDt ??
                                                 DateTime.Now, //will cause error if dates are null
                                             ToDate =
-                                                leaveApplication.ToDt ??
+                                                leaveApplicationDetails.ToDt ??
                                                 DateTime.Now.AddDays(-1), //will cause error if dates are null
-                                            LeaveTyp = leaveApplication.LeaveTypeCode,
-                                            HalfDay = leaveApplication.HalfDayFlag,
+                                            LeaveTyp = leaveApplicationDetails.LeaveTypeCode,
+                                            HalfDay = leaveApplicationDetails.HalfDayFlag,
                                             PostedFlg = false,
-                                            AttdUser = dto.UserId, //TODO: CHANGE TO ATTENDANCE SYSTEM USER ID
-                                            Remarks = leaveApplication.Remarks,
+                                            AttdUser = dto.UserId,
+                                            Remarks = leaveApplicationDetails.Remarks,
                                             ERROR = "",
                                             Location = emp.Location
                                         };
@@ -642,22 +745,20 @@ namespace ESS.Controllers.Api
                                     if (attdLeaveObj.LeaveTyp == LeaveTypes.CompOff)
                                     {
                                         //In case of CompOff, 
-                                        leaveApplication.FromDt = leaveApplication.ToDt;
+                                        leaveApplicationDetails.FromDt = leaveApplicationDetails.ToDt;
                                         attdLeaveObj.FromDate = attdLeaveObj.ToDate;
                                     }
 
 
-                                    bool result;
-
-                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out result);
+                                    attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out var result);
 
                                     if (result)
                                     {
                                         //UPDATE POSTED FLAGE
 
-                                        leaveApplication.IsPosted = dto1.IsPosted;
-                                        leaveApplication.PostUser = dto1.UserId;
-                                        leaveApplication.PostedDt = DateTime.Now;
+                                        leaveApplicationDetails.IsPosted = dto1.IsPosted;
+                                        leaveApplicationDetails.PostUser = dto1.UserId;
+                                        leaveApplicationDetails.PostedDt = DateTime.Now;
                                         //l.UpdUser = dto1.UserId;
                                         //l.UpdDt = DateTime.Now;
 
@@ -665,9 +766,9 @@ namespace ESS.Controllers.Api
                                         // we'll set the IsCancellationPosted flag
 
                                         if (dto1.IsPosted == LeaveApplicationDetails.FullyPosted &&
-                                            leaveApplication.Cancelled == true)
+                                            leaveApplicationDetails.Cancelled == true)
                                         {
-                                            leaveApplication.IsCancellationPosted = true;
+                                            leaveApplicationDetails.IsCancellationPosted = true;
                                         }
                                     }
                                     else
@@ -675,8 +776,8 @@ namespace ESS.Controllers.Api
                                         return BadRequest("Error: " + attdLeaveObj.ERROR);
                                     }
                                 }
-                            }
-                        }
+                            } //LEAVE APPLICATION DETAIL LOOP 
+                        } // LEAVE APPLICATION HEADER LOOP
 
                         _context.SaveChanges();
                     }

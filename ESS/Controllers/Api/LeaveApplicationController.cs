@@ -190,7 +190,7 @@ namespace ESS.Controllers.Api
 
             //Checks for leave application are here
 
-            foreach (var leaveApplicationDetailDto in leaveApplicationDto.LeaveApplicationDetails)
+            foreach (LeaveApplicationDetailDto leaveApplicationDetailDto in leaveApplicationDto.LeaveApplicationDetails)
             {
                 leaveApplicationDetailDto.LeaveAppId = leaveApplicationDto.LeaveAppId;
 
@@ -202,7 +202,7 @@ namespace ESS.Controllers.Api
             //add code for application release status table
 
             //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
-            var relStrat = _context.ReleaseStrategy
+            ReleaseStrategies relStrat = _context.ReleaseStrategy
                 .FirstOrDefault(
                     r =>
                         r.ReleaseGroupCode == leaveApplicationDto.ReleaseGroupCode &&
@@ -241,12 +241,12 @@ namespace ESS.Controllers.Api
             //Now for each release strategy details record create ApplReleaseStatus record
 
             //create a temp collection to be added to leaveapplicationdto later on
-            List<ApplReleaseStatusDto> apps = new List<ApplReleaseStatusDto>();
+            var apps = new List<ApplReleaseStatusDto>();
 
-            foreach (var relStratReleaseStrategyLevel in relStrat.ReleaseStrategyLevels)
+            foreach (ReleaseStrategyLevels relStratReleaseStrategyLevel in relStrat.ReleaseStrategyLevels)
             {
                 //get releaser ID from ReleaseAuth model
-                var relAuth = _context.ReleaseAuth
+                ReleaseAuth relAuth = _context.ReleaseAuth
                     .FirstOrDefault(ra => ra.ReleaseCode == relStratReleaseStrategyLevel.ReleaseCode);
 
 
