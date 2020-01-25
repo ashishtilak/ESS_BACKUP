@@ -85,5 +85,10 @@ namespace ESS.Dto
 
         public bool LockEntry { get; set; }
 
+        public float DisableDependent { get; set; }
+        public float MedicalExpenditure { get; set; }
+
+        public float MunicipalTax { get; set; }
+
     }
 }

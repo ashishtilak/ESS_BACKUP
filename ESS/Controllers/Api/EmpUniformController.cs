@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using System.Data.Entity;
 using AutoMapper;
@@ -15,7 +12,7 @@ namespace ESS.Controllers.Api
 {
     public class EmpUniformController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public EmpUniformController()
         {
@@ -70,7 +67,7 @@ namespace ESS.Controllers.Api
                     UpdTime = DateTime.Now
                 };
 
-                empUniDtl = _context.EmpUniform.Add(empUni);
+                _context.EmpUniform.Add(empUni);
             }
 
             _context.SaveChanges();

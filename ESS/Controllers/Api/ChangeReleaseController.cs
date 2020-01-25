@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using System.Data.Entity;
-using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
 using Newtonsoft.Json;
@@ -14,7 +9,7 @@ namespace ESS.Controllers.Api
 {
     public class ChangeReleaseController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public ChangeReleaseController()
         {
@@ -38,12 +33,12 @@ namespace ESS.Controllers.Api
                 .ToList();
 
             //list of result to be returned
-            List<ReleaseAuthEmp> result = new List<ReleaseAuthEmp>();
+            var result = new List<ReleaseAuthEmp>();
 
 
             //for each release auth of this employee,
             //get the release codes
-            foreach (var auth in relAuth)
+            foreach (ReleaseAuth auth in relAuth)
             {
                 var employees = _context.ReleaseAuth
                     .Where(r => r.ReleaseCode == auth.ReleaseCode)
@@ -59,7 +54,7 @@ namespace ESS.Controllers.Api
                         EmpUnqId = emp
                     };
 
-                    var empname = _context.Employees.SingleOrDefault(e => e.EmpUnqId == emp);
+                    Employees empname = _context.Employees.SingleOrDefault(e => e.EmpUnqId == emp);
                     if (empname != null)
                         res.EmpName = empname.EmpName;
 
@@ -76,7 +71,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult ChangeReleaseStrategy([FromBody] object requestData)
         {
 
-            var dto = JsonConvert.DeserializeObject<ReleaseStrategyDto>(requestData.ToString());
+            ReleaseStrategyDto dto = JsonConvert.DeserializeObject<ReleaseStrategyDto>(requestData.ToString());
 
             //check if release strategy exist. If exist, do nothing,
             //if not, create new release strategy object and add to context
@@ -119,20 +114,18 @@ namespace ESS.Controllers.Api
             _context.ReleaseStrategyLevels.RemoveRange(releaseStrategyLevels);
 
 
-            var last = dto.ReleaseStrategyLevels.LastOrDefault();
+            ReleaseStrategyLevelDto last = dto.ReleaseStrategyLevels.LastOrDefault();
 
-            foreach (var level in dto.ReleaseStrategyLevels)
+            foreach (ReleaseStrategyLevels newRelStrLevel in dto.ReleaseStrategyLevels.Select(level => new ReleaseStrategyLevels
             {
-                ReleaseStrategyLevels newRelStrLevel =
-                    new ReleaseStrategyLevels
-                    {
-                        ReleaseGroupCode = dto.ReleaseGroupCode,
-                        ReleaseStrategy = dto.ReleaseStrategy,
-                        ReleaseStrategyLevel = level.ReleaseStrategyLevel,
-                        ReleaseCode = level.ReleaseCode,
-                        //check if this is last line, in that case 
-                        IsFinalRelease = (last != null && last.Equals(level))
-                    };
+                ReleaseGroupCode = dto.ReleaseGroupCode,
+                ReleaseStrategy = dto.ReleaseStrategy,
+                ReleaseStrategyLevel = level.ReleaseStrategyLevel,
+                ReleaseCode = level.ReleaseCode,
+                //check if this is last line, in that case 
+                IsFinalRelease = (last != null && last.Equals(level))
+            }))
+            {
                 _context.ReleaseStrategyLevels.Add(newRelStrLevel);
             }
 

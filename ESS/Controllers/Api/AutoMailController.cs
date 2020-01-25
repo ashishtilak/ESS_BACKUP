@@ -4,8 +4,6 @@ using System.Configuration;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Web.Http;
 using AutoMapper;
@@ -16,7 +14,7 @@ namespace ESS.Controllers.Api
 {
     public class AutoMailController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public AutoMailController()
         {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using ESS.Dto;
@@ -13,7 +10,7 @@ namespace ESS.Controllers.Api
 {
     public class EmpAddressController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public EmpAddressController()
         {
@@ -23,7 +20,7 @@ namespace ESS.Controllers.Api
 
         public IHttpActionResult GetEmpAddress(string empUnqId)
         {
-            var empAdd = _context.EmpAddress
+            EmpAddressDto empAdd = _context.EmpAddress
                 .OrderByDescending(e => e.Counter)
                 .Select(Mapper.Map<EmpAddress, EmpAddressDto>)
                 .FirstOrDefault(e => e.EmpUnqId == empUnqId);
@@ -38,11 +35,11 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult UpdateEmpAddress([FromBody] object requestData)
         {
-            var dto = JsonConvert.DeserializeObject<EmpAddressDto>(requestData.ToString());
+            EmpAddressDto dto = JsonConvert.DeserializeObject<EmpAddressDto>(requestData.ToString());
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            int maxId = 0;
+            int maxId;
             try
             {
                 maxId = _context.EmpAddress.Where(e => e.EmpUnqId == dto.EmpUnqId).Max(e => e.Counter);
@@ -54,14 +51,14 @@ namespace ESS.Controllers.Api
 
             maxId++;
 
-            var empAdd = _context.EmpAddress
+            EmpAddress empAdd = _context.EmpAddress
                 .OrderByDescending(e => e.Counter)
                 .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
 
             if (empAdd == null)
             {
-                var emp = _context.Employees
+                Employees emp = _context.Employees
                     .SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (emp == null)

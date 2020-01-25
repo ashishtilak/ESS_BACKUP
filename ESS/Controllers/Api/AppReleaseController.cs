@@ -12,7 +12,7 @@ namespace ESS.Controllers.Api
 {
     public class AppReleaseController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public AppReleaseController()
         {
@@ -75,7 +75,7 @@ namespace ESS.Controllers.Api
                         .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
                         .ToList();
 
-                    foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
+                    foreach (ReleaseAuth unused in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                     {
                         applReleaseStatusDto.ReleaseAuth = empUnqId;
                     }
@@ -352,17 +352,15 @@ namespace ESS.Controllers.Api
                 //for each release auth
                 foreach (ReleaseAuth rAuth in relAuth)
                 {
-                    var app = new List<ApplReleaseStatus>();
-
                     // get list of all application release status
                     // which are in release
 
-                    app = _context.ApplReleaseStatus
+                    var app = _context.ApplReleaseStatus
                         .Where(l => 
                             rAuth.ReleaseCode == l.ReleaseCode && 
                             l.ReleaseStatusCode == "I" && 
                             l.ReleaseGroupCode == ReleaseGroups.GatePassAdvice
-                            )
+                        )
                         .ToList();
 
                     var appIds = app.Select(a => a.ApplicationId).ToArray();
@@ -397,7 +395,7 @@ namespace ESS.Controllers.Api
                                 .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
                                 .ToList();
 
-                            foreach (ReleaseAuth auth in relCode.Where(auth => auth.EmpUnqId == empUnqId))
+                            foreach (ReleaseAuth unused in relCode.Where(auth => auth.EmpUnqId == empUnqId))
                             {
                                 applReleaseStatusDto.ReleaseAuth = empUnqId;
                                 dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
@@ -717,11 +715,11 @@ namespace ESS.Controllers.Api
             //Following details will be filled:
             //YearMonth, ReleaseGroupCode, ApplicationId, ReleaseStrategy, ReleaseStrategyLevel, ReleaseCode
 
-            string vRelStr = "";
-            var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+            string vRelStr;
+            ApplReleaseStatus dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
 
 
-            var applicationDetail = _context.ApplReleaseStatus
+            ApplReleaseStatus applicationDetail = _context.ApplReleaseStatus
                 .SingleOrDefault(
                     a => a.YearMonth == dto.YearMonth &&
                          a.ReleaseGroupCode == dto.ReleaseGroupCode &&
@@ -931,11 +929,10 @@ namespace ESS.Controllers.Api
 
         private GpAdvices GatePassAdviceRelease(object requestData, string empUnqId, string releaseStatusCode)
         {
-            string vRelStr = "";
-            var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+            ApplReleaseStatus dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
 
 
-            var applicationDetail = _context.ApplReleaseStatus
+            ApplReleaseStatus applicationDetail = _context.ApplReleaseStatus
                 .SingleOrDefault(
                     a => a.YearMonth == dto.YearMonth &&
                          a.ReleaseGroupCode == dto.ReleaseGroupCode &&
@@ -953,10 +950,7 @@ namespace ESS.Controllers.Api
                 throw new Exception("Application is not in release state.");
 
 
-            ReleaseAuth relAuth;
-
-
-            relAuth = _context.ReleaseAuth
+            ReleaseAuth relAuth = _context.ReleaseAuth
                 .Single(
                     r =>
                         r.ReleaseCode == applicationDetail.ReleaseCode &&
@@ -967,7 +961,7 @@ namespace ESS.Controllers.Api
             if (relAuth == null)
                 throw new Exception("Invalid releaser code. Check Active, Valid From, Valid to.");
 
-            vRelStr = applicationDetail.ReleaseStrategy;
+            var vRelStr = applicationDetail.ReleaseStrategy;
 
 
             //releaser is Ok. Now find release strategy level details

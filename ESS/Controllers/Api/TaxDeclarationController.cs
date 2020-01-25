@@ -166,6 +166,7 @@ namespace ESS.Controllers.Api
                     empRec.BankPan = prov.LoanBankPan;
                     empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
+                    
 
                     //Average out rent
 
@@ -218,6 +219,11 @@ namespace ESS.Controllers.Api
                     empRec.MedicalPreventiveHealthCheckup = prov.MedicalPreventiveHealthCheckup;
                     empRec.PhysicalDisability = prov.PhysicalDisability;
                     empRec.SevereDisability = prov.SevereDisability;
+
+                    empRec.DisableDependent = prov.DisableDependent;
+                    empRec.MedicalExpenditure = prov.MedicalExpenditure;
+                    empRec.MunicipalTax = prov.MunicipalTax;
+
                     empRec.LockEntry = prov.LockEntry;
                 }
 
@@ -330,6 +336,11 @@ namespace ESS.Controllers.Api
                     empRec.MedicalPreventiveHealthCheckup = act.MedicalPreventiveHealthCheckup;
                     empRec.PhysicalDisability = act.PhysicalDisability;
                     empRec.SevereDisability = act.SevereDisability;
+
+                    empRec.DisableDependent = act.DisableDependent;
+                    empRec.MedicalExpenditure = act.MedicalExpenditure;
+                    empRec.MunicipalTax = act.MunicipalTax;
+
                     empRec.LockEntry = act.LockEntry;
                 }
 

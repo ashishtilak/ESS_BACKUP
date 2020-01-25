@@ -200,6 +200,7 @@
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\RolesController.cs" />
+    <Compile Include="Controllers\Api\SalarySlipController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
@@ -263,6 +264,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CustomHelper.cs" />
+    <Compile Include="Helpers\FileResult.cs" />
     <Compile Include="Migrations\201712260719014_InitialModel.cs" />
     <Compile Include="Migrations\201712260719014_InitialModel.Designer.cs">
       <DependentUpon>201712260719014_InitialModel.cs</DependentUpon>
@@ -571,6 +573,18 @@
     <Compile Include="Migrations\201911290632331_ChangeInLeaveRules.Designer.cs">
       <DependentUpon>201911290632331_ChangeInLeaveRules.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001060849324_AddFieldToTaxStructure.cs" />
+    <Compile Include="Migrations\202001060849324_AddFieldToTaxStructure.Designer.cs">
+      <DependentUpon>202001060849324_AddFieldToTaxStructure.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001091013327_LeaveAppDetailFieldChanges.cs" />
+    <Compile Include="Migrations\202001091013327_LeaveAppDetailFieldChanges.Designer.cs">
+      <DependentUpon>202001091013327_LeaveAppDetailFieldChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001160507395_ChangeInLocationModel.cs" />
+    <Compile Include="Migrations\202001160507395_ChangeInLocationModel.Designer.cs">
+      <DependentUpon>202001160507395_ChangeInLocationModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -630,6 +644,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\requirement.txt" />
     <Content Include="Content\bootstrap-lumen.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -711,9 +726,7 @@
       <DependentUpon>respond.min.js</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -952,6 +965,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911290632331_ChangeInLeaveRules.resx">
       <DependentUpon>201911290632331_ChangeInLeaveRules.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001060849324_AddFieldToTaxStructure.resx">
+      <DependentUpon>202001060849324_AddFieldToTaxStructure.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001091013327_LeaveAppDetailFieldChanges.resx">
+      <DependentUpon>202001091013327_LeaveAppDetailFieldChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001160507395_ChangeInLocationModel.resx">
+      <DependentUpon>202001160507395_ChangeInLocationModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

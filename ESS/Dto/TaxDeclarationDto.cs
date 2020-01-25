@@ -53,6 +53,9 @@ namespace ESS.Dto
         public float SevereDisability { get; set; }
         public float NationalPensionScheme { get; set; }
 
+        public float DisableDependent { get; set; }
+        public float MedicalExpenditure { get; set; }
+
         public string PropertyAddress { get; set; }
         public string PropertyStatus { get; set; }          //s=self; v=vacant; l=letout
         public string LoanBank { get; set; }                //Bank drop down required...
@@ -71,6 +74,7 @@ namespace ESS.Dto
 
         public float JointOwnerShare { get; set; }          //percentage
         public float RentalIncomePerMonth { get; set; }
+        public float MunicipalTax { get; set; }
 
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }

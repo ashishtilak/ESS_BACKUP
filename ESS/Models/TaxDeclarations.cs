@@ -82,6 +82,14 @@ namespace ESS.Models
         public float SevereDisability { get; set; }
         public float NationalPensionScheme { get; set; }
 
+        // 80DD
+        public float DisableDependent { get; set; }
+
+        // 80DDB
+        public float MedicalExpenditure { get; set; }
+
+
+
         [StringLength(200)]
         public string PropertyAddress { get; set; }
         [StringLength(1)]
@@ -110,6 +118,8 @@ namespace ESS.Models
 
         public float JointOwnerShare { get; set; }          //percentage
         public float RentalIncomePerMonth { get; set; }
+
+        public float MunicipalTax { get; set; }
 
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }

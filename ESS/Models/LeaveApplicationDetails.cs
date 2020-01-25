@@ -49,10 +49,16 @@ namespace ESS.Models
 
         public float TotalDays { get; set; }
 
+        [StringLength(1)]
         public string IsPosted { get; set; }
 
+        [StringLength(255)]
         public string Remarks { get; set; }
+
+        [StringLength(255)]
         public string PlaceOfVisit { get; set; }
+
+        [StringLength(255)]
         public string ContactAddress { get; set; }
 
         public bool? Cancelled { get; set; }
@@ -60,6 +66,7 @@ namespace ESS.Models
 
         public bool? IsCancellationPosted { get; set; }
 
+        [StringLength(10)]
         public string PostUser { get; set; }
         [Column(TypeName = "datetime2")]
         public DateTime? PostedDt { get; set; }
@@ -68,6 +75,7 @@ namespace ESS.Models
         public string CoMode { get; set; }          // W, H, E
         public DateTime? CoDate1 { get; set; }
         public DateTime? CoDate2 { get; set; }
+
 
         public static readonly string NotPosted = "N";
         public static readonly string FullyPosted = "F";
