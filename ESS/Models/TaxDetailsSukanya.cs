@@ -19,7 +19,10 @@ namespace ESS.Models
         [Key, Column(Order = 2)]
         public bool ActualFlag { get; set; }                      //Provisional v/s Actual
 
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 3)]
+        public int Id { get; set; }
+
         [StringLength(50)]
         public string SukanyaName { get; set; }
         public DateTime? SukanyaDate { get; set; }

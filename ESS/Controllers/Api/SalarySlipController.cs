@@ -44,7 +44,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetLinks(string empUnqId)
         {
             DateTime today = DateTime.Today;
-            DateTime sixMonth = today.AddMonths(-6);
+            DateTime sixMonth = today.AddMonths(-7);
             var months = new List<Months>();
             
             for (DateTime dt = today; dt > sixMonth;)

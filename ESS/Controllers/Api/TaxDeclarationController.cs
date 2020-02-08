@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -52,24 +53,24 @@ namespace ESS.Controllers.Api
                 .Include(s => s.SukanyaDetails)
                 .Include(u => u.UlipDetails)
                 .Include(r => r.RentDetails)
-                .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth && t.ActualFlag == actualFlag)
+                .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth )
                 .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
                 .ToList();
-            if (taxDetails.Count == 0)
-            {
-                taxDetails = _context.TaxDeclarations
-                    .Include(i => i.InsuranceDetails)
-                    .Include(m => m.MutualFundDetails)
-                    .Include(n => n.NscDetails)
-                    .Include(p => p.PpfDetails)
-                    .Include(b => b.BankDeposits)
-                    .Include(s => s.SukanyaDetails)
-                    .Include(u => u.UlipDetails)
-                    .Include(r => r.RentDetails)
-                    .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth && t.ActualFlag == false)
-                    .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
-                    .ToList();
-            }
+            // if (taxDetails.Count == 0)
+            // {
+            //     taxDetails = _context.TaxDeclarations
+            //         .Include(i => i.InsuranceDetails)
+            //         .Include(m => m.MutualFundDetails)
+            //         .Include(n => n.NscDetails)
+            //         .Include(p => p.PpfDetails)
+            //         .Include(b => b.BankDeposits)
+            //         .Include(s => s.SukanyaDetails)
+            //         .Include(u => u.UlipDetails)
+            //         .Include(r => r.RentDetails)
+            //         .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth && t.ActualFlag == false)
+            //         .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
+            //         .ToList();
+            // }
 
             return Ok(taxDetails);
         }
@@ -225,6 +226,7 @@ namespace ESS.Controllers.Api
                     empRec.MunicipalTax = prov.MunicipalTax;
 
                     empRec.LockEntry = prov.LockEntry;
+                    empRec.ActualFlag = false;
                 }
 
 
@@ -342,6 +344,7 @@ namespace ESS.Controllers.Api
                     empRec.MunicipalTax = act.MunicipalTax;
 
                     empRec.LockEntry = act.LockEntry;
+                    empRec.ActualFlag = true;
                 }
 
                 report.Add(empRec);
@@ -407,7 +410,7 @@ namespace ESS.Controllers.Api
             foreach (PropertyInfo prop in tmp.GetType().GetProperties())
             {
                 if (!prop.CanRead) continue;            //if property is readable... 
-
+                if (prop.PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)) continue;
                 object value = prop.GetValue(tmp, null);
                 prop.SetValue(taxDeclaration, value);
 

@@ -801,17 +801,17 @@ namespace ESS.Controllers.Api
 
         private AttdLeavePost AttdPostLeave(AttdLeavePost attdLeaveObj, string location, out bool output)
         {
-            using (var client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri(Helpers.CustomHelper.GetAttendanceServerApi(location));
 
-                var content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
+                StringContent content = new StringContent(JsonConvert.SerializeObject(attdLeaveObj),
                     Encoding.UTF8, "application/json");
 
                 var responseTask = client.PostAsync("/api/leavepost", content);
                 responseTask.Wait();
 
-                var result = responseTask.Result;
+                HttpResponseMessage result = responseTask.Result;
                 output = result.IsSuccessStatusCode;
 
                 if (result.IsSuccessStatusCode)

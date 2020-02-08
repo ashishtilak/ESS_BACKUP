@@ -8,6 +8,7 @@ namespace ESS.Dto
 {
     public class TaxDetailsNscDto
     {
+        public int Id { get; set; }
         public int YearMonth { get; set; }                  //201920
         public string EmpUnqId { get; set; }
         public bool ActualFlag { get; set; }                      //Provisional v/s Actual

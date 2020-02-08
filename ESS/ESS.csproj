@@ -585,6 +585,14 @@
     <Compile Include="Migrations\202001160507395_ChangeInLocationModel.Designer.cs">
       <DependentUpon>202001160507395_ChangeInLocationModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002080440514_RemovedPKFromTaxTables.cs" />
+    <Compile Include="Migrations\202002080440514_RemovedPKFromTaxTables.Designer.cs">
+      <DependentUpon>202002080440514_RemovedPKFromTaxTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002080744461_AddCompositePKinTaxTables.cs" />
+    <Compile Include="Migrations\202002080744461_AddCompositePKinTaxTables.Designer.cs">
+      <DependentUpon>202002080744461_AddCompositePKinTaxTables.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -974,6 +982,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001160507395_ChangeInLocationModel.resx">
       <DependentUpon>202001160507395_ChangeInLocationModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002080440514_RemovedPKFromTaxTables.resx">
+      <DependentUpon>202002080440514_RemovedPKFromTaxTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002080744461_AddCompositePKinTaxTables.resx">
+      <DependentUpon>202002080744461_AddCompositePKinTaxTables.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

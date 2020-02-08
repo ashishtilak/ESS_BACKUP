@@ -9,6 +9,7 @@ namespace ESS.Models
 {
     public class TaxDetailsInsurance
     {
+
         [Key, Column(Order = 0)]
         public int YearMonth { get; set; }                  //201920
 
@@ -19,7 +20,10 @@ namespace ESS.Models
         [Key, Column(Order = 2)]
         public bool ActualFlag { get; set; }                      //Provisional v/s Actual
 
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 3)]
+        public int Id { get; set; }
+
         [StringLength(20)]
         public string PolicyNo { get; set; }
         public DateTime? PolicyDate { get; set; }
