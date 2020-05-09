@@ -227,6 +227,8 @@ namespace ESS.Controllers.Api
 
                     empRec.LockEntry = prov.LockEntry;
                     empRec.ActualFlag = false;
+
+                    empRec.TaxRegime = prov.TaxRegime;
                 }
 
 
@@ -345,6 +347,8 @@ namespace ESS.Controllers.Api
 
                     empRec.LockEntry = act.LockEntry;
                     empRec.ActualFlag = true;
+
+                    empRec.TaxRegime = act.TaxRegime;
                 }
 
                 report.Add(empRec);
@@ -388,6 +392,15 @@ namespace ESS.Controllers.Api
             if (!found)
             {
                 taxDeclaration = new TaxDeclarations();
+
+                taxDeclaration.PpfDetails = new List<TaxDetailsPpf>();
+                taxDeclaration.BankDeposits = new List<TaxDetailsBankDeposit>();
+                taxDeclaration.InsuranceDetails = new List<TaxDetailsInsurance>();
+                taxDeclaration.NscDetails = new List<TaxDetailsNsc>();
+                taxDeclaration.MutualFundDetails = new List<TaxDetailsMutualFunds>();
+                taxDeclaration.UlipDetails = new List<TaxDetailsUlip>();
+                taxDeclaration.SukanyaDetails = new List<TaxDetailsSukanya>();
+                taxDeclaration.RentDetails = new List<TaxDetailsRent>();
             }
             else
             {
@@ -399,7 +412,18 @@ namespace ESS.Controllers.Api
 
                 if (taxDeclaration != null && taxDeclaration.LockEntry)
                 {
-                    return BadRequest("Entry is locked for you sir.");
+                    if (sentData.UpdateUserId == "102971" ||
+                        sentData.UpdateUserId == "104065" ||
+                        sentData.UpdateUserId == "113052" ||
+                        sentData.UpdateUserId == "112213")
+                    {
+                        if (taxDeclaration.FinLock)
+                        {
+                            return BadRequest("Entry is locked for you sir.");
+                        }
+                    }
+                    else
+                        return BadRequest("Entry is locked for you sir.");
                 }
             }
 

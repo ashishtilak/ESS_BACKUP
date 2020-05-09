@@ -197,8 +197,7 @@ namespace ESS.Controllers.Api
                 //posting status to "N"
                 leaveApplicationDetailDto.IsPosted = LeaveApplicationDetails.NotPosted;
             }
-
-
+            
             //add code for application release status table
 
             //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code

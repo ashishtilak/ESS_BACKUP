@@ -188,7 +188,8 @@ namespace ESS.Controllers.Api
             }
             else if (mode == 3) //Family details
             {
-                return Ok("Not implemented yet...");
+                var result = Helpers.CustomHelper.GetEmpFamilyDetails(empUnqId);
+                return Ok(result);
             }
             return NotFound();
 

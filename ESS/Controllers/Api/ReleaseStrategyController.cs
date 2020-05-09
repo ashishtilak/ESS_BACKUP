@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using ESS.Dto;
@@ -24,7 +21,9 @@ namespace ESS.Controllers.Api
         [HttpGet]
         public IHttpActionResult GetReleaseStrategy(string releaseGroup, string empUnqId)
         {
-            if (releaseGroup == ReleaseGroups.LeaveApplication)
+            if (releaseGroup == ReleaseGroups.LeaveApplication ||
+                releaseGroup == ReleaseGroups.OutStationDuty ||
+                releaseGroup == ReleaseGroups.CompOff)
             {
                 var releaseStrDto = _context.ReleaseStrategy
                     .Where(r =>
@@ -46,7 +45,6 @@ namespace ESS.Controllers.Api
                     ).ToList()
                     .Select(Mapper.Map<ReleaseStrategyLevels, ReleaseStrategyLevelDto>)
                     .ToList();
-
                 foreach (var levelDto in relStrLvl)
                 {
                     var relCode = levelDto.ReleaseCode;
@@ -72,7 +70,8 @@ namespace ESS.Controllers.Api
 
                 return Ok(releaseStrDto);
             }
-            else if (releaseGroup == ReleaseGroups.GatePass)
+
+            if (releaseGroup == ReleaseGroups.GatePass)
             {
                 //Get emp details like compcode, wrkgrp....
 
@@ -96,8 +95,7 @@ namespace ESS.Controllers.Api
                     .FirstOrDefault();
 
 
-
-                List<GpReleaseStrategyLevelDto> relStrLvl = new List<GpReleaseStrategyLevelDto>();
+                var relStrLvl = new List<GpReleaseStrategyLevelDto>();
 
                 if (gpReleaseStrDto != null)
                 {
@@ -108,8 +106,6 @@ namespace ESS.Controllers.Api
                         )
                         .Select(Mapper.Map<GpReleaseStrategyLevels, GpReleaseStrategyLevelDto>)
                         .ToList();
-
-
                 }
 
                 // DAY release strategy
@@ -153,7 +149,6 @@ namespace ESS.Controllers.Api
 
                     foreach (var r in releser)
                     {
-
                         var emp = _context.Employees
                             .Select(e => new EmployeeDto
                             {
@@ -185,9 +180,9 @@ namespace ESS.Controllers.Api
                     return BadRequest("No one is authorized to release!");
 
                 return Ok(gpReleaseStrDto);
-
             }
-            else if (releaseGroup == ReleaseGroups.GatePassAdvice)
+
+            if (releaseGroup == ReleaseGroups.GatePassAdvice)
             {
                 //For gate pass advice
 
@@ -238,9 +233,10 @@ namespace ESS.Controllers.Api
                 return Ok(releaseStrDto);
             }
             else
-                return BadRequest("Release strategy group code not found."); //If other that LA/GP is specified, return error
+                return
+                    BadRequest(
+                        "Release strategy group code not found."); //If other that LA/GP is specified, return error
         }
-
 
 
         [HttpGet]
@@ -345,8 +341,6 @@ namespace ESS.Controllers.Api
                 return BadRequest("No employee found...");
 
             return Ok(employees);
-
         }
-
     }
 }

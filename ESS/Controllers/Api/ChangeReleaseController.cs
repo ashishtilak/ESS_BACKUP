@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Antlr.Runtime.Misc;
 using ESS.Dto;
 using ESS.Models;
 using Newtonsoft.Json;
@@ -15,7 +17,6 @@ namespace ESS.Controllers.Api
         {
             _context = new ApplicationDbContext();
         }
-
 
         public class ReleaseAuthEmp
         {
@@ -65,7 +66,6 @@ namespace ESS.Controllers.Api
 
             return Ok(result);
         }
-
 
         [HttpPost]
         public IHttpActionResult ChangeReleaseStrategy([FromBody] object requestData)
@@ -132,6 +132,61 @@ namespace ESS.Controllers.Api
             _context.SaveChanges();
 
             return Ok();
+        }
+
+
+        // release strategy inactive releasestrategy, gpreleasestrategy
+        // releaseauth in active
+
+        [HttpGet]
+        public IHttpActionResult Cleanup()
+        {
+            try
+            {
+                //TODO: Remove hard coded "COMP"
+                var emps = _context.Employees.Where(e => e.WrkGrp == "COMP" && e.Active == false).Select(e => e.EmpUnqId).ToArray();
+                var releaseStrategies = _context.ReleaseStrategy
+                    .Where(r => emps.Contains(r.ReleaseStrategy) && r.Active)
+                    .ToList();
+
+                foreach (var rel in releaseStrategies)
+                {
+                    rel.Active = false;
+                }
+
+
+                var gpReleaseStrategies = _context.GpReleaseStrategy
+                    .Where(r => emps.Contains(r.GpReleaseStrategy) && r.Active)
+                    .ToList();
+
+                foreach (var rel in gpReleaseStrategies)
+                {
+                    rel.Active = false;
+                }
+
+                _context.SaveChanges();
+
+
+                var releaseAuths = _context.ReleaseAuth
+                    .Where(r => emps.Contains(r.EmpUnqId) && r.Active)
+                    .ToList();
+
+                foreach (var rel in releaseAuths)
+                {
+                    rel.Active = false;
+                }
+
+                _context.SaveChanges();
+
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+
         }
 
     }

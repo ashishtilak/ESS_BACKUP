@@ -34,8 +34,11 @@ namespace ESS.Controllers.Api
             var app = _context.ApplReleaseStatus
                 .Where(l =>
                     relAuth.Contains(l.ReleaseCode) &&
-                    l.ReleaseStatusCode == ReleaseStatus.InRelease &&
-                    l.ReleaseGroupCode == ReleaseGroups.LeaveApplication
+                    l.ReleaseStatusCode == ReleaseStatus.InRelease && (
+                        l.ReleaseGroupCode == ReleaseGroups.LeaveApplication  ||
+                        l.ReleaseGroupCode == ReleaseGroups.OutStationDuty ||
+                        l.ReleaseGroupCode == ReleaseGroups.CompOff
+                        )
                 )
                 .ToList();
 

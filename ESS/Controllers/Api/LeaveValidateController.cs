@@ -94,7 +94,8 @@ namespace ESS.Controllers.Api
                 if (!leaveExist &&
                     (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
                      details.LeaveTypeCode != LeaveTypes.CompOff &&
-                     details.LeaveTypeCode != LeaveTypes.OutdoorDuty ))
+                     details.LeaveTypeCode != LeaveTypes.OutdoorDuty && 
+                     details.LeaveTypeCode != LeaveTypes.WeekOff))
                 {
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
@@ -109,7 +110,8 @@ namespace ESS.Controllers.Api
                 //check3 over
 
                 
-                if (details.LeaveTypeCode == LeaveTypes.OutdoorDuty)
+                if (details.LeaveTypeCode == LeaveTypes.OutdoorDuty ||
+                    details.LeaveTypeCode == LeaveTypes.WeekOff)
                     continue;
                 
                 // Re calculate days because, days passed from client are from grid
@@ -125,6 +127,11 @@ namespace ESS.Controllers.Api
                 if (details.LeaveTypeCode == LeaveTypes.CompOff)
                     details.TotalDays = 1;
 
+                // allow half CO in case of JFL tembhurni
+                if (emp.Location == Locations.Jfl &&
+                    details.LeaveTypeCode == LeaveTypes.CompOff && details.HalfDayFlag == true)
+                    details.TotalDays = 0.5f;
+                
 
                 //check4 that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails

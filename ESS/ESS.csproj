@@ -219,6 +219,7 @@
     <Compile Include="Dto\EmpAddressDto.cs" />
     <Compile Include="Dto\EmpDetailsDto.cs" />
     <Compile Include="Dto\EmpEduDto.cs" />
+    <Compile Include="Dto\EmpFamilyDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
@@ -592,6 +593,14 @@
     <Compile Include="Migrations\202002080744461_AddCompositePKinTaxTables.cs" />
     <Compile Include="Migrations\202002080744461_AddCompositePKinTaxTables.Designer.cs">
       <DependentUpon>202002080744461_AddCompositePKinTaxTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002240701364_FinLockInTaxDeclaration.cs" />
+    <Compile Include="Migrations\202002240701364_FinLockInTaxDeclaration.Designer.cs">
+      <DependentUpon>202002240701364_FinLockInTaxDeclaration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202004240636488_AddTaxRegimeInTaxDeclaration.cs" />
+    <Compile Include="Migrations\202004240636488_AddTaxRegimeInTaxDeclaration.Designer.cs">
+      <DependentUpon>202004240636488_AddTaxRegimeInTaxDeclaration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -988,6 +997,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002080744461_AddCompositePKinTaxTables.resx">
       <DependentUpon>202002080744461_AddCompositePKinTaxTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002240701364_FinLockInTaxDeclaration.resx">
+      <DependentUpon>202002240701364_FinLockInTaxDeclaration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004240636488_AddTaxRegimeInTaxDeclaration.resx">
+      <DependentUpon>202004240636488_AddTaxRegimeInTaxDeclaration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

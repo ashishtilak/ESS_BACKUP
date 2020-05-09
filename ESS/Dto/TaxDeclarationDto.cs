@@ -83,10 +83,13 @@ namespace ESS.Dto
         public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
+        public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
+
         public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
 
         public bool LockEntry { get; set; }
+        public bool FinLock { get; set; }
 
         public List<TaxDetailsPpfDto> PpfDetails { get; set; }
         public List<TaxDetailsInsuranceDto> InsuranceDetails { get; set; }

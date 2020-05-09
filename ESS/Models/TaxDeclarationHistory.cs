@@ -113,6 +113,10 @@ namespace ESS.Models
         public float InterestPreConstruction { get; set; }
 
         public float OtherInterest { get; set; }
+
+        [StringLength(1)] 
+        public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
+
         [StringLength(50)]
         public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }

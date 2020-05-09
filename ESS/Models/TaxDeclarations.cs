@@ -129,11 +129,14 @@ namespace ESS.Models
         public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
+        [StringLength(1)]
+        public string TaxRegime { get; set; }     //O=Old regime, N=New Regime (from april 2020).
 
         [StringLength(8)]
         public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
 
         public bool LockEntry { get; set; }
+        public bool FinLock { get; set; }
     }
 }

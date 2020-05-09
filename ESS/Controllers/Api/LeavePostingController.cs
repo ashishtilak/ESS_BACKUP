@@ -23,8 +23,9 @@ namespace ESS.Controllers.Api
             _context.Database.Log = s => Debug.WriteLine(s);
         }
 
-        //this will give pending leaves for posting
-        public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt, bool flag)
+        //this will give pending leaves for posting (ESS->Leave posting)
+
+        public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt, bool woFlag)
         {
             var leaveAppDto = _context.LeaveApplications
                 .Include(e => e.Employee)
@@ -71,6 +72,24 @@ namespace ESS.Controllers.Api
             );
 
 
+
+            // IF Flag = true, return only Week Off applications
+            if (woFlag)
+            {
+                // remove all leave application except Week off as leave type
+                leaveAppDto.RemoveAll(l => l.LeaveApplicationDetails.Any(
+                    ld => ld.LeaveTypeCode != LeaveTypes.WeekOff
+                ));
+            }
+            else
+            {
+                // remove all leave application with Week off as leave type
+                leaveAppDto.RemoveAll(l => l.LeaveApplicationDetails.Any(
+                    ld => ld.LeaveTypeCode == LeaveTypes.WeekOff
+                ));
+            }
+
+            
             foreach (var lApp in leaveAppDto)
             {
                 var app = _context.ApplReleaseStatus
@@ -177,6 +196,7 @@ namespace ESS.Controllers.Api
 
                 foreach (var applReleaseStatusDto in app)
                 {
+                    applReleaseStatusDto.ReleaserName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)?.EmpName;
                     lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
             }

@@ -1538,5 +1538,46 @@ namespace ESS.Helpers
             return result;
         }
 
+
+        public static List<EmpFamilyDto> GetEmpFamilyDetails(string empUnqId)
+        {
+            var result = new List<EmpFamilyDto>();
+            
+            var sql =
+                "SELECT [EmpUnqID],[Sr],[Name],[Relation],[BirthDt],[Education],[Occupation] " +
+                "FROM[ATTENDANCE].[dbo].[MastEmpFamily] " +
+                "where empunqid = '" + empUnqId + "'";
+
+            var context = new ApplicationDbContext();
+            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var strRemoteServer = GetRemoteServer(emp.Location);
+
+            using (var cn = new SqlConnection(strRemoteServer))
+            {
+                cn.Open();
+
+                var cmd = new SqlCommand(sql, cn);
+                var dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new EmpFamilyDto()
+                    {
+                        EmpUnqId = dr["EmpUnqId"].ToString(),
+                        Sr = int.Parse(dr["Sr"].ToString()),
+                        Name = dr["Name"].ToString(),
+                        Relation = dr["Relation"].ToString(),
+                        BirthDt =  DateTime.Parse(dr["BirthDt"].ToString()),
+                        Education =  dr["Education"].ToString(),
+                        Occupation = dr["Occupation"].ToString()
+                    };
+
+                    result.Add(res);
+                }
+
+            }
+
+            return result;
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace ESS.Models
         public static readonly string LeaveApplication = "LA";
         public static readonly string OutStationDuty = "OD";
         public static readonly string GatePass = "GP";
-        public static readonly string GatePassAdvice = "GA"; 
+        public static readonly string GatePassAdvice = "GA";
+        public static readonly string CompOff = "CO";
     }
 }

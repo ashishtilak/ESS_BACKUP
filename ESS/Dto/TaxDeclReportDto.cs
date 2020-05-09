@@ -92,5 +92,7 @@ namespace ESS.Dto
 
         public float MunicipalTax { get; set; }
 
+        public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
+
     }
 }

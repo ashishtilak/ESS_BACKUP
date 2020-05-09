@@ -32,7 +32,12 @@ namespace ESS.Controllers.Api
 
 
             var releaseStr = _context.ReleaseStrategyLevels
-                .Where(l => releaseCode.Contains(l.ReleaseCode) && l.ReleaseGroupCode == ReleaseGroups.LeaveApplication)
+                .Where(l => releaseCode.Contains(l.ReleaseCode) && 
+                            (l.ReleaseGroupCode == ReleaseGroups.LeaveApplication ||
+                             l.ReleaseGroupCode == ReleaseGroups.OutStationDuty ||
+                             l.ReleaseGroupCode == ReleaseGroups.CompOff
+                             )
+                            )
                 .Select(l => l.ReleaseStrategy)
                 .ToList();
 
