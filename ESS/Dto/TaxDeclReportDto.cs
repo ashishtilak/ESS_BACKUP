@@ -62,6 +62,7 @@ namespace ESS.Dto
         public float EduLoanInterest { get; set; }
         public float Nps { get; set; }
         public float InterestOnLoan { get; set; }
+        public float InterestPreConstruction { get; set; }
         public float RentReceived { get; set; }
         public string BankName { get; set; }
         public string BankPan { get; set; }

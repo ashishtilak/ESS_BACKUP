@@ -17,16 +17,22 @@ namespace ESS.Models
         public int Counter { get; set; }
 
         [StringLength(100)]
-        public string PreAdd1 { get; set; }
+        public string HouseNumber { get; set; }
 
         [StringLength(100)]
-        public string PreAdd2 { get; set; }
+        public string SocietyName { get; set; }
 
         [StringLength(50)]
-        public string PreAdd3 { get; set; }
+        public string AreaName { get; set; }
+
+        [StringLength(50)] 
+        public string LandMark { get; set; }
+        
+        [StringLength(50)]
+        public string Tehsil { get; set; }
 
         [StringLength(50)]
-        public string PreAdd4 { get; set; }
+        public string PoliceStation { get; set; }
 
         [StringLength(50)]
         public string PreDistrict { get; set; }
@@ -50,6 +56,10 @@ namespace ESS.Models
         public string PreEmail { get; set; }
 
         public DateTime UpdDt { get; set; }
+
+        public bool HrVerified { get; set; }
+        public bool HrUser { get; set; }
+        public DateTime? HrVerificationDate { get; set; }
 
     }
 }

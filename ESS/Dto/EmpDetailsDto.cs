@@ -24,10 +24,12 @@ namespace ESS.Dto
         public string PerPhone { get; set; }
         public string PerPoliceSt { get; set; }
 
-        public string PreAdd1 { get; set; }
-        public string PreAdd2 { get; set; }
-        public string PreAdd3 { get; set; }
-        public string PreAdd4 { get; set; }
+        public string HouseNumber { get; set; }
+        public string SocietyName { get; set; }
+        public string AreaName { get; set; }
+        public string LandMark { get; set; }
+        public string Tehsil { get; set; }
+        public string PoliceStation { get; set; }
         public string PreDistrict { get; set; }
         public string PreCity { get; set; }
         public string PreState { get; set; }

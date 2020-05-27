@@ -1382,10 +1382,10 @@ namespace ESS.Helpers
                         PerPhone = dr["PERPHONE"].ToString(),
                         PerPoliceSt = dr["PERPOLICEST"].ToString(),
 
-                        PreAdd1 = dr["PreADD1"].ToString(),
-                        PreAdd2 = dr["PreADD2"].ToString(),
-                        PreAdd3 = dr["PreADD3"].ToString(),
-                        PreAdd4 = dr["PreADD4"].ToString(),
+                        HouseNumber = dr["PreADD1"].ToString(),
+                        SocietyName = dr["PreADD2"].ToString(),
+                        AreaName = dr["PreADD3"].ToString(),
+                        LandMark = dr["PreADD4"].ToString(),
                         PreDistrict = dr["PreDistrict"].ToString(),
                         PreCity = dr["PreCITY"].ToString(),
                         PreState = dr["PreSTATE"].ToString(),
@@ -1430,10 +1430,12 @@ namespace ESS.Helpers
                         .FirstOrDefault(e => e.EmpUnqId == res.EmpUnqId);
                     if (empAdd != null)
                     {
-                        res.PreAdd1 = empAdd.PreAdd1;
-                        res.PreAdd2 = empAdd.PreAdd2;
-                        res.PreAdd3 = empAdd.PreAdd3;
-                        res.PreAdd4 = empAdd.PreAdd4;
+                        res.HouseNumber = empAdd.HouseNumber;
+                        res.SocietyName = empAdd.SocietyName;
+                        res.AreaName = empAdd.AreaName;
+                        res.LandMark = empAdd.LandMark;
+                        res.Tehsil = empAdd.Tehsil;
+                        res.PoliceStation = empAdd.PoliceStation;
                         res.PreDistrict = empAdd.PreDistrict;
                         res.PreCity = empAdd.PreCity;
                         res.PreState = empAdd.PreState;

@@ -49,10 +49,13 @@ namespace ESS.Dto
         public string DesgName { get; set; }
 
 
-        public string PreAdd1 { get; set; }
-        public string PreAdd2 { get; set; }
-        public string PreAdd3 { get; set; }
-        public string PreAdd4 { get; set; }
+        public int Counter { get; set; }
+        public string HouseNumber { get; set; }
+        public string SocietyName { get; set; }
+        public string AreaName { get; set; }
+        public string LandMark { get; set; }
+        public string Tehsil { get; set; }
+        public string PoliceStation { get; set; }
         public string PreDistrict { get; set; }
         public string PreCity { get; set; }
         public string PreState { get; set; }
@@ -60,6 +63,7 @@ namespace ESS.Dto
         public string PrePhone { get; set; }
         public string PreResPhone { get; set; }
         public string PreEmail { get; set; }
+        public DateTime? UpdDt { get; set; }  //present address update date
 
         public string PerAdd1 { get; set; }
         public string PerAdd2 { get; set; }
@@ -71,6 +75,10 @@ namespace ESS.Dto
         public string PerPin { get; set; }
         public string PerPhone { get; set; }
         public string PerPoliceSt { get; set; }
+
+        public bool HrVerified { get; set; }
+        public bool HrUser { get; set; }
+        public DateTime? HrVerificationDate { get; set; }
 
         public string Location { get; set; }
 

@@ -82,11 +82,14 @@ namespace ESS.Controllers.Api
 
                 if (empAdd == null) continue;
 
+                dto.Counter = empAdd.Counter;
                 dto.EmpUnqId = empAdd.EmpUnqId;
-                dto.PreAdd1 = empAdd.PreAdd1;
-                dto.PreAdd2 = empAdd.PreAdd2;
-                dto.PreAdd3 = empAdd.PreAdd3;
-                dto.PreAdd4 = empAdd.PreAdd4;
+                dto.HouseNumber = empAdd.HouseNumber;
+                dto.SocietyName = empAdd.SocietyName;
+                dto.AreaName = empAdd.AreaName;
+                dto.LandMark = empAdd.LandMark;
+                dto.Tehsil = empAdd.Tehsil;
+                dto.PoliceStation = empAdd.PoliceStation;
                 dto.PreDistrict = empAdd.PreDistrict;
                 dto.PreCity = empAdd.PreCity;
                 dto.PreState = empAdd.PreState;
@@ -94,8 +97,11 @@ namespace ESS.Controllers.Api
                 dto.PrePhone = empAdd.PrePhone;
                 dto.PreResPhone = empAdd.PreResPhone;
                 dto.PreEmail = empAdd.PreEmail;
-
-
+                dto.HrVerified = empAdd.HrVerified;
+                dto.HrUser = empAdd.HrUser;
+                dto.HrVerificationDate = empAdd.HrVerificationDate;
+                dto.UpdDt = empAdd.UpdDt;
+                
                 var perAdd = empPerAdd.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (perAdd == null) continue;
@@ -111,6 +117,7 @@ namespace ESS.Controllers.Api
                 dto.PerPin = perAdd.PerPin;
                 dto.PerPhone = perAdd.PerPhone;
                 dto.PerPoliceSt = perAdd.PerPoliceSt;
+                
             }
 
             return Ok(employeeDto);

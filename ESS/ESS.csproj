@@ -602,6 +602,18 @@
     <Compile Include="Migrations\202004240636488_AddTaxRegimeInTaxDeclaration.Designer.cs">
       <DependentUpon>202004240636488_AddTaxRegimeInTaxDeclaration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202005111241404_FieldChangesInEmpAddress.cs" />
+    <Compile Include="Migrations\202005111241404_FieldChangesInEmpAddress.Designer.cs">
+      <DependentUpon>202005111241404_FieldChangesInEmpAddress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202005130430212_ChangeInFieldLengthEmpAddress.cs" />
+    <Compile Include="Migrations\202005130430212_ChangeInFieldLengthEmpAddress.Designer.cs">
+      <DependentUpon>202005130430212_ChangeInFieldLengthEmpAddress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202005210505581_WhyThisErrorIsComing.cs" />
+    <Compile Include="Migrations\202005210505581_WhyThisErrorIsComing.Designer.cs">
+      <DependentUpon>202005210505581_WhyThisErrorIsComing.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -1003,6 +1015,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004240636488_AddTaxRegimeInTaxDeclaration.resx">
       <DependentUpon>202004240636488_AddTaxRegimeInTaxDeclaration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005111241404_FieldChangesInEmpAddress.resx">
+      <DependentUpon>202005111241404_FieldChangesInEmpAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005130430212_ChangeInFieldLengthEmpAddress.resx">
+      <DependentUpon>202005130430212_ChangeInFieldLengthEmpAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202005210505581_WhyThisErrorIsComing.resx">
+      <DependentUpon>202005210505581_WhyThisErrorIsComing.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

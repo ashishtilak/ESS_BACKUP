@@ -162,6 +162,7 @@ namespace ESS.Controllers.Api
                     empRec.EduLoanInterest = prov.EducationLoanInterest;
                     empRec.Nps = prov.NationalPensionScheme;
                     empRec.InterestOnLoan = prov.InterestOnLoan;
+                    empRec.InterestPreConstruction = prov.InterestPreConstruction;
                     empRec.RentReceived = prov.RentalIncomePerMonth;
                     empRec.BankName = prov.LoanBank;
                     empRec.BankPan = prov.LoanBankPan;
@@ -283,6 +284,7 @@ namespace ESS.Controllers.Api
                     empRec.EduLoanInterest = act.EducationLoanInterest;
                     empRec.Nps = act.NationalPensionScheme;
                     empRec.InterestOnLoan = act.InterestOnLoan;
+                    empRec.InterestPreConstruction = act.InterestPreConstruction;
                     empRec.RentReceived = act.RentalIncomePerMonth;
                     empRec.BankName = act.LoanBank;
                     empRec.BankPan = act.LoanBankPan;

@@ -69,10 +69,12 @@ namespace ESS.Controllers.Api
                 //Check if data is changed or not
                 if (
 
-                    empAdd.PreAdd1 == dto.PreAdd1 &&
-                    empAdd.PreAdd2 == dto.PreAdd2 &&
-                    empAdd.PreAdd3 == dto.PreAdd3 &&
-                    empAdd.PreAdd4 == dto.PreAdd4 &&
+                    empAdd.HouseNumber == dto.HouseNumber &&
+                    empAdd.SocietyName == dto.SocietyName &&
+                    empAdd.AreaName == dto.AreaName &&
+                    empAdd.LandMark == dto.LandMark &&
+                    empAdd.Tehsil == dto.Tehsil &&
+                    empAdd.PoliceStation == dto.PoliceStation &&
                     empAdd.PreDistrict == dto.PreDistrict &&
                     empAdd.PreCity == dto.PreCity &&
                     empAdd.PreState == dto.PreState &&
@@ -80,7 +82,6 @@ namespace ESS.Controllers.Api
                     empAdd.PrePhone == dto.PrePhone &&
                     empAdd.PreResPhone == dto.PreResPhone &&
                     empAdd.PreEmail == dto.PreEmail
-
                 )
                 {
                     return BadRequest("NO DATA CHANGED.");
@@ -92,10 +93,12 @@ namespace ESS.Controllers.Api
             {
                 EmpUnqId = dto.EmpUnqId,
                 Counter = maxId,
-                PreAdd1 = dto.PreAdd1,
-                PreAdd2 = dto.PreAdd2,
-                PreAdd3 = dto.PreAdd3,
-                PreAdd4 = dto.PreAdd4,
+                HouseNumber = dto.HouseNumber,
+                SocietyName = dto.SocietyName,
+                AreaName= dto.AreaName,
+                LandMark = dto.LandMark,
+                Tehsil = dto.Tehsil,
+                PoliceStation = dto.PoliceStation,
                 PreDistrict = dto.PreDistrict,
                 PreCity = dto.PreCity,
                 PreState = dto.PreState,
@@ -103,17 +106,54 @@ namespace ESS.Controllers.Api
                 PrePhone = dto.PrePhone,
                 PreResPhone = dto.PreResPhone,
                 PreEmail = dto.PreEmail,
-                UpdDt = DateTime.Now
+                UpdDt = DateTime.Now,
+                HrVerified =  false
             };
 
             _context.EmpAddress.Add(newAdd);
-
-
 
             _context.SaveChanges();
 
             return Ok();
 
+        }
+
+
+        [HttpPut]
+        public IHttpActionResult UpdateEmpAddressHr([FromBody] object requestData)
+        {
+            var dto = JsonConvert.DeserializeObject<EmpAddressDto>(requestData.ToString());
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var empAdd = _context.EmpAddress
+                .OrderByDescending(e => e.Counter)
+                .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId && e.Counter == dto.Counter);
+
+            if (empAdd == null)
+            {
+                return BadRequest("Invalid details");
+            }
+
+            empAdd.HouseNumber = dto.HouseNumber;
+            empAdd.SocietyName = dto.SocietyName;
+            empAdd.AreaName = dto.AreaName;
+            empAdd.LandMark = dto.LandMark;
+            empAdd.Tehsil = dto.Tehsil;
+            empAdd.PoliceStation = dto.PoliceStation;
+            empAdd.PreDistrict = dto.PreDistrict;
+            empAdd.PreCity = dto.PreCity;
+            empAdd.PreState = dto.PreState;
+            empAdd.PrePin = dto.PrePin;
+            empAdd.PrePhone = dto.PrePhone;
+            empAdd.PreResPhone = dto.PreResPhone;
+            empAdd.PreEmail = dto.PreEmail;
+            empAdd.UpdDt = DateTime.Now;
+            empAdd.HrVerified = true;
+
+            _context.SaveChanges();
+
+            return Ok();
         }
     }
 }
