@@ -184,6 +184,7 @@
     <Compile Include="Controllers\Api\EmpAddressController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
+    <Compile Include="Controllers\Api\Form16Controller.cs" />
     <Compile Include="Controllers\Api\GateInOutController.cs" />
     <Compile Include="Controllers\Api\GatePassController.cs" />
     <Compile Include="Controllers\Api\GpAdviceController.cs" />
@@ -614,6 +615,10 @@
     <Compile Include="Migrations\202005210505581_WhyThisErrorIsComing.Designer.cs">
       <DependentUpon>202005210505581_WhyThisErrorIsComing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006080553093_AddBirthdatePanInEmployee.cs" />
+    <Compile Include="Migrations\202006080553093_AddBirthdatePanInEmployee.Designer.cs">
+      <DependentUpon>202006080553093_AddBirthdatePanInEmployee.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -1024,6 +1029,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202005210505581_WhyThisErrorIsComing.resx">
       <DependentUpon>202005210505581_WhyThisErrorIsComing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006080553093_AddBirthdatePanInEmployee.resx">
+      <DependentUpon>202006080553093_AddBirthdatePanInEmployee.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

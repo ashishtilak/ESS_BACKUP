@@ -1046,7 +1046,8 @@ namespace ESS.Helpers
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
                                   "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
-                                  "EmpUnqId as SapId, 0 as CompanyAcc " +
+                                  "EmpUnqId as SapId, 0 as CompanyAcc, " +
+                                  "convert(datetime2, BirthDT) as BirthDate " +
                                   "from MastEmp where active = 1 ";
 
                         }
@@ -1058,7 +1059,8 @@ namespace ESS.Helpers
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
                                   "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
-                                  "SapId as SapId, 0 as CompanyAcc " +
+                                  "SapId as SapId, 0 as CompanyAcc, " +
+                                  "convert(datetime2, BirthDT) as BirthDate " +
                                   "from MastEmp ";
 
                         }
@@ -1097,6 +1099,8 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("Location", "Location");
                             bulk.ColumnMappings.Add("SapId", "SapId");
                             bulk.ColumnMappings.Add("CompanyAcc", "CompanyAcc");
+                            bulk.ColumnMappings.Add("BirthDate", "BirthDate");
+
 
                             bulk.WriteToServer(dt);
                         }
@@ -1124,8 +1128,8 @@ namespace ESS.Helpers
                               "Target.OtFlag = Source.OtFlag," +
                               "Target.Active = Source.Active, " +
                               "Target.Location = Source.Location, " +
-                              "Target.SapId = Source.SapId " +
-                            //"Target.IsHod = Source.IsHod " +
+                              "Target.SapId = Source.SapId, " +
+                              "Target.BirthDate = Source.BirthDate " +
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
                               "unitcode, deptcode, statcode, " +
@@ -1133,14 +1137,15 @@ namespace ESS.Helpers
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
-                              "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc ) " +
+                              "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc, " + 
+                              "birthdate ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                             //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
                               "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, 0, " +
-                              "'" + location + "', source.SapId, 0 ); ";
+                              "'" + location + "', source.SapId, 0, source.BirthDate ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();

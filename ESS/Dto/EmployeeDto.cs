@@ -86,5 +86,9 @@ namespace ESS.Dto
         public bool CompanyAcc { get; set; }
 
         public int RoleId { get; set; }
+
+        public DateTime? BirthDate { get; set; }
+        public string Pan { get; set; }
+
     }
 }

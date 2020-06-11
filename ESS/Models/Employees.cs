@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ESS.Models
@@ -98,6 +99,12 @@ namespace ESS.Models
         public string SapId { get; set; }
 
         public bool CompanyAcc { get; set; }
+
+        //added on 08.06.2020 by Ashish
+        [Column(TypeName = "datetime2")]
+        public DateTime? BirthDate { get; set; }
+        [StringLength(10)]
+        public string Pan { get; set; }
 
     }
 }

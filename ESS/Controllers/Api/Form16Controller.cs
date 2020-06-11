@@ -1,103 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Http;
-using System.Web.Http.Results;
 using ESS.Helpers;
 using ESS.Models;
 using Newtonsoft.Json;
 
 namespace ESS.Controllers.Api
 {
-    public class SalarySlipController : ApiController
+    public class Form16Controller : ApiController
     {
         private ApplicationDbContext _context;
 
-        public SalarySlipController()
+        public Form16Controller()
         {
             _context = new ApplicationDbContext();
         }
 
-        private class Months
+        private class Form16
         {
-            public int YearMonth { get; set; }
-            public string MonthName { get; set; }
-        }
-
-        private class PaySlip
-        {
-            public int YearMonth { get; set; }
+            public string AssYear { get; set; }
             public string EmpUnqId { get; set; }
+            public string FormNumber { get; set; }
         }
-
 
         [HttpGet]
         public IHttpActionResult GetLinks(string empUnqId)
         {
             DateTime today = DateTime.Today;
-            DateTime sixMonth = today.AddMonths(-7);
-            var months = new List<Months>();
-            
-            for (DateTime dt = today; dt > sixMonth;)
+            DateTime threeYears = today.AddYears(-3);
+            var assYears = new List<string>();
+
+            for (DateTime dt = today; dt > threeYears;)
             {
-                
+
                 if (DateTimeFormatInfo.CurrentInfo != null)
                 {
-                    Months mon = new Months
-                    {
-                        YearMonth = Convert.ToInt32(dt.Year + dt.Month.ToString()),
-                        MonthName = DateTimeFormatInfo.CurrentInfo.GetMonthName(dt.Month) + " " + dt.Year
-                    };
-                    months.Add(mon);
+                    string assYear = (dt.Year - 1)+ "-" + (dt.Year);
+                    assYears.Add(assYear);
                 }
 
-                dt=dt.AddMonths(-1);
+                dt = dt.AddYears(-1);
             }
 
-            return Ok(months);
+            return Ok(assYears);
         }
 
+
         [HttpPost]
-        public IHttpActionResult GetSalarySlip([FromBody] object requestData)
+        public IHttpActionResult GetForm16([FromBody] object requestData)
         {
-            PaySlip payslip;
-            
+            Form16 form16;
+
             try
             {
-                payslip = JsonConvert.DeserializeObject<PaySlip>(requestData.ToString());
+                form16= JsonConvert.DeserializeObject<Form16>(requestData.ToString());
             }
             catch (Exception e)
             {
                 return BadRequest(e.ToString());
             }
 
-            // Access folder with yearmonth as suffix
-            Locations loc = _context.Location.FirstOrDefault();
-            if (loc == null) 
+            // Access folder with year as suffix then Form16 and Form12 folders
+            var loc = _context.Location.FirstOrDefault();
+            if (loc == null)
                 return BadRequest("Location configuration error.");
-            
-            string path = HostingEnvironment.MapPath(@"~/App_Data/"+payslip.YearMonth);
+
+            //var empDetails = Helpers.CustomHelper.GetEmpDetails(form16.EmpUnqId);
+            var pan = _context.Employees.FirstOrDefault(e => e.EmpUnqId == form16.EmpUnqId)?.Pan;
+
+            var path = HostingEnvironment.MapPath(@"~/App_Data/" + form16.AssYear);
 
             if (string.IsNullOrEmpty(path))
                 return BadRequest("Path not found.");
+
+
+            if(form16.FormNumber == "16")
+                path += "\\form16\\" + pan + ".pdf";
+            else
+                path += "\\form12\\" + pan + ".pdf";
                 
-            path +=  "\\" + payslip.EmpUnqId + ".pdf";
-
             return new FileResult(path, "application/pdf");
-
         }
 
+
+        
         [HttpPost]
-        public IHttpActionResult UploadPaySlip(string folderName)
+        public IHttpActionResult UploadForm(string folderName)
         {
             HttpContext httpContext = HttpContext.Current;  
   
@@ -138,5 +133,6 @@ namespace ESS.Controllers.Api
             // Return status code  
             return Ok();
         }
+
     }
 }

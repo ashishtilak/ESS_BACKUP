@@ -766,9 +766,7 @@ namespace ESS.Controllers.Api
                 fromEight = today.AddDays(-1).Date.AddHours(20);
                 toEight = today.AddDays(-1).Date.AddHours(32);
             }
-
-
-
+            
 
             ReleaseAuth relAuth;
 

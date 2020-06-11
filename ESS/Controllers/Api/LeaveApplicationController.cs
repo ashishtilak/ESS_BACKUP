@@ -206,14 +206,6 @@ namespace ESS.Controllers.Api
                     r =>
                         r.ReleaseGroupCode == leaveApplicationDto.ReleaseGroupCode &&
                         r.ReleaseStrategy == leaveApplicationDto.EmpUnqId &&
-                        //r.CompCode == leaveApplicationDto.CompCode &&
-                        //r.WrkGrp == leaveApplicationDto.WrkGrp &&
-                        //r.UnitCode == leaveApplicationDto.UnitCode &&
-                        //r.DeptCode == leaveApplicationDto.DeptCode &&
-                        //r.StatCode == leaveApplicationDto.StatCode &&
-                        //r.SecCode == leaveApplicationDto.SecCode &&
-                        ////r.CatCode == leaveApplicationDto.CatCode &&
-                        //r.IsHod == leaveApplicationDto.IsHod &&
                         r.Active == true
                 );
 
@@ -224,6 +216,8 @@ namespace ESS.Controllers.Api
             leaveApplicationDto.ReleaseStrategy = relStrat.ReleaseStrategy;
             leaveApplicationDto.ReleaseStatusCode = ReleaseStatus.NotReleased;
 
+            leaveApplicationDto.AddDt = DateTime.Now;
+            
 
             //get release strategy levels
             var relStratLevels = _context.ReleaseStrategyLevels

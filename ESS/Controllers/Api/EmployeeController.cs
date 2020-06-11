@@ -167,7 +167,11 @@ namespace ESS.Controllers.Api
 
                         Location = e.Location,
                         SapId = e.SapId,
-                        CompanyAcc = e.CompanyAcc
+                        CompanyAcc = e.CompanyAcc,
+
+                        BirthDate =   e.BirthDate,
+                        Pan = e.Pan
+                        
                     }
                 )
                 .Where(e => e.EmpUnqId == empUnqId)
