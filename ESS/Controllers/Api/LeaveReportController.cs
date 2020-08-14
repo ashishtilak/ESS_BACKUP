@@ -32,12 +32,12 @@ namespace ESS.Controllers.Api
 
 
             var releaseStr = _context.ReleaseStrategyLevels
-                .Where(l => releaseCode.Contains(l.ReleaseCode) && 
+                .Where(l => releaseCode.Contains(l.ReleaseCode) &&
                             (l.ReleaseGroupCode == ReleaseGroups.LeaveApplication ||
                              l.ReleaseGroupCode == ReleaseGroups.OutStationDuty ||
                              l.ReleaseGroupCode == ReleaseGroups.CompOff
-                             )
                             )
+                )
                 .Select(l => l.ReleaseStrategy)
                 .ToList();
 
@@ -61,6 +61,26 @@ namespace ESS.Controllers.Api
                 .ToList();
 
 
+            foreach (var lApp in leaves)
+            {
+                var app = _context.ApplReleaseStatus
+                    .Where(l =>
+                        l.YearMonth == lApp.YearMonth &&
+                        l.ReleaseGroupCode == lApp.ReleaseGroupCode &&
+                        l.ApplicationId == lApp.LeaveAppId &&
+                        l.IsFinalRelease
+                    )
+                    .ToList()
+                    .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                foreach (var applReleaseStatusDto in app)
+                {
+                    applReleaseStatusDto.ReleaserName = _context.Employees
+                        .FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)?.EmpName;
+                    lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
+                }
+            }
+            
             return Ok(leaves);
         }
 
@@ -72,7 +92,6 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetLeaves(DateTime fromDt, DateTime toDt, string deptCode = "", string statCode = "",
             string empUnqId = "")
         {
-
             DateTime startDt = fromDt;
             DateTime endDt = toDt;
 
@@ -89,7 +108,7 @@ namespace ESS.Controllers.Api
 
 
             // Loop for each date
-            for (DateTime tDate = startDt; tDate < endDt; )
+            for (DateTime tDate = startDt; tDate < endDt;)
             {
                 // add this date as new column to datatable
                 dt.Columns.Add(tDate.ToString("MMM-dd"), typeof(string));
@@ -104,7 +123,7 @@ namespace ESS.Controllers.Api
                         l.Cancelled == false &&
                         l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
                         l.LeaveApplicationDetails.Any(d => d.FromDt <= tDate && d.ToDt >= tDate)
-                     )
+                    )
                     .ToList();
 
 
@@ -125,7 +144,6 @@ namespace ESS.Controllers.Api
                     }
                     else
                     {
-
                         //add new row for this employee and set this day
                         DataRow dr = dt.Rows.Add();
                         dr["EmpCode"] = l.EmpUnqId;
@@ -134,7 +152,6 @@ namespace ESS.Controllers.Api
                         dr["Station"] = l.Stations.StatName;
                         dr[tDate.ToString("MMM-dd")] = leaveType;
                     }
-
                 }
 
                 // set next day as this day

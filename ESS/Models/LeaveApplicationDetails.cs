@@ -76,7 +76,9 @@ namespace ESS.Models
         public DateTime? CoDate1 { get; set; }
         public DateTime? CoDate2 { get; set; }
 
-
+        [StringLength(255)]
+        public string AdditionalRemarks { get; set; }
+        
         public static readonly string NotPosted = "N";
         public static readonly string FullyPosted = "F";
         public static readonly string PartiallyPosted = "P";

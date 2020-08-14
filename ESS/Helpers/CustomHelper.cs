@@ -244,6 +244,7 @@ namespace ESS.Helpers
             SyncGrade(strRemoteServer, location);
             SyncEmpType(strRemoteServer, location);
             SyncEmp(strRemoteServer, location);
+            SyncShift(strRemoteServer, location);
         }
 
         public static void SyncCompany(string strRemoteServer, string location)
@@ -1163,6 +1164,82 @@ namespace ESS.Helpers
                 throw;
             }
             #endregion
+        }
+
+        public static void SyncShift(string strRemoteServer, string location)
+        {
+            try
+            {
+                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                {
+                    cnRemote.Open();
+                    //first get all masters:
+
+                    SqlConnection cnLocal;
+
+                    //create a temp table
+                    using (cnLocal = new SqlConnection(ThisServer))
+                    {
+                        string sql = "select top 0 * into #tmpShifts from Shifts";
+                        cnLocal.Open();
+                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        cmd.ExecuteNonQuery();
+
+
+                        //get data from attendance server
+                        sql = "select ShiftCode, ShiftDesc, ShiftStart, ShiftEnd, " +
+                              "'" + location + "' as location " +
+                              " from MastShift where CompCode = '01'";
+
+                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+
+                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        {
+                            bulk.DestinationTableName = "#tmpShifts";
+
+                            bulk.ColumnMappings.Add("ShiftCode", "ShiftCode");
+                            bulk.ColumnMappings.Add("ShiftDesc", "ShiftDesc");
+                            bulk.ColumnMappings.Add("ShiftStart", "ShiftStart");
+                            bulk.ColumnMappings.Add("ShiftEnd", "ShiftEnd");
+
+                            bulk.WriteToServer(dt);
+                        }
+
+                        //bulk copy done, now use MERGE
+
+                        sql = "merge into Shifts as target " +
+                              "using #tmpShifts as Source " +
+                              "on " +
+                              "Target.ShiftCode = Source.ShiftCode and " +
+                              "Target.ShiftDesc = Source.ShiftDesc and " +
+                              "Target.ShiftStart = Source.ShiftStart and " +
+                              "Target.ShiftEnd = Source.ShiftEnd " +
+                              "when matched then " +
+                              "update set Target.ShiftDesc = Source.ShiftDesc, " +
+                              "Target.ShiftStart = Source.ShiftStart, " +
+                              "Target.ShiftEnd = Source.ShiftEnd " +
+                              "when not matched then " +
+                              "insert (ShiftCode, ShiftDesc, ShiftStart, ShiftEnd) " +
+                              "values (source.ShiftCode, source.ShiftDesc, source.ShiftStart, source.ShiftEnd " +
+                              " ); ";
+
+                        cmd = new SqlCommand(sql, cnLocal);
+                        cmd.ExecuteNonQuery();
+
+
+                        sql = "drop table #tmpShifts";
+                        cmd = new SqlCommand(sql, cnLocal);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
 
         public static void UpdateOpenMonth()

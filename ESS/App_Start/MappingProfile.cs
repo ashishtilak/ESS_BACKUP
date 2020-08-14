@@ -99,6 +99,14 @@ namespace ESS.App_Start
 
             CreateMap<Vendors, VendorDto>();
             CreateMap<VendorDto, Vendors>();
+
+            CreateMap<Shifts, ShiftDto>();
+            CreateMap<ShiftDto, Shifts>();
+
+            CreateMap<ShiftSchedules, ShiftScheduleDto>();
+            CreateMap<ShiftScheduleDto, ShiftSchedules>();
+            CreateMap<ShiftScheduleDetails, ShiftScheduleDetailDto>();
+            CreateMap<ShiftScheduleDetailDto, ShiftScheduleDetails>();
         }
     }
 }

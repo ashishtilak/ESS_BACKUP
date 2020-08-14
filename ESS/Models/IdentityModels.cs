@@ -126,6 +126,12 @@ namespace ESS.Models
 
         public DbSet<Vendors> Vendors { get; set; }
 
+
+        public DbSet<Shifts> Shifts { get; set; }
+        public DbSet<ShiftSchedules> ShiftSchedules { get; set; }
+        public DbSet<ShiftScheduleDetails> ShiftScheduleDetails { get; set; }
+        public DbSet<SsOpenMonth> SsOpenMonth { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

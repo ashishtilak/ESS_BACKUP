@@ -202,15 +202,12 @@
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\RolesController.cs" />
     <Compile Include="Controllers\Api\SalarySlipController.cs" />
+    <Compile Include="Controllers\Api\ShiftScheduleController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
-    <Compile Include="Controllers\DepartmentsController.cs" />
-    <Compile Include="Controllers\EmployeesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\LeaveBalanceController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\StationsController.cs" />
     <Compile Include="Dto\ApplReleaseStatusDto.cs" />
     <Compile Include="Dto\BankDto.cs" />
     <Compile Include="Dto\CategoryDto.cs" />
@@ -248,6 +245,9 @@
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\RoleAuthDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
+    <Compile Include="Dto\ShiftDto.cs" />
+    <Compile Include="Dto\ShiftScheduleDetailDto.cs" />
+    <Compile Include="Dto\ShiftScheduleDto.cs" />
     <Compile Include="Dto\StationDto.cs" />
     <Compile Include="Dto\TaxDetailsBankDepositDto.cs" />
     <Compile Include="Dto\TaxDeclarationDto.cs" />
@@ -619,6 +619,26 @@
     <Compile Include="Migrations\202006080553093_AddBirthdatePanInEmployee.Designer.cs">
       <DependentUpon>202006080553093_AddBirthdatePanInEmployee.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202006110856474_ShiftScheduleTables.cs" />
+    <Compile Include="Migrations\202006110856474_ShiftScheduleTables.Designer.cs">
+      <DependentUpon>202006110856474_ShiftScheduleTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006120627566_ShiftScheduleOpenMonthTable.cs" />
+    <Compile Include="Migrations\202006120627566_ShiftScheduleOpenMonthTable.Designer.cs">
+      <DependentUpon>202006120627566_ShiftScheduleOpenMonthTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006160713325_AddFiledInLeaveDetails.cs" />
+    <Compile Include="Migrations\202006160713325_AddFiledInLeaveDetails.Designer.cs">
+      <DependentUpon>202006160713325_AddFiledInLeaveDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006161045051_AddRemarkFieldInShiftSchedule.cs" />
+    <Compile Include="Migrations\202006161045051_AddRemarkFieldInShiftSchedule.Designer.cs">
+      <DependentUpon>202006161045051_AddRemarkFieldInShiftSchedule.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202006180655592_ChangeKeyInShiftSchedule.cs" />
+    <Compile Include="Migrations\202006180655592_ChangeKeyInShiftSchedule.Designer.cs">
+      <DependentUpon>202006180655592_ChangeKeyInShiftSchedule.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -659,6 +679,10 @@
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RoleUsers.cs" />
     <Compile Include="Models\Sections.cs" />
+    <Compile Include="Models\Shifts.cs" />
+    <Compile Include="Models\ShiftScheduleDetails.cs" />
+    <Compile Include="Models\ShiftSchedules.cs" />
+    <Compile Include="Models\SsOpenMonth.cs" />
     <Compile Include="Models\Stations.cs" />
     <Compile Include="Models\TaxConfig.cs" />
     <Compile Include="Models\TaxDeclarationHistory.cs" />
@@ -719,37 +743,9 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-    <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
-    <Content Include="Views\Account\ConfirmEmail.cshtml" />
-    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
-    <Content Include="Views\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Account\ResetPassword.cshtml" />
-    <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\SendCode.cshtml" />
-    <Content Include="Views\Account\VerifyCode.cshtml" />
-    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
-    <Content Include="Views\Manage\Index.cshtml" />
-    <Content Include="Views\Manage\ManageLogins.cshtml" />
-    <Content Include="Views\Manage\SetPassword.cshtml" />
-    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
-    <Content Include="Views\Shared\Lockout.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Shared\_NavBar.cshtml" />
-    <Content Include="Views\Departments\Index.cshtml" />
-    <Content Include="Views\Stations\Index.cshtml" />
-    <Content Include="Views\Employees\Index.cshtml" />
-    <Content Include="Views\LeaveBalance\Index.cshtml" />
     <Content Include="Scripts\jquery.validate.min.js.map">
       <DependentUpon>jquery.validate.min.js</DependentUpon>
     </Content>
@@ -1032,6 +1028,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006080553093_AddBirthdatePanInEmployee.resx">
       <DependentUpon>202006080553093_AddBirthdatePanInEmployee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006110856474_ShiftScheduleTables.resx">
+      <DependentUpon>202006110856474_ShiftScheduleTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006120627566_ShiftScheduleOpenMonthTable.resx">
+      <DependentUpon>202006120627566_ShiftScheduleOpenMonthTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006160713325_AddFiledInLeaveDetails.resx">
+      <DependentUpon>202006160713325_AddFiledInLeaveDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006161045051_AddRemarkFieldInShiftSchedule.resx">
+      <DependentUpon>202006161045051_AddRemarkFieldInShiftSchedule.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202006180655592_ChangeKeyInShiftSchedule.resx">
+      <DependentUpon>202006180655592_ChangeKeyInShiftSchedule.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

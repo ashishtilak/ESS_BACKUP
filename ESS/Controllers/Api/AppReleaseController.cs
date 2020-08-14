@@ -127,7 +127,19 @@ namespace ESS.Controllers.Api
             return Ok(lv);
         }
 
+        private class ScheduleData
+        {
+            public int YearMonth { get; set; }
+            public int ScheduleId { get; set; }
+            public string AddUser { get; set; }
+            public List<ShiftScheduleDto> Schedules { get; set; }
 
+            public ScheduleData()
+            {
+                //
+            }
+        }
+        
         [HttpGet]
         [ActionName("getapplreleasestatus")]
         public IHttpActionResult GetApplReleaseStatus(string empUnqId, string releaseGroupCode)
@@ -456,6 +468,157 @@ namespace ESS.Controllers.Api
 
                 return Ok(outputGp);
             }
+            else if (releaseGroupCode == ReleaseGroups.ShiftSchedule)
+            {
+                /////////////////////////////////////////////
+
+                // find release authorization for given employee
+                var relAuth = _context.ReleaseAuth
+                    .Where(r => r.EmpUnqId == empUnqId)
+                    .ToList();
+
+                // create return data object
+                var resultData = new List<ScheduleData>();
+
+                //for each release auth
+                foreach (ReleaseAuth rAuth in relAuth)
+                {
+                    // get list of all application release status
+                    // which are in release
+
+                    var app = _context.ApplReleaseStatus
+                        .Where(l => 
+                            rAuth.ReleaseCode == l.ReleaseCode && 
+                            l.ReleaseStatusCode == "I" && 
+                            l.ReleaseGroupCode == ReleaseGroups.ShiftSchedule
+                        )
+                        .ToList();
+
+                    var appIds = app.Select(a => a.ApplicationId).ToArray();
+
+                    // find the gate pass advice related to above list of app release 
+
+                    var sch = _context.ShiftSchedules
+                        .Include(r => r.ReleaseGroup)
+                        .Include(rs => rs.RelStrategy)
+                        .Where(s => appIds.Contains(s.ScheduleId))
+                        .ToList()
+                        .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>).ToList();
+
+                    // now for all gate pass advices,
+
+                    int prevId = 0;
+
+                    foreach (ShiftScheduleDto dto in sch)
+                    {
+                        dto.ShiftScheduleDetails = new List<ShiftScheduleDetailDto>();
+
+                        var schDtl = _context.ShiftScheduleDetails
+                            .Where(s => s.YearMonth == dto.YearMonth &&
+                                        s.ScheduleId == dto.ScheduleId &&
+                                        s.EmpUnqId == dto.EmpUnqId)
+                            .ToList();
+
+                        dto.ShiftScheduleDetails.AddRange(Mapper.Map<List<ShiftScheduleDetails>, List<ShiftScheduleDetailDto>>(schDtl));
+
+                        //get relevant app release object 
+                        var appl = app
+                            .Where(l =>
+                                l.YearMonth == dto.YearMonth &&
+                                l.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                                l.ApplicationId == dto.ScheduleId && 
+                                l.ReleaseCode == rAuth.ReleaseCode
+                                )
+                            .ToList()
+                            .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                        //for each app release lines
+                        foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
+                        {
+                            var relCode = _context.ReleaseAuth
+                                .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                                .ToList();
+
+                            foreach (ReleaseAuth unused in relCode.Where(auth => auth.EmpUnqId == empUnqId))
+                            {
+                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
+                                {
+                                    applReleaseStatusDto
+                                };
+                            }
+                        }
+
+
+                        EmployeeDto employeeDto = _context.Employees
+                            .Select(e => new EmployeeDto
+                            {
+                                EmpUnqId = e.EmpUnqId,
+                                EmpName = e.EmpName,
+                                FatherName = e.FatherName,
+                                Active = e.Active,
+                                Pass = e.Pass,
+
+                                CompCode = e.CatCode,
+                                WrkGrp = e.WrkGrp,
+                                UnitCode = e.UnitCode,
+                                DeptCode = e.DeptCode,
+                                StatCode = e.StatCode,
+                                CatCode = e.CatCode,
+                                EmpTypeCode = e.EmpTypeCode,
+                                GradeCode = e.GradeCode,
+                                DesgCode = e.DesgCode,
+                                IsHod = e.IsHod,
+
+                                CompName = e.Company.CompName,
+                                WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                                UnitName = e.Units.UnitName,
+                                DeptName = e.Departments.DeptName,
+                                StatName = e.Stations.StatName,
+                                CatName = e.Categories.CatName,
+                                EmpTypeName = e.EmpTypes.EmpTypeName,
+                                GradeName = e.Grades.GradeName,
+                                DesgName = e.Designations.DesgName,
+
+                                Location = e.Location
+                            })
+                            .Single(e => e.EmpUnqId == dto.EmpUnqId);
+
+                        dto.DeptName = employeeDto.DeptName;
+                        dto.StatName = employeeDto.StatName;
+                        dto.EmpName = employeeDto.EmpName;
+
+
+                        if (dto.ScheduleId != prevId)
+                        {
+                            // add current object to return data and create new one
+                            var thisData = new ScheduleData
+                            {
+                                YearMonth = dto.YearMonth,
+                                ScheduleId = dto.ScheduleId,
+                                AddUser = dto.AddUser,
+                                Schedules = new List<ShiftScheduleDto>()
+                            };
+
+                            thisData.Schedules.Add(dto);
+                            resultData.Add(thisData);
+
+                            prevId = dto.ScheduleId;
+                        }
+                        else
+                        {
+                            resultData.FirstOrDefault(r =>
+                                r.YearMonth == dto.YearMonth && r.ScheduleId == dto.ScheduleId)
+                                ?.Schedules.Add(dto);
+                        }
+
+                    } //foreach dto in schedules
+
+                } // End for loop for release auth
+
+                //string json = JsonConvert.SerializeObject(resultData);
+                return Ok(resultData);
+            } // App release For Schedules...
             else
                 return BadRequest("Not implemented");
         }
@@ -468,9 +631,7 @@ namespace ESS.Controllers.Api
             //Following details will be filled:
             //YearMonth, ReleaseGroupCode, ApplicationId, ReleaseStrategy, ReleaseStrategyLevel, ReleaseCode
 
-
             var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
-
 
             var applicationDetail = _context.ApplReleaseStatus
                 .SingleOrDefault(
@@ -701,6 +862,18 @@ namespace ESS.Controllers.Api
                 {
                     var gp = GatePassAdviceRelease(requestData, empUnqId, releaseStatusCode);
                     return Ok(gp);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.ToString());
+                }
+            }
+            else if (releaseGroupCode == ReleaseGroups.ShiftSchedule)
+            {
+                try
+                {
+                    var sch = ShiftScheduleRelease(requestData, empUnqId, releaseStatusCode);
+                    return Ok(sch);
                 }
                 catch (Exception ex)
                 {
@@ -1055,5 +1228,154 @@ namespace ESS.Controllers.Api
 
             return gp;
         }
+
+        private List<ShiftSchedules> ShiftScheduleRelease(object requestData, string empUnqId, string releaseStatusCode)
+        {
+            ApplReleaseStatus dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+
+
+            List<ShiftSchedules> resultData = new List<ShiftSchedules>();
+
+            var allAppReleaseObj = _context.ApplReleaseStatus
+                .Where(a => a.YearMonth == dto.YearMonth &&
+                            a.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                            a.ApplicationId == dto.ApplicationId)
+                .ToList();
+
+            foreach (ApplReleaseStatus appRelobj in allAppReleaseObj)
+            {
+                ApplReleaseStatus applicationDetail = _context.ApplReleaseStatus
+                    .SingleOrDefault(
+                        a => a.YearMonth == appRelobj.YearMonth &&
+                             a.ReleaseGroupCode == appRelobj.ReleaseGroupCode &&
+                             a.ApplicationId == appRelobj.ApplicationId &&
+                             a.ReleaseStrategy == appRelobj.ReleaseStrategy &&
+                             a.ReleaseStrategyLevel == appRelobj.ReleaseStrategyLevel
+                    );
+
+                if (applicationDetail == null)
+                    throw new Exception("Invalid app release status detals...");
+
+                applicationDetail.Remarks = appRelobj.Remarks;
+
+                //If releaseStatusCode is not I, we've nothing to do...
+                if (applicationDetail.ReleaseStatusCode != ReleaseStatus.InRelease)
+                    throw new Exception("Application is not in release state.");
+
+
+                ReleaseAuth relAuth = _context.ReleaseAuth
+                    .Single(
+                        r =>
+                            r.ReleaseCode == applicationDetail.ReleaseCode &&
+                            r.EmpUnqId == empUnqId &&
+                            r.Active
+                    );
+
+                if (relAuth == null)
+                    throw new Exception("Invalid releaser code. Check Active, Valid From, Valid to.");
+
+                var vRelStr = applicationDetail.ReleaseStrategy;
+
+
+                //releaser is Ok. Now find release strategy level details
+                var relStrLevel = _context.ReleaseStrategyLevels
+                    .Single(
+                        r =>
+                            r.ReleaseGroupCode == applicationDetail.ReleaseGroupCode &&
+                            r.ReleaseStrategy == vRelStr &&
+                            r.ReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel &&
+                            r.ReleaseCode == applicationDetail.ReleaseCode
+                    );
+
+                if (relStrLevel == null)
+                    throw new Exception("Release strategy detail not found:");
+
+
+                var sch = _context.ShiftSchedules
+                    .Single(
+                        g =>
+                            g.YearMonth == applicationDetail.YearMonth &&
+                            g.ScheduleId == applicationDetail.ApplicationId &&
+                            g.ReleaseStrategy == applicationDetail.ReleaseStrategy
+                    );
+
+                sch.Remarks = dto.Remarks;
+
+                using (DbContextTransaction transaction = _context.Database.BeginTransaction())
+                {
+                    if (releaseStatusCode == ReleaseStatus.ReleaseRejected)
+                    {
+                        //set this application details status to "R"
+                        //we'll not set next level to "I", it'll forever be "N"
+                        applicationDetail.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+
+                        //now set leave application header release status to "R" as well
+                        sch.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                    }
+                    else if (releaseStatusCode == ReleaseStatus.FullyReleased)
+                    {
+                        //if this is NOT the final release, set next level release status to "I"
+                        if (!applicationDetail.IsFinalRelease)
+                        {
+                            //get next application level object
+                            ApplReleaseStatus nextApplicationLevel = _context.ApplReleaseStatus
+                                .Single(
+                                    a =>
+                                        a.YearMonth == applicationDetail.YearMonth &&
+                                        a.ReleaseGroupCode == applicationDetail.ReleaseGroupCode &&
+                                        a.ApplicationId == applicationDetail.ApplicationId &&
+                                        a.ReleaseStrategy == applicationDetail.ReleaseStrategy &&
+                                        a.ReleaseStrategyLevel == applicationDetail.ReleaseStrategyLevel + 1
+                                );
+
+                            if (nextApplicationLevel == null)
+                                throw new Exception(
+                                    "This is not final release, and next release not found! Check database.");
+
+                            //change status of next level object
+                            nextApplicationLevel.ReleaseStatusCode = ReleaseStatus.InRelease;
+
+                            //also update leave application status to "P"
+                            sch.ReleaseStatusCode = ReleaseStatus.PartiallyReleased;
+                            sch.ReleaseUser = empUnqId;
+                            sch.ReleaseDt = DateTime.Now;
+                        }
+                        else
+                        {
+                            ////if this IS final release, then set leave app header status to "F"
+                            sch.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                            sch.ReleaseUser = empUnqId;
+                            sch.ReleaseDt = DateTime.Now;
+                        }
+
+                        //Finally set this application details status to "F"
+                        applicationDetail.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                        applicationDetail.ReleaseDate = DateTime.Now.Date;
+                        applicationDetail.ReleaseAuth = empUnqId;
+                    }
+
+
+                    //finally update database
+                    _context.SaveChanges();
+
+                    // UPDATE RELEASESTRATEGY MANUALLY, AS IT IS KEY FIELD AND CANNOT BE UPDATED BY ENTITY FRAMEWORK
+
+                    string strSql = "update ApplReleaseStatus set ReleaseStrategy = '" + vRelStr + "' " +
+                                    "where ReleaseGroupCode = 'SS' " +
+                                    "and ApplicationId = " + applicationDetail.ApplicationId + " " +
+                                    "and ReleaseStrategy = '" + applicationDetail.ReleaseStrategy + "' " ;
+
+                    _context.Database.ExecuteSqlCommand(strSql);
+
+                    //now commit changes...
+                    transaction.Commit();
+
+                    resultData.Add(sch);
+                }
+            }
+            
+            return resultData;
+        }
+
     }
 }

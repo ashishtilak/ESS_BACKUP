@@ -36,6 +36,8 @@ namespace ESS.Dto
         public DateTime? CoDate1 { get; set; }
         public DateTime? CoDate2 { get; set; }
 
+        public string AdditionalRemarks { get; set; }
+
         public bool IsCancellationPosted { get; set; }
 
         public LeaveTypeDto LeaveType { get; set; }

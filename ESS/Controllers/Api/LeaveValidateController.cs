@@ -95,7 +95,9 @@ namespace ESS.Controllers.Api
                     (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
                      details.LeaveTypeCode != LeaveTypes.CompOff &&
                      details.LeaveTypeCode != LeaveTypes.OutdoorDuty && 
-                     details.LeaveTypeCode != LeaveTypes.WeekOff))
+                     details.LeaveTypeCode != LeaveTypes.WeekOff && 
+                     details.LeaveTypeCode != LeaveTypes.Lockdown
+                     ))
                 {
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
@@ -111,7 +113,9 @@ namespace ESS.Controllers.Api
 
                 
                 if (details.LeaveTypeCode == LeaveTypes.OutdoorDuty ||
-                    details.LeaveTypeCode == LeaveTypes.WeekOff)
+                    details.LeaveTypeCode == LeaveTypes.WeekOff || 
+                    details.LeaveTypeCode == LeaveTypes.Lockdown
+                    )
                     continue;
                 
                 // Re calculate days because, days passed from client are from grid

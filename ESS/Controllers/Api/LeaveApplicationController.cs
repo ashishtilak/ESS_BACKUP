@@ -160,7 +160,6 @@ namespace ESS.Controllers.Api
             return leaveAppDto;
         }
 
-
         [HttpPost]
         public IHttpActionResult CreateLeaveApplication([FromBody] object requestData)
         {
@@ -229,7 +228,6 @@ namespace ESS.Controllers.Api
 
 
             relStrat.ReleaseStrategyLevels = relStratLevels;
-
 
             //Now for each release strategy details record create ApplReleaseStatus record
 
