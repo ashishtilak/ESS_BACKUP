@@ -52,128 +52,143 @@ namespace ESS.Controllers.Api
             // 4: PREVIOUS MONTH RELEASED
 
             // Check if employee passed is a releaser...
-            string relCode = _context.ReleaseAuth.FirstOrDefault(e => e.EmpUnqId == empUnqId)?.ReleaseCode;
 
-            if (relCode == null) return BadRequest("Employee is not a releaser.");
-
-            var relStrLvl = _context.ReleaseStrategyLevels
-                .Where(r => relCode.Contains(r.ReleaseCode) && r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
-                .Select(r => r.ReleaseStrategy).ToArray();
-
-            var vRelStr = _context.ReleaseStrategy
-                .Where(r => relStrLvl.Contains(r.ReleaseStrategy) &&
-                            r.Active &&
-                            r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
-                .ToList();
-
-            var allRelStr = vRelStr.Select(v => v.ReleaseStrategy).ToArray();
-
-            var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
-            if (openMonth == null) return BadRequest("Open month not configured.");
-
-            //carry on the good work...
-
-            DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
-                                             openMonth.ToString().Substring(0, 4));
-            DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
-
-            // If data required for previous month,
-            if (mode == ReportModes.PreviousMonthAll || mode == ReportModes.PreviousMonthReleased)
+            try
             {
-                // then change from date, to date and openMonth to
-                fromDt = fromDt.AddMonths(-1);
-                toDt = fromDt.AddMonths(1).AddDays(-1);
-                openMonth = Convert.ToInt32(fromDt.Year.ToString("0000") + fromDt.Month.ToString("00"));
-            }
+                string relCode = _context.ReleaseAuth.FirstOrDefault(e => e.EmpUnqId == empUnqId)?.ReleaseCode;
 
-            // Get all schedules from master whether released or not except rejected...
+                if (relCode == null) return BadRequest("Employee is not a releaser.");
 
-            var shedules = _context.ShiftSchedules
-                .Where(s => s.YearMonth == openMonth &&
-                            allRelStr.Contains(s.ReleaseStrategy) &&
-                            s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected
-                ).ToList();
+                var relStrLvl = _context.ReleaseStrategyLevels
+                    .Where(r => relCode.Contains(r.ReleaseCode) && r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
+                    .Select(r => r.ReleaseStrategy).ToArray();
 
+                var vRelStr = _context.ReleaseStrategy
+                    .Where(r => relStrLvl.Contains(r.ReleaseStrategy) &&
+                                r.Active &&
+                                r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
+                    .ToList();
 
-            //return bad request if we've asked for blank format and any employee is found already uploaded
-            if (mode == ReportModes.ExcelDownload && shedules.Count > 0)
-                return Content(HttpStatusCode.BadRequest, shedules);
+                var allRelStr = vRelStr.Select(v => v.ReleaseStrategy).ToArray();
 
+                var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
+                if (openMonth == null) return BadRequest("Open month not configured.");
 
-            var outputTable = new DataTable("ShiftSchedule");
-            outputTable.Columns.Add("EmpUnqId");
-            //TODO: "COLUMN ORDER" remember to change below in for loop if adding/deleting any columns
+                //carry on the good work...
 
-            for (DateTime dt = fromDt; dt <= toDt;)
-            {
-                outputTable.Columns.Add("D" + dt.Day.ToString("00"));
+                //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
+                //                                 openMonth.ToString().Substring(0, 4));
 
-                //TODO: "COLUMN ORDER" Remember to change here if adding/deleting columns from excel
-                outputTable.Columns["D" + dt.Day.ToString("00")].SetOrdinal(dt.Day);
-                dt = dt.AddDays(1);
-            }
+                DateTime fromDt = new DateTime(
+                    Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                    Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
 
+                DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
 
-            // Loop for each employee under this releaser
-            foreach (ReleaseStrategies relStr in vRelStr)
-            {
-                // loop for each day of month
-                DataRow dr = outputTable.NewRow();
-                dr["EmpUnqId"] = relStr.ReleaseStrategy;
-
-                if (mode == ReportModes.ExcelDownload)
+                // If data required for previous month,
+                if (mode == ReportModes.PreviousMonthAll || mode == ReportModes.PreviousMonthReleased)
                 {
+                    // then change from date, to date and openMonth to
+                    fromDt = fromDt.AddMonths(-1);
+                    toDt = fromDt.AddMonths(1).AddDays(-1);
+                    openMonth = Convert.ToInt32(fromDt.Year.ToString("0000") + fromDt.Month.ToString("00"));
+                }
+
+                // Get all schedules from master whether released or not except rejected...
+
+                var shedules = _context.ShiftSchedules
+                    .Where(s => s.YearMonth == openMonth &&
+                                allRelStr.Contains(s.ReleaseStrategy) &&
+                                s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected
+                    ).ToList();
+
+
+                //return bad request if we've asked for blank format and any employee is found already uploaded
+                if (mode == ReportModes.ExcelDownload && shedules.Count > 0)
+                    return Content(HttpStatusCode.BadRequest, shedules);
+
+
+                var outputTable = new DataTable("ShiftSchedule");
+                outputTable.Columns.Add("EmpUnqId");
+                //TODO: "COLUMN ORDER" remember to change below in for loop if adding/deleting any columns
+
+                //for (int dt = fromDt.Day; dt <= toDt.Day; dt++)
+                for (int dt = 1; dt <= toDt.Day; dt++)
+                {
+                    outputTable.Columns.Add("D" + dt.ToString("00"));
+
+                    //TODO: "COLUMN ORDER" Remember to change here if adding/deleting columns from excel
+                    //outputTable.Columns["D" + dt.Day.ToString("00")].SetOrdinal(dt.Day);
+                }
+
+
+                // Loop for each employee under this releaser
+                foreach (ReleaseStrategies relStr in vRelStr)
+                {
+                    // loop for each day of month
+                    DataRow dr = outputTable.NewRow();
+                    dr["EmpUnqId"] = relStr.ReleaseStrategy;
+
+                    if (mode == ReportModes.ExcelDownload)
+                    {
+                        outputTable.Rows.Add(dr);
+                        continue;
+                    }
+
+                    // If there are multiple schedules uploaded for this employee, 
+                    // show only last one
+
+                    List<ShiftSchedules> schedule;
+
+                    if (mode == ReportModes.CurrentMonthReleased || mode == ReportModes.PreviousMonthReleased)
+                    {
+                        schedule = _context.ShiftSchedules
+                            .Where(s =>
+                                s.ReleaseStrategy == relStr.ReleaseStrategy &&
+                                s.YearMonth == openMonth &&
+                                s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
+                            .OrderByDescending(s => s.ScheduleId)
+                            .ToList();
+                    }
+                    else
+                    {
+                        schedule = _context.ShiftSchedules
+                            .Where(s =>
+                                s.ReleaseStrategy == relStr.ReleaseStrategy &&
+                                s.YearMonth == openMonth)
+                            .OrderByDescending(s => s.ScheduleId)
+                            .ToList();
+                    }
+
+                    if (!schedule.Any())
+                        continue;
+
+                    ShiftSchedules sch = schedule.First();
+
+                    var schDtl = _context.ShiftScheduleDetails
+                        .Where(s =>
+                            s.YearMonth == sch.YearMonth &&
+                            s.ScheduleId == sch.ScheduleId &&
+                            s.EmpUnqId == sch.EmpUnqId).ToList();
+
+                    for (DateTime dt = fromDt; dt <= toDt;)
+                    {
+                        dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                        dt = dt.AddDays(1);
+                    }
+
+
                     outputTable.Rows.Add(dr);
-                    continue;
-                }
-                
-                // If there are multiple schedules uploaded for this employee, 
-                // show only last one
-
-                List<ShiftSchedules> schedule;
-                
-                if (mode == ReportModes.CurrentMonthReleased || mode == ReportModes.PreviousMonthReleased)
-                {
-                    schedule = _context.ShiftSchedules
-                        .Where(s =>
-                            s.ReleaseStrategy == relStr.ReleaseStrategy &&
-                            s.YearMonth == openMonth &&
-                            s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
-                        .OrderByDescending(s => s.ScheduleId)
-                        .ToList();
-                }
-                else
-                {
-                    schedule = _context.ShiftSchedules
-                        .Where(s =>
-                            s.ReleaseStrategy == relStr.ReleaseStrategy &&
-                            s.YearMonth == openMonth)
-                        .OrderByDescending(s => s.ScheduleId)
-                        .ToList();
                 }
 
-                if (!schedule.Any())
-                    continue;
-                
-                ShiftSchedules sch = schedule.First();
+                return Ok(outputTable);
 
-                var schDtl = _context.ShiftScheduleDetails
-                    .Where(s =>
-                        s.YearMonth == sch.YearMonth &&
-                        s.ScheduleId == sch.ScheduleId &&
-                        s.EmpUnqId == sch.EmpUnqId).ToList();
-
-                for (DateTime dt = fromDt; dt <= toDt;)
-                {
-                    dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
-                    dt = dt.AddDays(1);
-                }
-
-
-                outputTable.Rows.Add(dr);
             }
+            catch (Exception ex)
+            {
 
-            return Ok(outputTable);
+                return BadRequest(ex.ToString());
+            }
         }
 
         public IHttpActionResult GetSchedule(DateTime fromDate, DateTime toDate)
@@ -185,8 +200,12 @@ namespace ESS.Controllers.Api
 
                 //carry on the good work...
 
-                DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
-                                                 openMonth.ToString().Substring(0, 4));
+                //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
+                //                                 openMonth.ToString().Substring(0, 4));
+
+                DateTime fromDt = new DateTime(
+                    Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                    Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
                 DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
 
                 var shedules = _context.ShiftSchedules
@@ -259,7 +278,7 @@ namespace ESS.Controllers.Api
                     Directory.CreateDirectory(folder ?? throw new InvalidOperationException("Folder not found"));
 
                 //Loop through uploaded files 
-                for (int i = 0; i < httpContext.Request.Files.Count; i++)
+                for (int i = 0; i < httpContext.Request.Files.Count; )
                 {
                     HttpPostedFile postedFile = httpContext.Request.Files[i];
 
@@ -297,7 +316,7 @@ namespace ESS.Controllers.Api
                                     EmpUnqId = row[0],
                                     ReleaseGroupCode = ReleaseGroups.ShiftSchedule,
                                     ReleaseStrategy = row[0],
-                                    ReleaseStatusCode = ReleaseStatus.InRelease,
+                                    ReleaseStatusCode = ReleaseStatus.PartiallyReleased,
                                     AddDt = DateTime.Now,
                                     AddUser = empUnqId,
                                     ShiftScheduleDetails = new List<ShiftScheduleDetailDto>()
@@ -399,14 +418,28 @@ namespace ESS.Controllers.Api
                                             ReleaseStrategy = relStratReleaseStrategyLevel.ReleaseStrategy,
                                             ReleaseStrategyLevel = relStratReleaseStrategyLevel.ReleaseStrategyLevel,
                                             ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
-                                            ReleaseStatusCode =
-                                                relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1
-                                                    ? ReleaseStatus.InRelease
-                                                    : ReleaseStatus.NotReleased,
+                                            ReleaseStatusCode = ReleaseStatus.NotReleased,
                                             ReleaseDate = null,
                                             ReleaseAuth = empUnqId,
                                             IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
                                         };
+
+
+                                        if (relStratReleaseStrategyLevel.ReleaseStrategyLevel <= 1)
+                                        {
+                                            appRelStat.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                                            appRelStat.ReleaseDate = DateTime.Now;
+                                        }
+                                        else if (relStratReleaseStrategyLevel.ReleaseStrategyLevel == 2)
+                                        {
+                                            appRelStat.ReleaseStatusCode = ReleaseStatus.InRelease;
+                                            appRelStat.ReleaseDate = null;
+                                        }
+                                        else
+                                        {
+                                            appRelStat.ReleaseStatusCode = ReleaseStatus.NotReleased;
+                                            appRelStat.ReleaseDate = null;
+                                        }
 
                                         //add to collection
                                         apps.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));

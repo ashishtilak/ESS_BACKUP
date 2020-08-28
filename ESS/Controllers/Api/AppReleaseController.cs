@@ -1239,7 +1239,8 @@ namespace ESS.Controllers.Api
             var allAppReleaseObj = _context.ApplReleaseStatus
                 .Where(a => a.YearMonth == dto.YearMonth &&
                             a.ReleaseGroupCode == dto.ReleaseGroupCode &&
-                            a.ApplicationId == dto.ApplicationId)
+                            a.ApplicationId == dto.ApplicationId &&
+                            a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel )
                 .ToList();
 
             foreach (ApplReleaseStatus appRelobj in allAppReleaseObj)
