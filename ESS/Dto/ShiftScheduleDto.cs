@@ -42,5 +42,7 @@ namespace ESS.Dto
         public string ModeName { get; set; }
         public string StatusName { get; set; }
 
+
+        public string AddUserName { get; set; }
     }
 }

@@ -23,7 +23,8 @@ namespace ESS.Controllers.Api
         {
             if (releaseGroup == ReleaseGroups.LeaveApplication ||
                 releaseGroup == ReleaseGroups.OutStationDuty ||
-                releaseGroup == ReleaseGroups.CompOff)
+                releaseGroup == ReleaseGroups.CompOff ||
+                releaseGroup == ReleaseGroups.ShiftSchedule)
             {
                 var releaseStrDto = _context.ReleaseStrategy
                     .Where(r =>

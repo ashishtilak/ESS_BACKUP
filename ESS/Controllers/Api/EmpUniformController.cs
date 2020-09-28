@@ -19,12 +19,12 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
-        public IHttpActionResult GetEmpUniform(int year, string empUnqId = "")
+        public IHttpActionResult GetEmpUniform(int year = 0, string empUnqId = "")
         {
             var empUniDto = _context.EmpUniform
                 .Include(e => e.Employee)
                 .Where(e => empUnqId == "" || e.EmpUnqId == empUnqId)
-                .Where(e => e.Year == year)
+                .Where(e => year == 0 || e.Year == year)
                 .ToList()
                 .Select(Mapper.Map<EmpUniform, EmpUniformDto>);
 

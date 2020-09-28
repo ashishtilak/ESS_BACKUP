@@ -199,15 +199,18 @@
     <Compile Include="Controllers\Api\ManageLeaveController.cs" />
     <Compile Include="Controllers\Api\MasterUploadController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
+    <Compile Include="Controllers\Api\ReimbursementController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\RolesController.cs" />
     <Compile Include="Controllers\Api\SalarySlipController.cs" />
     <Compile Include="Controllers\Api\ShiftScheduleController.cs" />
+    <Compile Include="Controllers\Api\ShiftScheduleUpdateController.cs" />
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ReimbursementDto.cs" />
     <Compile Include="Dto\ApplReleaseStatusDto.cs" />
     <Compile Include="Dto\BankDto.cs" />
     <Compile Include="Dto\CategoryDto.cs" />
@@ -240,6 +243,7 @@
     <Compile Include="Dto\MaterialDto.cs" />
     <Compile Include="Dto\PerfAttdDto.cs" />
     <Compile Include="Dto\PerfPunchDto.cs" />
+    <Compile Include="Dto\ReimbConvDto.cs" />
     <Compile Include="Dto\ReleaseGroupDto.cs" />
     <Compile Include="Dto\ReleaseStrategyDto.cs" />
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />
@@ -639,6 +643,10 @@
     <Compile Include="Migrations\202006180655592_ChangeKeyInShiftSchedule.Designer.cs">
       <DependentUpon>202006180655592_ChangeKeyInShiftSchedule.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009150421411_AddReimbAndReimbConvTables.cs" />
+    <Compile Include="Migrations\202009150421411_AddReimbAndReimbConvTables.Designer.cs">
+      <DependentUpon>202009150421411_AddReimbAndReimbConvTables.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -670,6 +678,8 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Materials.cs" />
     <Compile Include="Models\OpenMonth.cs" />
+    <Compile Include="Models\ReimbConv.cs" />
+    <Compile Include="Models\Reimbursements.cs" />
     <Compile Include="Models\ReleaseAuth.cs" />
     <Compile Include="Models\ReleaseGroups.cs" />
     <Compile Include="Models\ReleaseStatus.cs" />
@@ -1043,6 +1053,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202006180655592_ChangeKeyInShiftSchedule.resx">
       <DependentUpon>202006180655592_ChangeKeyInShiftSchedule.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009150421411_AddReimbAndReimbConvTables.resx">
+      <DependentUpon>202009150421411_AddReimbAndReimbConvTables.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AutoMapper;
+using ESS.Controllers;
 using ESS.Dto;
 using ESS.Models;
 
@@ -107,6 +108,12 @@ namespace ESS.App_Start
             CreateMap<ShiftScheduleDto, ShiftSchedules>();
             CreateMap<ShiftScheduleDetails, ShiftScheduleDetailDto>();
             CreateMap<ShiftScheduleDetailDto, ShiftScheduleDetails>();
+
+            CreateMap<Reimbursements, ReimbursementDto>();
+            CreateMap<ReimbursementDto, Reimbursements>();
+
+            CreateMap<ReimbConv, ReimbConvDto>();
+            CreateMap<ReimbConvDto, ReimbConv>();
         }
     }
 }

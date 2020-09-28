@@ -132,6 +132,10 @@ namespace ESS.Models
         public DbSet<ShiftScheduleDetails> ShiftScheduleDetails { get; set; }
         public DbSet<SsOpenMonth> SsOpenMonth { get; set; }
 
+
+        public DbSet<Reimbursements> Reimbursement { get; set; } 
+        public DbSet<ReimbConv> ReimbConvs { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

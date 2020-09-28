@@ -18,5 +18,7 @@ namespace ESS.Models
         public static readonly string GatePassAdvice = "GA";
         public static readonly string CompOff = "CO";
         public static readonly string ShiftSchedule = "SS";
+        public static readonly string Reimbursement = "RE";
+
     }
 }

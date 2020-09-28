@@ -611,6 +611,12 @@ namespace ESS.Controllers.Api
 
                 foreach (var gp in dto)
                 {
+                    var emp = _context.Employees
+                        .SingleOrDefault(e => e.EmpUnqId == gp.EmpUnqId);
+
+                    if (emp == null)
+                        return BadRequest("Employee not found: " + gp.EmpUnqId.ToString());
+
                     //loop through all GP details 
                     GatePass newGp = new GatePass
                     {

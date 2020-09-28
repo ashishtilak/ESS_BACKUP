@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Http;
 using Antlr.Runtime.Misc;
@@ -18,13 +17,6 @@ namespace ESS.Controllers.Api
 {
     public class ShiftScheduleController : ApiController
     {
-        private readonly ApplicationDbContext _context;
-
-        public ShiftScheduleController()
-        {
-            _context = new ApplicationDbContext();
-        }
-
         public enum ReportModes
         {
             ExcelDownload,
@@ -34,15 +26,39 @@ namespace ESS.Controllers.Api
             PreviousMonthReleased
         }
 
-        /// <summary>
-        /// Get schedule to be used to get blank excel template for all employees under release
-        /// </summary>
-        /// <param name="empUnqId">SAP code of Releaser</param>
-        /// <param name="mode">Report type selection
-        /// 0- ExcelDownload, 1-CurrentMonthAll, 2-CurrentMonthReleased,
-        /// 3- PreviousMonthAll, 4- PreviousMonthReleased,
-        /// </param>
-        /// <returns>json data in template format</returns>
+        private static ApplicationDbContext _context;
+
+        public ShiftScheduleController()
+        {
+            _context = new ApplicationDbContext();
+        }
+
+        public IHttpActionResult GetOpenMonth()
+        {
+            var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
+            if (openMonth == null)
+                return BadRequest("Open month is null. Pl check.");
+
+            var fromDt = new DateTime(
+                Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
+
+            string year = openMonth.ToString().Substring(0, 4);
+            string month = openMonth.ToString().Substring(4, 2);
+
+            var result = new DateTime();
+            try
+            {
+                result = DateTime.ParseExact(string.Format("{0}-{1}-{2}", year, month, "01"), "yyyy-MM-dd", null);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+
+            return Ok(result);
+        }
+
         public IHttpActionResult GetSchedule(string empUnqId, ReportModes mode)
         {
             // LIST OF MODES:
@@ -55,9 +71,12 @@ namespace ESS.Controllers.Api
 
             try
             {
-                string relCode = _context.ReleaseAuth.FirstOrDefault(e => e.EmpUnqId == empUnqId)?.ReleaseCode;
+                var relCode = _context.ReleaseAuth
+                    .Where(e => e.EmpUnqId == empUnqId)
+                    .Select(e=>e.ReleaseCode)
+                    .ToArray();
 
-                if (relCode == null) return BadRequest("Employee is not a releaser.");
+                if (relCode.Length == 0) return BadRequest("Employee is not a releaser.");
 
                 var relStrLvl = _context.ReleaseStrategyLevels
                     .Where(r => relCode.Contains(r.ReleaseCode) && r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
@@ -79,7 +98,7 @@ namespace ESS.Controllers.Api
                 //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
                 //                                 openMonth.ToString().Substring(0, 4));
 
-                DateTime fromDt = new DateTime(
+                var fromDt = new DateTime(
                     Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
                     Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
 
@@ -110,16 +129,22 @@ namespace ESS.Controllers.Api
 
                 var outputTable = new DataTable("ShiftSchedule");
                 outputTable.Columns.Add("EmpUnqId");
-                //TODO: "COLUMN ORDER" remember to change below in for loop if adding/deleting any columns
+
+                outputTable.Columns.Add("EmpName");
+                outputTable.Columns.Add("DeptName");
+                outputTable.Columns.Add("StatName");
+                outputTable.Columns.Add("Designation");
+                outputTable.Columns.Add("CatName");
 
                 //for (int dt = fromDt.Day; dt <= toDt.Day; dt++)
+                var loopDate = fromDt;
                 for (int dt = 1; dt <= toDt.Day; dt++)
                 {
-                    outputTable.Columns.Add("D" + dt.ToString("00"));
-
-                    //TODO: "COLUMN ORDER" Remember to change here if adding/deleting columns from excel
-                    //outputTable.Columns["D" + dt.Day.ToString("00")].SetOrdinal(dt.Day);
+                    string dayStr = dt.ToString("00") + "_" + loopDate.DayOfWeek.ToString().Substring(0, 2);
+                    outputTable.Columns.Add(dayStr);
+                    loopDate = loopDate.AddDays(1);
                 }
+                //outputTable.Columns["D" + dt.Day.ToString("00")].SetOrdinal(dt.Day);
 
 
                 // Loop for each employee under this releaser
@@ -128,6 +153,46 @@ namespace ESS.Controllers.Api
                     // loop for each day of month
                     DataRow dr = outputTable.NewRow();
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
+
+                    EmployeeDto employeeDto = _context.Employees
+                        .Select(e => new EmployeeDto
+                        {
+                            EmpUnqId = e.EmpUnqId,
+                            EmpName = e.EmpName,
+                            FatherName = e.FatherName,
+                            Active = e.Active,
+                            Pass = e.Pass,
+
+                            CompCode = e.CatCode,
+                            WrkGrp = e.WrkGrp,
+                            UnitCode = e.UnitCode,
+                            DeptCode = e.DeptCode,
+                            StatCode = e.StatCode,
+                            CatCode = e.CatCode,
+                            EmpTypeCode = e.EmpTypeCode,
+                            GradeCode = e.GradeCode,
+                            DesgCode = e.DesgCode,
+                            IsHod = e.IsHod,
+
+                            CompName = e.Company.CompName,
+                            WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                            UnitName = e.Units.UnitName,
+                            DeptName = e.Departments.DeptName,
+                            StatName = e.Stations.StatName,
+                            CatName = e.Categories.CatName,
+                            EmpTypeName = e.EmpTypes.EmpTypeName,
+                            GradeName = e.Grades.GradeName,
+                            DesgName = e.Designations.DesgName,
+
+                            Location = e.Location
+                        })
+                        .Single(e => e.EmpUnqId == relStr.ReleaseStrategy);
+
+                    dr["EmpName"] = employeeDto.EmpName;
+                    dr["DeptName"] = employeeDto.DeptName;
+                    dr["StatName"] = employeeDto.StatName;
+                    dr["Designation"] = employeeDto.DesgName;
+                    dr["CatName"] = employeeDto.CatName;
 
                     if (mode == ReportModes.ExcelDownload)
                     {
@@ -141,7 +206,6 @@ namespace ESS.Controllers.Api
                     List<ShiftSchedules> schedule;
 
                     if (mode == ReportModes.CurrentMonthReleased || mode == ReportModes.PreviousMonthReleased)
-                    {
                         schedule = _context.ShiftSchedules
                             .Where(s =>
                                 s.ReleaseStrategy == relStr.ReleaseStrategy &&
@@ -149,16 +213,13 @@ namespace ESS.Controllers.Api
                                 s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
                             .OrderByDescending(s => s.ScheduleId)
                             .ToList();
-                    }
                     else
-                    {
                         schedule = _context.ShiftSchedules
                             .Where(s =>
                                 s.ReleaseStrategy == relStr.ReleaseStrategy &&
                                 s.YearMonth == openMonth)
                             .OrderByDescending(s => s.ScheduleId)
                             .ToList();
-                    }
 
                     if (!schedule.Any())
                         continue;
@@ -173,20 +234,20 @@ namespace ESS.Controllers.Api
 
                     for (DateTime dt = fromDt; dt <= toDt;)
                     {
-                        dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                        string dayStr = dt.Day.ToString("00") + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
+
+                        //dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                        dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                         dt = dt.AddDays(1);
                     }
-
 
                     outputTable.Rows.Add(dr);
                 }
 
                 return Ok(outputTable);
-
             }
             catch (Exception ex)
             {
-
                 return BadRequest(ex.ToString());
             }
         }
@@ -203,19 +264,24 @@ namespace ESS.Controllers.Api
                 //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
                 //                                 openMonth.ToString().Substring(0, 4));
 
-                DateTime fromDt = new DateTime(
+                var fromDt = new DateTime(
                     Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
                     Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
                 DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
 
                 var shedules = _context.ShiftSchedules
-                    .Where(s => (s.ReleaseDt>= fromDate && s.AddDt <= toDate) &&
+                    .Where(s => s.ReleaseDt >= fromDate && s.AddDt <= toDate &&
                                 s.YearMonth == openMonth &&
                                 s.ReleaseStatusCode == ReleaseStatus.FullyReleased
                     ).ToList();
 
                 var outputTable = new DataTable("ShiftSchedule");
                 outputTable.Columns.Add("EmpUnqId");
+                outputTable.Columns.Add("EmpName");
+                outputTable.Columns.Add("DeptName");
+                outputTable.Columns.Add("StatName");
+                outputTable.Columns.Add("Designation");
+                outputTable.Columns.Add("CatName");
 
                 for (DateTime dt = fromDt; dt <= toDt;)
                 {
@@ -223,6 +289,10 @@ namespace ESS.Controllers.Api
                     dt = dt.AddDays(1);
                 }
 
+                outputTable.Columns.Add("FinalReleaseDate");
+                outputTable.Columns.Add("ReleaseUser");
+                outputTable.Columns.Add("AddDate");
+                outputTable.Columns.Add("AddUser");
 
                 // Loop for each employee under this releaser
                 foreach (ShiftSchedules sch in shedules)
@@ -230,6 +300,46 @@ namespace ESS.Controllers.Api
                     // loop for each day of month
                     DataRow dr = outputTable.NewRow();
                     dr["EmpUnqId"] = sch.ReleaseStrategy;
+
+                    EmployeeDto employeeDto = _context.Employees
+                        .Select(e => new EmployeeDto
+                        {
+                            EmpUnqId = e.EmpUnqId,
+                            EmpName = e.EmpName,
+                            FatherName = e.FatherName,
+                            Active = e.Active,
+                            Pass = e.Pass,
+
+                            CompCode = e.CatCode,
+                            WrkGrp = e.WrkGrp,
+                            UnitCode = e.UnitCode,
+                            DeptCode = e.DeptCode,
+                            StatCode = e.StatCode,
+                            CatCode = e.CatCode,
+                            EmpTypeCode = e.EmpTypeCode,
+                            GradeCode = e.GradeCode,
+                            DesgCode = e.DesgCode,
+                            IsHod = e.IsHod,
+
+                            CompName = e.Company.CompName,
+                            WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                            UnitName = e.Units.UnitName,
+                            DeptName = e.Departments.DeptName,
+                            StatName = e.Stations.StatName,
+                            CatName = e.Categories.CatName,
+                            EmpTypeName = e.EmpTypes.EmpTypeName,
+                            GradeName = e.Grades.GradeName,
+                            DesgName = e.Designations.DesgName,
+
+                            Location = e.Location
+                        })
+                        .Single(e => e.EmpUnqId == sch.ReleaseStrategy);
+
+                    dr["EmpName"] = employeeDto.EmpName;
+                    dr["DeptName"] = employeeDto.DeptName;
+                    dr["StatName"] = employeeDto.StatName;
+                    dr["Designation"] = employeeDto.DesgName;
+                    dr["CatName"] = employeeDto.CatName;
 
                     var schDtl = _context.ShiftScheduleDetails
                         .Where(s =>
@@ -242,7 +352,11 @@ namespace ESS.Controllers.Api
                         dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                         dt = dt.AddDays(1);
                     }
-
+                    
+                    dr["FinalReleaseDate"] = sch.ReleaseDt ;
+                    dr["ReleaseUser"] = sch.ReleaseUser;
+                    dr["AddDate"]= sch.AddDt;
+                    dr["AddUser"]= sch.AddUser;
 
                     outputTable.Rows.Add(dr);
                 }
@@ -255,11 +369,6 @@ namespace ESS.Controllers.Api
             }
         }
 
-        /// <summary>
-        /// Shift schedule upload for employees under the releaser
-        /// </summary>
-        /// <param name="empUnqId">SAP code of releaser and csv file in filedata</param>
-        /// <returns>Ok with uploaded schedule data</returns>
         [HttpPost]
         public IHttpActionResult UploadSchedule(string empUnqId)
         {
@@ -278,7 +387,7 @@ namespace ESS.Controllers.Api
                     Directory.CreateDirectory(folder ?? throw new InvalidOperationException("Folder not found"));
 
                 //Loop through uploaded files 
-                for (int i = 0; i < httpContext.Request.Files.Count; )
+                for (int i = 0; i < httpContext.Request.Files.Count;)
                 {
                     HttpPostedFile postedFile = httpContext.Request.Files[i];
 
@@ -288,6 +397,7 @@ namespace ESS.Controllers.Api
                     {
                         string fileExt = Path.GetExtension(postedFile.FileName);
                         if (fileExt != ".csv") return BadRequest("Invalid file extension.");
+
 
                         SsOpenMonth ssOpenMonth = _context.SsOpenMonth.FirstOrDefault();
                         int openMonth = 0;
@@ -321,13 +431,13 @@ namespace ESS.Controllers.Api
                                     AddUser = empUnqId,
                                     ShiftScheduleDetails = new List<ShiftScheduleDetailDto>()
                                 };
-                                
-                                for (int rowIndex = 1; rowIndex < row.Length; rowIndex++)
+
+                                for (int rowIndex = 6; rowIndex < row.Length; rowIndex++)
                                 {
                                     var schLine = new ShiftScheduleDetailDto
                                     {
                                         YearMonth = sch.YearMonth,
-                                        ShiftDay = rowIndex,
+                                        ShiftDay = rowIndex-5,
                                         ShiftCode = row[rowIndex]
                                     };
 
@@ -345,7 +455,8 @@ namespace ESS.Controllers.Api
                             var existingSch = _context.ShiftSchedules
                                 .Where(s => s.YearMonth == openMonth &&
                                             schEmps.Contains(s.EmpUnqId) &&
-                                            s.ReleaseStatusCode != ReleaseStatus.FullyReleased)
+                                            (s.ReleaseStatusCode != ReleaseStatus.FullyReleased &&
+                                             s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected))
                                 .Select(e => e.EmpUnqId)
                                 .ToArray();
 
@@ -410,7 +521,7 @@ namespace ESS.Controllers.Api
                                     foreach (ReleaseStrategyLevels relStratReleaseStrategyLevel in relStrat
                                         .ReleaseStrategyLevels)
                                     {
-                                        ApplReleaseStatus appRelStat = new ApplReleaseStatus
+                                        var appRelStat = new ApplReleaseStatus
                                         {
                                             YearMonth = sch.YearMonth,
                                             ReleaseGroupCode = sch.ReleaseGroupCode,
@@ -483,13 +594,7 @@ namespace ESS.Controllers.Api
             return Ok();
         }
 
-        /// <summary>
-        /// Validate given shift schedule
-        /// </summary>
-        /// <param name="schedule">Shift schedule object</param>
-        /// <param name="empUnqId">Employee id of releaser</param>
-        /// <returns></returns>
-        private List<string> SchValidate(List<ShiftScheduleDto> schedule, string empUnqId)
+        public static List<string> SchValidate(List<ShiftScheduleDto> schedule, string empUnqId)
         {
             //get all shifts in a list
             var shifts = _context.Shifts.Select(s => s.ShiftCode).ToList();
@@ -553,13 +658,7 @@ namespace ESS.Controllers.Api
             return errors;
         }
 
-        /// <summary>
-        /// Validates whether the employee is under release of releaser
-        /// </summary>
-        /// <param name="empUnqId">Employee to check</param>
-        /// <param name="releaser">SAP id of releaser</param>
-        /// <returns></returns>
-        private bool CheckReleaser(string empUnqId, string releaser)
+        private static bool CheckReleaser(string empUnqId, string releaser)
         {
             //Get release strategy of the employee
 
