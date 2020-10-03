@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,17 +40,17 @@ namespace ESS.Controllers.Api
             if (openMonth == null)
                 return BadRequest("Open month is null. Pl check.");
 
-            var fromDt = new DateTime(
-                Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
-                Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
+            //var dateTime = new DateTime(
+            //    Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+            //    Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
 
             string year = openMonth.ToString().Substring(0, 4);
             string month = openMonth.ToString().Substring(4, 2);
 
-            var result = new DateTime();
+            DateTime result;
             try
             {
-                result = DateTime.ParseExact(string.Format("{0}-{1}-{2}", year, month, "01"), "yyyy-MM-dd", null);
+                result = DateTime.ParseExact($"{year}-{month}-01", "yyyy-MM-dd", null);
             }
             catch (Exception ex)
             {
@@ -57,6 +58,29 @@ namespace ESS.Controllers.Api
             }
 
             return Ok(result);
+        }
+
+        public IHttpActionResult GetSchedule(int openMonth)
+        {
+            SsOpenMonth currentMonth = _context.SsOpenMonth.FirstOrDefault();
+
+            var schedule = _context.ShiftSchedules
+                .Include(s => s.ShiftScheduleDetails)
+                .Include(s => s.Company)
+                .Include(s => s.Departments)
+                .Include(s => s.Stations)
+                .Include(s=>s.Employee)
+                .Include(s=>s.ReleaseStatus)
+                .Where(s =>
+                    s.YearMonth == currentMonth.YearMonth &&
+                    s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected)
+                .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>)
+                .ToList();
+
+            if (schedule.Count == 0)
+                return BadRequest("No records found.");
+
+            return Ok(schedule);
         }
 
         public IHttpActionResult GetSchedule(string empUnqId, ReportModes mode)
@@ -122,10 +146,18 @@ namespace ESS.Controllers.Api
                     ).ToList();
 
 
-                //return bad request if we've asked for blank format and any employee is found already uploaded
-                if (mode == ReportModes.ExcelDownload && shedules.Count > 0)
-                    return Content(HttpStatusCode.BadRequest, shedules);
 
+                //REMOVED ON 03/10/2020:
+                //NOW WE'LL NOT RETURN BAD REQUEST, BUT INSTEAD RETURN SS TEMPLATE
+                //FOR REMAINING EMPLOYEES WHOSE SS IS NOT UPLOADED...
+
+                //return bad request if we've asked for blank format and any employee is found already uploaded
+                //if (mode == ReportModes.ExcelDownload && shedules.Count > 0)
+                //    return Content(HttpStatusCode.BadRequest, shedules);
+                //REMOVED ON 03/10/2020
+
+                if (mode != ReportModes.ExcelDownload && shedules.Count == 0)
+                    return Content(HttpStatusCode.BadRequest, "No records found.");
 
                 var outputTable = new DataTable("ShiftSchedule");
                 outputTable.Columns.Add("EmpUnqId");
@@ -150,6 +182,9 @@ namespace ESS.Controllers.Api
                 // Loop for each employee under this releaser
                 foreach (ReleaseStrategies relStr in vRelStr)
                 {
+                    if (mode == ReportModes.ExcelDownload)
+                        if (shedules.Any(s=>s.ReleaseStrategy == relStr.ReleaseStrategy)) continue;
+                    
                     // loop for each day of month
                     DataRow dr = outputTable.NewRow();
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
@@ -351,6 +386,7 @@ namespace ESS.Controllers.Api
                     {
                         dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                         dt = dt.AddDays(1);
+                        Debug.Print(sch.EmpUnqId);
                     }
                     
                     dr["FinalReleaseDate"] = sch.ReleaseDt ;
@@ -412,7 +448,32 @@ namespace ESS.Controllers.Api
                         {
                             // This will just rip off the first Header line off the excel file
                             var header = reader.ReadLine()?.Split(',');
+                            if (header == null)
+                                return BadRequest("Header is null!!");
 
+                            //validate columns:
+                            //first check number of columns. 
+                            //first 5 are fixed, and rest are number of days of month
+
+                            var fromDt = new DateTime(
+                                Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                                Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
+
+                            for (int j = 6; j < header.Length; j++)
+                            {
+
+                                if (header[j].Length < 2)
+                                    return BadRequest("Invalid template format. Pl don't change column order");
+
+                                bool result = int.TryParse((header[j].Substring(0, 2)),out int val);
+                                if(result && j-5 == val) continue;
+
+                                return BadRequest("Invalid template format. Pl don't change column order");
+                            }
+                            
+                            //column validation over
+
+                            
                             var schedules = new List<ShiftScheduleDto>();
 
                             while (!reader.EndOfStream)

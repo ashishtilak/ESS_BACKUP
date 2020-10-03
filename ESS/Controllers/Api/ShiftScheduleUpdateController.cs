@@ -257,8 +257,16 @@ namespace ESS.Controllers.Api
                             //first get the schedule for upto FromDate 
                             //and add it to details
 
+                            var extScheduleId = _context.ShiftSchedules
+                                .Where(s => s.EmpUnqId == tmpEmpId &&
+                                            s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
+                                .Max(s => s.ScheduleId);
+
                             var existingSch = _context.ShiftScheduleDetails
-                                .Where(s => s.YearMonth == openMonth && s.EmpUnqId == tmpEmpId)
+                                .Where(s => s.YearMonth == openMonth && 
+                                            s.ScheduleId == extScheduleId &&
+                                            s.EmpUnqId == tmpEmpId
+                                            )
                                 .ToList();
 
                             for (int rowIndex = 1; rowIndex < fromDt.Day; rowIndex++)

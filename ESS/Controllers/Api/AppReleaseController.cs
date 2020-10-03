@@ -1353,6 +1353,36 @@ namespace ESS.Controllers.Api
                             a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel)
                 .ToList();
 
+
+            //TODO: THIS CODES IS TO BE REMOVED...
+            
+            var releaseCodes = _context.ReleaseAuth
+                .Where(r => r.EmpUnqId == empUnqId && r.Active)
+                .Select(r=>r.ReleaseCode)
+                .ToArray();
+
+            var allRelStrLevel = _context.ReleaseStrategyLevels
+                .Where(r => r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule &&
+                            releaseCodes.Contains(r.ReleaseCode));
+
+            foreach (ApplReleaseStatus appRelObj in allAppReleaseObj.ToList())
+            {
+                bool found = allRelStrLevel.Any(r => r.ReleaseGroupCode == appRelObj.ReleaseGroupCode &&
+                                                     r.ReleaseStrategy == appRelObj.ReleaseStrategy &&
+                                                     r.ReleaseStrategyLevel == appRelObj.ReleaseStrategyLevel);
+                if (!found)
+                {
+                    allAppReleaseObj.Remove(appRelObj);
+                }
+                else if (appRelObj.ReleaseStatusCode == ReleaseStatus.FullyReleased)
+                {
+                    allAppReleaseObj.Remove(appRelObj);
+                }
+            }
+            
+            //TODO: THIS CODES IS TO BE REMOVED...
+
+            
             foreach (ApplReleaseStatus appRelobj in allAppReleaseObj)
             {
                 ApplReleaseStatus applicationDetail = _context.ApplReleaseStatus
@@ -1363,6 +1393,7 @@ namespace ESS.Controllers.Api
                              a.ReleaseStrategy == appRelobj.ReleaseStrategy &&
                              a.ReleaseStrategyLevel == appRelobj.ReleaseStrategyLevel
                     );
+
 
                 if (applicationDetail == null)
                     throw new Exception("Invalid app release status detals...");

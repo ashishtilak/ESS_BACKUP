@@ -47,9 +47,9 @@ namespace ESS.Controllers.Api
                     .ToList();
 
                 // now we have multiple employees against release code (if exist)
-                foreach (var emp in employees)
+                foreach (string emp in employees)
                 {
-                    ReleaseAuthEmp res = new ReleaseAuthEmp
+                    var res = new ReleaseAuthEmp
                     {
                         ReleaseCode = auth.ReleaseCode,
                         EmpUnqId = emp

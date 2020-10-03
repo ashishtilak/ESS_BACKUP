@@ -23,6 +23,47 @@ namespace ESS.Controllers.Api
         }
 
 
+        public IHttpActionResult GetLeaves()
+        {
+            var pendingLeaves = _context.LeaveApplications
+                .Include(l => l.LeaveApplicationDetails)
+                .Include(l => l.Departments)
+                .Include(l => l.Stations)
+                .Include(l => l.Categories)
+                .Include(l => l.Employee)
+                .Where(l => (l.ReleaseStatusCode == ReleaseStatus.PartiallyReleased ||
+                             l.ReleaseStatusCode == ReleaseStatus.InRelease))
+                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
+                .ToList();
+                
+
+            if (pendingLeaves.Count == 0)
+                return Ok("No records found.");
+
+
+            var leaveAppId = pendingLeaves.Select(l => l.LeaveAppId).ToArray();
+
+            var appReleaseStatuses = _context.ApplReleaseStatus
+                .Where(a => a.ReleaseGroupCode == ReleaseGroups.LeaveApplication &&
+                            leaveAppId.Contains(a.ApplicationId))
+                .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
+                .ToList();
+            
+
+            foreach (LeaveApplicationDto leave in pendingLeaves)
+            {
+                var appRelease = appReleaseStatuses.Where(a => a.ApplicationId == leave.LeaveAppId);
+                foreach (ApplReleaseStatusDto app in appRelease)
+                {
+                    app.ReleaserName = _context.Employees
+                        .FirstOrDefault(e => e.EmpUnqId == app.ReleaseAuth)?.EmpName;
+                    leave.ApplReleaseStatus.Add(app);
+                }
+            }
+
+            return Ok(pendingLeaves);
+        }
+
         public IHttpActionResult GetLeaves(string empUnqId, DateTime fromDt, DateTime toDt)
         {
             var releaseCode = _context.ReleaseAuth
