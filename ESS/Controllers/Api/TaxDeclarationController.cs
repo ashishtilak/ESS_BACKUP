@@ -140,6 +140,9 @@ namespace ESS.Controllers.Api
                     empRec.HomeLoanCode = 14;
                     empRec.HomeLoanPro = prov.HouseLoanPrincipal;
 
+                    empRec.HomeLoanCode2 = 14;
+                    empRec.HomeLoanPro2 = prov.HouseLoanPrincipal2;
+                    
                     empRec.NotifiedMfCode = 18;
                     empRec.NotifiedMfPro = prov.TotalSukanya;
 
@@ -153,22 +156,29 @@ namespace ESS.Controllers.Api
                     empRec.TermDepoPro = prov.TotalBankDepositAmount;
 
                     empRec.Total80C = empRec.InsPro + empRec.UlipPro + empRec.MfPro + empRec.PpfPro + empRec.NscPro +
-                                      empRec.HomeLoanPro + empRec.NotifiedMfPro + empRec.Child1Pro + empRec.Child2Pro +
-                                      empRec.TermDepoPro;
+                                      empRec.HomeLoanPro + empRec.HomeLoanPro2 + empRec.NotifiedMfPro + empRec.Child1Pro + 
+                                      empRec.Child2Pro + empRec.TermDepoPro;
 
 
                     empRec.LongTermMf = 0;          //TODO: CONFIRM
                     empRec.MedicalPremium = prov.MedicalPremiumSelf + prov.MedicalPremiumParents;
                     empRec.EduLoanInterest = prov.EducationLoanInterest;
                     empRec.Nps = prov.NationalPensionScheme;
+
                     empRec.InterestOnLoan = prov.InterestOnLoan;
                     empRec.InterestPreConstruction = prov.InterestPreConstruction;
                     empRec.RentReceived = prov.RentalIncomePerMonth;
                     empRec.BankName = prov.LoanBank;
                     empRec.BankPan = prov.LoanBankPan;
+
+                    empRec.InterestOnLoan2 = prov.InterestOnLoan2;
+                    empRec.InterestPreConstruction2 = prov.InterestPreConstruction2;
+                    empRec.RentReceived2 = prov.RentalIncomePerMonth2;
+                    empRec.BankName2 = prov.LoanBank2;
+                    empRec.BankPan2 = prov.LoanBankPan2;
+
                     empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
-                    
 
                     //Average out rent
 
@@ -262,6 +272,9 @@ namespace ESS.Controllers.Api
                     empRec.HomeLoanCode = 14;
                     empRec.HomeLoanAct = act.HouseLoanPrincipal;
 
+                    empRec.HomeLoanCode2 = 14;
+                    empRec.HomeLoanAct2 = act.HouseLoanPrincipal2;
+
                     empRec.NotifiedMfCode = 18;
                     empRec.NotifiedMfAct = act.TotalSukanya;
 
@@ -275,20 +288,30 @@ namespace ESS.Controllers.Api
                     empRec.TermDepoAct = act.TotalBankDepositAmount;
 
                     empRec.Total80C = empRec.InsAct + empRec.UlipAct + empRec.MfAct + empRec.PpfAct + empRec.NscAct +
-                                      empRec.HomeLoanAct + empRec.NotifiedMfAct + empRec.Child1Act + empRec.Child2Act +
-                                      empRec.TermDepoAct;
+                                      empRec.HomeLoanAct + empRec.HomeLoanAct2 + empRec.NotifiedMfAct + empRec.Child1Act + 
+                                      empRec.Child2Act +  empRec.TermDepoAct;
 
 
                     empRec.LongTermMf = 0;          //TODO: CONFIRM
                     empRec.MedicalPremium = act.MedicalPremiumSelf + act.MedicalPremiumParents;
                     empRec.EduLoanInterest = act.EducationLoanInterest;
                     empRec.Nps = act.NationalPensionScheme;
+
                     empRec.InterestOnLoan = act.InterestOnLoan;
                     empRec.InterestPreConstruction = act.InterestPreConstruction;
                     empRec.RentReceived = act.RentalIncomePerMonth;
                     empRec.BankName = act.LoanBank;
                     empRec.BankPan = act.LoanBankPan;
+                    
+                    empRec.InterestOnLoan2 = act.InterestOnLoan2;
+                    empRec.InterestPreConstruction2 = act.InterestPreConstruction2;
+                    empRec.RentReceived2 = act.RentalIncomePerMonth2;
+                    empRec.BankName2 = act.LoanBank2;
+                    empRec.BankPan2 = act.LoanBankPan2;
+
+                    
                     empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
+
 
 
                     //Average out rent

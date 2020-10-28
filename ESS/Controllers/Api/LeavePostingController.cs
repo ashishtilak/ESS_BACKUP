@@ -349,6 +349,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult PostLeaves([FromBody] object requestData)
         {
             var leavePostingDtos = JsonConvert.DeserializeObject<List<LeavePostingDto>>(requestData.ToString());
+
             if (!ModelState.IsValid)
                 return BadRequest();
 

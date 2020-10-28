@@ -29,10 +29,10 @@ namespace ESS.Controllers.Api
             {
                 if (releaseGroupCode == ReleaseGroups.LeaveApplication)
                     return Ok(SendMailLeave(id, releaseAuth));
-
                 else if (releaseGroupCode == ReleaseGroups.GatePass)
                     return Ok(SendMailGatepass(id, releaseAuth));
-
+                else if (releaseGroupCode == ReleaseGroups.ShiftSchedule)
+                    return Ok(SendMailShiftSchedule(id, releaseAuth));
                 else
                     return BadRequest("Invalid release group code");
             }
@@ -40,6 +40,151 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest(ex.ToString());
             }
+        }
+
+        private bool SendMailShiftSchedule(int id, string releaseCode)
+        {
+            ShiftScheduleDto ssDto = _context.ShiftSchedules
+                .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>)
+                .FirstOrDefault(s => s.ScheduleId == id);
+
+            if(ssDto == null)
+                throw new Exception("Invalid shift schedule id");
+
+            // get corresponding app release objects
+            var app = _context.ApplReleaseStatus
+                .Where(l =>
+                    l.YearMonth == ssDto.YearMonth &&
+                    l.ApplicationId == ssDto.ScheduleId &&
+                    l.ReleaseGroupCode == ssDto.ReleaseGroupCode &&
+                    l.ReleaseCode == releaseCode
+                )
+                .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
+                .FirstOrDefault();
+
+            // add them to dto
+            ssDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+
+            if(app != null)
+                ssDto.ApplReleaseStatus.Add(app);
+            else
+                throw new Exception("Releaser is invalid! No app release line found.");
+
+            //// loop through each app release object
+            //foreach (var applReleaseStatusDto in app)
+            //{
+            //    // Check for release code for supplied releaser 
+            //    var relAuth = _context.ReleaseAuth
+            //        .SingleOrDefault(r =>
+            //            r.ReleaseCode == releaseCode
+            //            );
+
+            //    // when release code is matched, add corresponding app rel line to gatepass dto
+            //    if (relAuth != null)
+            //        ssDto.ApplReleaseStatus.Add(applReleaseStatusDto);
+            //}
+
+            // if no app release lines are found, there's no line for this employee to release
+            //if (ssDto.ApplReleaseStatus.Count == 0)
+            //    throw new Exception("Releaser is invalid! No app release line found.");    
+
+            //// FILL EMP DETAILS....
+            Employees emp = _context.Employees
+                .Include(d => d.Departments)
+                .Include(s => s.Stations)
+                .FirstOrDefault(e => e.EmpUnqId == ssDto.AddUser);
+            if (emp != null)
+            {
+                ssDto.EmpName = emp.EmpName;
+                ssDto.DeptName = emp.Departments.DeptName;
+                ssDto.StatName = emp.Stations.StatName;
+            }
+
+            string empCode = ssDto.EmpUnqId;
+            string empName = ssDto.EmpName;
+            string deptstat = ssDto.DeptName + " / " + ssDto.StatName;
+
+            const string header = @"
+                <html lang=""en"">
+                    <head>    
+                        <meta content=""text/html; charset=utf-8"" http-equiv=""Content-Type"">
+                        <title>
+                            ESS Portal - Automessage
+                        </title>
+                        <style type=""text/css"">
+                            body { font-family: arial, sans-serif; }
+                            table {
+                                font-family: arial, sans-serif;
+                                border-collapse: collapse;
+                                width: 80%;
+                            }
+
+                            td, th {
+                                border: 1px solid #dddddd;
+                                text-align: left;
+                                padding: 8px;
+                            }
+
+                            tr:nth-child(even) {
+                                background-color: #dddddd;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                ";
+
+            string body = "Dear Sir, <br /><br /> " +
+                          "Following Shift schedule application requires your attention: <br/> <br />" +
+                          "Shif schedule Uploaded by: " + empCode + " <br/>" +
+                          "Name: " + empName + " <br/>" +
+                          "Dept/Station: " + deptstat + " <br/></br>";
+
+            body = header + body;
+
+            body += "<br/>Kindly review the same in <a href='" + ConfigurationManager.AppSettings["PortalAddress"] +
+                    "'>ESS Portal</a>.";
+
+            body += "</body></html>";
+
+            var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
+            {
+                //Credentials = new System.Net.NetworkCredential("tilaka@jindalsaw.com", "ashish123$$"),
+                UseDefaultCredentials = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                EnableSsl = false
+            };
+
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
+                //From = new MailAddress("attnd.nkp@jindalsaw.com", "ESS Portal"),
+                Subject = "Notification from ESS Portal for Shift schedule release.",
+                BodyEncoding = System.Text.Encoding.UTF8,
+                IsBodyHtml = true,
+                Body = body
+
+            };
+
+            //now loop through all app release lines -- there'll be only one line, but anyway...
+            foreach (ApplReleaseStatusDto dto in ssDto.ApplReleaseStatus)
+            {
+                //find the releaser from the releasecode
+                var releasers = _context.ReleaseAuth
+                    .Where(r => r.ReleaseCode == dto.ReleaseCode).ToList();
+
+                //in case of multiple releasers for single release code,
+                foreach (Employees releaser in 
+                    releasers.Select(r => 
+                        _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId)).Where(releaser => releaser != null).Where(releaser => !string.IsNullOrEmpty(releaser.Email)))
+                {
+                    mail.To.Add(new MailAddress(releaser.Email));
+                    smtpClient.Send(mail);
+                    mail.To.Remove(new MailAddress(releaser.Email));
+                }
+            }
+
+            return true;
         }
 
         private bool SendMailGatepass(int id, string releaseAuth)

@@ -198,6 +198,8 @@
     <Compile Include="Controllers\Api\LoginController.cs" />
     <Compile Include="Controllers\Api\ManageLeaveController.cs" />
     <Compile Include="Controllers\Api\MasterUploadController.cs" />
+    <Compile Include="Controllers\Api\MedDependentController.cs" />
+    <Compile Include="Controllers\Api\MedicalFitnessController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReimbursementController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
@@ -212,6 +214,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ReimbursementDto.cs" />
     <Compile Include="Dto\ApplReleaseStatusDto.cs" />
+    <Compile Include="Dto\AttdShiftScheduleDto.cs" />
     <Compile Include="Dto\BankDto.cs" />
     <Compile Include="Dto\CategoryDto.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="Dto\EmpEduDto.cs" />
     <Compile Include="Dto\EmpFamilyDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
+    <Compile Include="Dto\EmpPunchBlockDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
     <Compile Include="Dto\GaReleaseStrategyDto.cs" />
@@ -241,6 +245,9 @@
     <Compile Include="Dto\LeaveTypeDto.cs" />
     <Compile Include="Dto\LoginDto.cs" />
     <Compile Include="Dto\MaterialDto.cs" />
+    <Compile Include="Dto\MedDependentDto.cs" />
+    <Compile Include="Dto\MedEmpUhidDto.cs" />
+    <Compile Include="Dto\MedicalFitnessDto.cs" />
     <Compile Include="Dto\PerfAttdDto.cs" />
     <Compile Include="Dto\PerfPunchDto.cs" />
     <Compile Include="Dto\ReimbConvDto.cs" />
@@ -647,6 +654,30 @@
     <Compile Include="Migrations\202009150421411_AddReimbAndReimbConvTables.Designer.cs">
       <DependentUpon>202009150421411_AddReimbAndReimbConvTables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202010080455300_TaxHomeLoan2.cs" />
+    <Compile Include="Migrations\202010080455300_TaxHomeLoan2.Designer.cs">
+      <DependentUpon>202010080455300_TaxHomeLoan2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010090516174_TaxDeclFieldAddLoan2.cs" />
+    <Compile Include="Migrations\202010090516174_TaxDeclFieldAddLoan2.Designer.cs">
+      <DependentUpon>202010090516174_TaxDeclFieldAddLoan2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010201057022_MediclaimInitialConfig.cs" />
+    <Compile Include="Migrations\202010201057022_MediclaimInitialConfig.Designer.cs">
+      <DependentUpon>202010201057022_MediclaimInitialConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010210529578_ChangeInMedDependentModel.cs" />
+    <Compile Include="Migrations\202010210529578_ChangeInMedDependentModel.Designer.cs">
+      <DependentUpon>202010210529578_ChangeInMedDependentModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010270733354_MedicalFitness.cs" />
+    <Compile Include="Migrations\202010270733354_MedicalFitness.Designer.cs">
+      <DependentUpon>202010270733354_MedicalFitness.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202010281153237_ChangeInMedDependent.cs" />
+    <Compile Include="Migrations\202010281153237_ChangeInMedDependent.Designer.cs">
+      <DependentUpon>202010281153237_ChangeInMedDependent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -677,6 +708,10 @@
     <Compile Include="Models\Locations.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Materials.cs" />
+    <Compile Include="Models\MedDependent.cs" />
+    <Compile Include="Models\MedEmpUhid.cs" />
+    <Compile Include="Models\MedicalFitness.cs" />
+    <Compile Include="Models\MedPolicy.cs" />
     <Compile Include="Models\OpenMonth.cs" />
     <Compile Include="Models\ReimbConv.cs" />
     <Compile Include="Models\Reimbursements.cs" />
@@ -1056,6 +1091,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202009150421411_AddReimbAndReimbConvTables.resx">
       <DependentUpon>202009150421411_AddReimbAndReimbConvTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010080455300_TaxHomeLoan2.resx">
+      <DependentUpon>202010080455300_TaxHomeLoan2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010090516174_TaxDeclFieldAddLoan2.resx">
+      <DependentUpon>202010090516174_TaxDeclFieldAddLoan2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010201057022_MediclaimInitialConfig.resx">
+      <DependentUpon>202010201057022_MediclaimInitialConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010210529578_ChangeInMedDependentModel.resx">
+      <DependentUpon>202010210529578_ChangeInMedDependentModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010270733354_MedicalFitness.resx">
+      <DependentUpon>202010270733354_MedicalFitness.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202010281153237_ChangeInMedDependent.resx">
+      <DependentUpon>202010281153237_ChangeInMedDependent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

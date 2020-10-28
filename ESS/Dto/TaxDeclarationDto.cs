@@ -27,6 +27,7 @@ namespace ESS.Dto
         public float TotalSukanya { get; set; }
 
         public float HouseLoanPrincipal { get; set; }
+        public float HouseLoanPrincipal2 { get; set; }
 
         public string Child1Name { get; set; }
         public float TuitionFeeChild1 { get; set; }
@@ -78,6 +79,34 @@ namespace ESS.Dto
 
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }
+
+
+        // second home loan
+
+        public string PropertyAddress2 { get; set; }
+        public string PropertyStatus2 { get; set; } //s=self; v=vacant; l=letout
+        public string LoanBank2 { get; set; } //Bank drop down required...
+        public string LoanBankPan2 { get; set; }
+
+        public float LoanAmount2 { get; set; }
+        public DateTime? LoanDate2 { get; set; }
+
+        public string Purpose2 { get; set; } //P-purchase; c=construction; r=repairs
+        public DateTime? ConstructionCompDate2 { get; set; }
+        public DateTime? PossessionDate2 { get; set; }
+
+        public string Ownership2 { get; set; } // j=joint; s=sole
+        public string JointOwnerName2 { get; set; }
+        public string JointOwnerRelation2 { get; set; }
+
+        public float JointOwnerShare2 { get; set; } //percentage
+        public float RentalIncomePerMonth2 { get; set; }
+        public float MunicipalTax2 { get; set; }
+
+        public float InterestOnLoan2 { get; set; }
+        public float InterestPreConstruction2 { get; set; }
+
+
 
         public float OtherInterest { get; set; }
         public string OtherIncomeDesc { get; set; }

@@ -19,6 +19,8 @@ namespace ESS.Models
         public static readonly string CompOff = "CO";
         public static readonly string ShiftSchedule = "SS";
         public static readonly string Reimbursement = "RE";
+        public static readonly string Mediclaim = "MC";
+
 
     }
 }

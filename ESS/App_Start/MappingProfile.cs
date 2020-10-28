@@ -114,6 +114,16 @@ namespace ESS.App_Start
 
             CreateMap<ReimbConv, ReimbConvDto>();
             CreateMap<ReimbConvDto, ReimbConv>();
+
+            CreateMap<MedDependent, MedDependentDto>();
+            CreateMap<MedDependentDto, MedDependent>();
+
+            CreateMap<MedEmpUhid, MedEmpUhidDto>();
+            CreateMap<MedEmpUhidDto, MedEmpUhid>();
+
+            CreateMap<MedicalFitness, MedicalFitnessDto>();
+            CreateMap<MedicalFitnessDto, MedicalFitness>();
+
         }
     }
 }

@@ -56,6 +56,7 @@ namespace ESS.Models
         public float TotalSukanya { get; set; }      //sukanya samriddhi 1
 
         public float HouseLoanPrincipal { get; set; }
+        public float HouseLoanPrincipal2 { get; set; }
 
         public string Child1Name { get; set; }
         public float TuitionFeeChild1 { get; set; }
@@ -89,40 +90,63 @@ namespace ESS.Models
         public float MedicalExpenditure { get; set; }
 
 
+        
+        [StringLength(200)] public string PropertyAddress { get; set; }
+        [StringLength(1)] public string PropertyStatus { get; set; } //s=self; v=vacant; l=letout
 
-        [StringLength(200)]
-        public string PropertyAddress { get; set; }
-        [StringLength(1)]
-        public string PropertyStatus { get; set; }          //s=self; v=vacant; l=letout
-
-        [StringLength(150)]
-        public string LoanBank { get; set; }                //Bank drop down required...
-        [StringLength(10)]
-        public string LoanBankPan { get; set; }
+        [StringLength(150)] public string LoanBank { get; set; } //Bank drop down required...
+        [StringLength(10)] public string LoanBankPan { get; set; }
 
         public float LoanAmount { get; set; }
         public DateTime? LoanDate { get; set; }
 
-        [StringLength(1)]
-        public string Purpose { get; set; }                 //P-purchase; c=construction; r=repairs
+        [StringLength(1)] public string Purpose { get; set; } //P-purchase; c=construction; r=repairs
         public DateTime? ConstructionCompDate { get; set; }
         public DateTime? PossessionDate { get; set; }
 
-        [StringLength(1)]
-        public string Ownership { get; set; }               // j=joint; s=sole
+        [StringLength(1)] public string Ownership { get; set; } // j=joint; s=sole
 
-        [StringLength(50)]
-        public string JointOwnerName { get; set; }
-        [StringLength(20)]
-        public string JointOwnerRelation { get; set; }
+        [StringLength(50)] public string JointOwnerName { get; set; }
+        [StringLength(20)] public string JointOwnerRelation { get; set; }
 
-        public float JointOwnerShare { get; set; }          //percentage
+        public float JointOwnerShare { get; set; } //percentage
         public float RentalIncomePerMonth { get; set; }
 
         public float MunicipalTax { get; set; }
 
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }
+
+        //fields for second home loan
+
+        [StringLength(200)] public string PropertyAddress2 { get; set; }
+        [StringLength(1)] public string PropertyStatus2 { get; set; } //s=self; v=vacant; l=letout
+
+        [StringLength(150)] public string LoanBank2 { get; set; } //Bank drop down required...
+        [StringLength(10)] public string LoanBankPan2 { get; set; }
+
+        public float LoanAmount2 { get; set; }
+        public DateTime? LoanDate2 { get; set; }
+
+        [StringLength(1)] public string Purpose2 { get; set; } //P-purchase; c=construction; r=repairs
+        public DateTime? ConstructionCompDate2 { get; set; }
+        public DateTime? PossessionDate2 { get; set; }
+
+        [StringLength(1)] public string Ownership2 { get; set; } // j=joint; s=sole
+
+        [StringLength(50)] public string JointOwnerName2 { get; set; }
+        [StringLength(20)] public string JointOwnerRelation2 { get; set; }
+
+        public float JointOwnerShare2 { get; set; } //percentage
+        public float RentalIncomePerMonth2 { get; set; }
+
+        public float MunicipalTax2 { get; set; }
+
+        public float InterestOnLoan2 { get; set; }
+        public float InterestPreConstruction2 { get; set; }
+
+
+
 
         public float OtherInterest { get; set; }
         [StringLength(50)]

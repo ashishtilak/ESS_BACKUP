@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -76,11 +76,12 @@ namespace ESS.Controllers.Api
 
                 // not require these columns:
 
-                // outputTable.Columns.Add("EmpName");
-                // outputTable.Columns.Add("DeptName");
-                // outputTable.Columns.Add("StatName");
-                // outputTable.Columns.Add("Designation");
-                // outputTable.Columns.Add("CatName");
+                outputTable.Columns.Add("EmpName");
+                outputTable.Columns.Add("DeptName");
+                outputTable.Columns.Add("StatName");
+                outputTable.Columns.Add("Designation");
+                outputTable.Columns.Add("CatName");
+                outputTable.Columns.Add("Remarks");
 
                 DateTime loopDate = fromDt;
                 for (int dt = fromDt.Day; dt <= toDt.Day; dt++)
@@ -133,15 +134,14 @@ namespace ESS.Controllers.Api
 
                     // don't need these columns:
 
-                    // dr["EmpName"] = employeeDto.EmpName;
-                    // dr["DeptName"] = employeeDto.DeptName;
-                    // dr["StatName"] = employeeDto.StatName;
-                    // dr["Designation"] = employeeDto.DesgName;
-                    // dr["CatName"] = employeeDto.CatName;
+                    dr["EmpName"] = employeeDto.EmpName;
+                    dr["DeptName"] = employeeDto.DeptName;
+                    dr["StatName"] = employeeDto.StatName;
+                    dr["Designation"] = employeeDto.DesgName;
+                    dr["CatName"] = employeeDto.CatName;
+                    dr["Remarks"] = "";
 
-                    List<ShiftSchedules> tmpSchedule;
-
-                    tmpSchedule = schedules
+                    var tmpSchedule = schedules
                         .Where(s =>
                             s.ReleaseStrategy == relStr.ReleaseStrategy &&
                             s.YearMonth == openMonth &&
@@ -155,16 +155,31 @@ namespace ESS.Controllers.Api
 
                     ShiftSchedules sch = tmpSchedule.First();
 
+                    //Get schedule from ESS
                     var schDtl = _context.ShiftScheduleDetails
                         .Where(s =>
                             s.YearMonth == sch.YearMonth &&
                             s.ScheduleId == sch.ScheduleId &&
                             s.EmpUnqId == sch.EmpUnqId).ToList();
 
+                    // Get schedule from ATTD
+                    AttdShiftScheduleDto attdSchedule = Helpers.CustomHelper
+                        .GetattdShiftSchedule(sch.YearMonth, sch.EmpUnqId, employeeDto.Location);
+
                     for (DateTime dt = fromDt; dt <= toDt;)
                     {
                         string dayStr = dt.Day.ToString("00") + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
-                        dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+
+                        // change following line to get current schedule from ATTD
+                        if (attdSchedule == null)
+                        {
+                            dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                        }
+                        else
+                        {
+                            dr[dayStr] = attdSchedule["D" + dt.Day.ToString("00")].ToString();
+                        }
+
                         dt = dt.AddDays(1);
                     }
 
@@ -215,6 +230,12 @@ namespace ESS.Controllers.Api
                     string fileExt = Path.GetExtension(postedFile.FileName);
                     if (fileExt != ".csv") return BadRequest("Invalid file extension.");
 
+                    //Save file to tmp directory for later reviews
+
+                    postedFile.SaveAs(
+                        HostingEnvironment.MapPath(@"~/App_Data/tmp/") +
+                        "u-" + empUnqId + "-" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".csv");
+
                     //don't get openmonth from db, as after 25th, the same will be changed to next month
                     //for uploading of next month's ss
                     int openMonth = Convert.ToInt32(DateTime.Now.Year + DateTime.Now.Month.ToString("00"));
@@ -224,14 +245,14 @@ namespace ESS.Controllers.Api
                         // This will just rip off the first Header line off the excel file
                         var header = reader.ReadLine()?.Split(',');
                         // Add check for column header here...
-                        //first column is empunqid. Second column is date
-                        if (header != null && header[1].Substring(0, 2) != fromDt.Day.ToString("00"))
+                        // first 7 columns are :
+                        // empunqid, name, deptname, statname, desig, category, remarks
+
+                        if (header != null && header[7].Substring(0, 2) != fromDt.Day.ToString("00"))
                             return BadRequest("check date column. Download template and upload it.");
 
-                        if (header != null && (header.Length - 1) != ((todt - fromDt).Days + 1))
-                        {
+                        if (header != null && header.Length - 1 != (todt - fromDt).Days + 7)
                             return BadRequest("File format invalid.");
-                        }
 
                         var schedules = new List<ShiftScheduleDto>();
 
@@ -240,7 +261,10 @@ namespace ESS.Controllers.Api
                             var row = reader.ReadLine()?.Split(',');
                             if (row == null) continue;
 
-                            var tmpEmpId = row[0].ToString();
+                            string tmpEmpId = row[0];
+
+                            if (row[6].Trim() == "")
+                                return BadRequest("Remarks column is mandatory for all employees for schedule change.");
 
                             var sch = new ShiftScheduleDto
                             {
@@ -251,23 +275,32 @@ namespace ESS.Controllers.Api
                                 ReleaseStatusCode = ReleaseStatus.PartiallyReleased,
                                 AddDt = DateTime.Now,
                                 AddUser = empUnqId,
+                                Remarks = row[6],
                                 ShiftScheduleDetails = new List<ShiftScheduleDetailDto>()
                             };
 
                             //first get the schedule for upto FromDate 
                             //and add it to details
 
-                            var extScheduleId = _context.ShiftSchedules
+                            int extScheduleId = _context.ShiftSchedules
                                 .Where(s => s.EmpUnqId == tmpEmpId &&
                                             s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
                                 .Max(s => s.ScheduleId);
 
                             var existingSch = _context.ShiftScheduleDetails
-                                .Where(s => s.YearMonth == openMonth && 
+                                .Where(s => s.YearMonth == openMonth &&
                                             s.ScheduleId == extScheduleId &&
                                             s.EmpUnqId == tmpEmpId
-                                            )
+                                )
                                 .ToList();
+
+                            // Get current employee rec - only location field required
+
+                            string empLoc = _context.Employees.FirstOrDefault(e => e.EmpUnqId == tmpEmpId)?.Location;
+
+                            // Get schedule from ATTD
+                            AttdShiftScheduleDto attdSchedule = Helpers.CustomHelper
+                                .GetattdShiftSchedule(sch.YearMonth, sch.EmpUnqId, empLoc);
 
                             for (int rowIndex = 1; rowIndex < fromDt.Day; rowIndex++)
                             {
@@ -275,6 +308,9 @@ namespace ESS.Controllers.Api
                                     existingSch.FirstOrDefault(s => s.ShiftDay == rowIndex);
 
                                 if (existingLine == null) continue;
+
+                                if (attdSchedule != null)
+                                    existingLine.ShiftCode = attdSchedule["D" + rowIndex.ToString("00")].ToString();
 
                                 var schLine = new ShiftScheduleDetailDto
                                 {
@@ -288,11 +324,40 @@ namespace ESS.Controllers.Api
 
                             for (int rowIndex = fromDt.Day; rowIndex <= todt.Day; rowIndex++)
                             {
+                                // Check for WO in existing schedule.
+
+                                if (attdSchedule != null)
+                                {
+                                    
+                                    // If there's a wo in existing schedule in attendnace,
+                                    if (attdSchedule["D" + rowIndex.ToString("00")].ToString() == "WO")
+                                    {
+                                        // and if currently supplied ss do not have WO, throw error
+                                        if (row[rowIndex - fromDt.Day + 7] != "WO")
+                                        {
+                                            return BadRequest(
+                                                "Do not change WO from exising one. Check employee " + tmpEmpId);
+                                        }
+                                    }
+
+
+                                    // If uploading ss is saying it's a WO,
+                                    if (row[rowIndex - fromDt.Day + 7] == "WO")
+                                    {
+                                        // and attendance system does not have one, throw error
+                                        if (attdSchedule["D" + rowIndex.ToString("00")].ToString() != "WO")
+                                        {
+                                            return BadRequest(
+                                                "Do not change WO from exising one. Check employee " + tmpEmpId);
+                                        }
+                                    }
+                                }
+
                                 var schLine = new ShiftScheduleDetailDto
                                 {
                                     YearMonth = sch.YearMonth,
                                     ShiftDay = rowIndex,
-                                    ShiftCode = row[rowIndex - fromDt.Day + 1]
+                                    ShiftCode = row[rowIndex - fromDt.Day + 7]
                                 };
 
                                 sch.ShiftScheduleDetails.Add(schLine);
@@ -309,8 +374,8 @@ namespace ESS.Controllers.Api
                         var unrelSch = _context.ShiftSchedules
                             .Where(s => s.YearMonth == openMonth &&
                                         schEmps.Contains(s.EmpUnqId) &&
-                                        (s.ReleaseStatusCode != ReleaseStatus.FullyReleased &&
-                                         s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected))
+                                        s.ReleaseStatusCode != ReleaseStatus.FullyReleased &&
+                                        s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected)
                             .Select(e => e.EmpUnqId)
                             .ToArray();
 

@@ -28,113 +28,68 @@ namespace ESS.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Company> Companies { get; set; }
-
         public DbSet<WorkGroups> WorkGroups { get; set; }
-
         public DbSet<Units> Units { get; set; }
-
         public DbSet<Designations> Designations { get; set; }
-
         public DbSet<Grades> Grades { get; set; }
-
         public DbSet<Departments> Departments { get; set; }
-
         public DbSet<Stations> Stations { get; set; }
-
         public DbSet<Sections> Sections { get; set; }
-
         public DbSet<Contractors> Contractors { get; set; }
-
         public DbSet<Categories> Categories { get; set; }
-
         public DbSet<EmpTypes> EmpTypes { get; set; }
-
         public DbSet<Employees> Employees { get; set; }
-
         public DbSet<LeaveTypes> LeaveTypes { get; set; }
-
         public DbSet<LeaveBalance> LeaveBalance { get; set; }
-
         public DbSet<ReleaseStatus> ReleaseStatus { get; set; }
-
         public DbSet<ReleaseGroups> ReleaseGroups { get; set; }
-
         public DbSet<ReleaseStrategies> ReleaseStrategy { get; set; }
-
         public DbSet<ReleaseStrategyLevels> ReleaseStrategyLevels { get; set; }
-
         public DbSet<ReleaseAuth> ReleaseAuth { get; set; }
-
         public DbSet<LeaveApplications> LeaveApplications { get; set; }
-
         public DbSet<LeaveApplicationDetails> LeaveApplicationDetails { get; set; }
-
         public DbSet<ApplReleaseStatus> ApplReleaseStatus { get; set; }
-
         public DbSet<OpenMonth> OpenMonth { get; set; }
-
         public DbSet<LeaveRules> LeaveRules { get; set; }
-
         public DbSet<EmpUniform> EmpUniform { get; set; }
-
         public DbSet<GatePass> GatePass { get; set; }
-
         public DbSet<EmpAddress> EmpAddress { get; set; }
-
         public DbSet<GpReleaseStrategies> GpReleaseStrategy { get; set; }
-
         public DbSet<GpReleaseStrategyLevels> GpReleaseStrategyLevels { get; set; }
-
         public DbSet<Locations> Location { get; set; }
-
         public DbSet<TaxDeclarations> TaxDeclarations { get; set; }
-
         public DbSet<TaxDetailsInsurance> TaxDetailsInsurances { get; set; }
-
         public DbSet<TaxDetailsMutualFunds> TaxDetailsMutualFundz { get; set; }
-
         public DbSet<TaxDetailsNsc> TaxDetailsNscs { get; set; }
-
         public DbSet<TaxDetailsPpf> TaxDetailsPpfs { get; set; }
-
         public DbSet<TaxConfig> TaxConfig { get; set; }
-
         public DbSet<Banks> Banks { get; set; }
-
         public DbSet<TaxDetailsUlip> TaxDetailsUlips { get; set; }
-
         public DbSet<TaxDetailsSukanya> TaxDetailsSukanyas { get; set; }
-
         public DbSet<TaxDetailsBankDeposit> TaxDetailsBankDeposits { get; set; }
-
         public DbSet<TaxDetailsRent> TaxDetailRents { get; set; }
-
         public DbSet<TaxDeclarationHistory> TaxDeclarationHistories { get; set; }
-
         public DbSet<Roles> Role { get; set; }
-
         public DbSet<RoleAuth> RoleAuths { get; set; }
-
         public DbSet<RoleUsers> RoleUser { get; set; }
-
         public DbSet<GpAdvices> GpAdvices { get; set; }
         public DbSet<GpAdviceDetails> GpAdviceDetails { get; set; }
         public DbSet<GaReleaseStrategies> GaReleaseStrategies { get; set; }
         public DbSet<GaReleaseStrategyLevels> GaReleaseStrategyLevels { get; set; }
-
         public DbSet<Materials> Materials { get; set; }
-
         public DbSet<Vendors> Vendors { get; set; }
-
-
         public DbSet<Shifts> Shifts { get; set; }
         public DbSet<ShiftSchedules> ShiftSchedules { get; set; }
         public DbSet<ShiftScheduleDetails> ShiftScheduleDetails { get; set; }
         public DbSet<SsOpenMonth> SsOpenMonth { get; set; }
-
-
         public DbSet<Reimbursements> Reimbursement { get; set; } 
         public DbSet<ReimbConv> ReimbConvs { get; set; }
+
+        public DbSet<MedPolicy> MedPolicies { get; set; }
+        public DbSet<MedDependent> MedDependents { get; set; }
+        public DbSet<MedEmpUhid> MedEmpUhids { get; set; }
+
+        public DbSet<MedicalFitness> MedicalFitness { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

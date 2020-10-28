@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Web;
 using ESS.Dto;
 using ESS.Models;
@@ -136,7 +137,99 @@ namespace ESS.Helpers
             }
         }
 
+        public static AttdShiftScheduleDto GetattdShiftSchedule(int yearMt, string empUnqId, string location)
+        {
+            AttdShiftScheduleDto dto = new AttdShiftScheduleDto();
+            string strRemoteServer = GetRemoteServer(location);
+            
+            using (var cn = new SqlConnection(strRemoteServer))
+            {
+                cn.Open();
+                string sql = "select * from MastShiftSchedule " +
+                             "where yearMt = '" + yearMt.ToString() + "' and " +
+                             "EmpUnqId = '" + empUnqId + "'";
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
 
+                
+                while (dr.Read())
+                {
+                    dto.YearMt = int.Parse(dr["yearmt"].ToString());
+                    dto.EmpUnqId = dr["empunqid"].ToString();
+                    dto.D01 = dr["d01"].ToString();
+                    dto.D02 = dr["d02"].ToString();
+                    dto.D03 = dr["d03"].ToString();
+                    dto.D04 = dr["d04"].ToString();
+                    dto.D05 = dr["d05"].ToString();
+                    dto.D06 = dr["d06"].ToString();
+                    dto.D07 = dr["d07"].ToString();
+                    dto.D08 = dr["d08"].ToString();
+                    dto.D09 = dr["d09"].ToString();
+                    dto.D10 = dr["d10"].ToString();
+                    dto.D11 = dr["d11"].ToString();
+                    dto.D12 = dr["d12"].ToString();
+                    dto.D13 = dr["d13"].ToString();
+                    dto.D14 = dr["d14"].ToString();
+                    dto.D15 = dr["d15"].ToString();
+                    dto.D16 = dr["d16"].ToString();
+                    dto.D17 = dr["d17"].ToString();
+                    dto.D18 = dr["d18"].ToString();
+                    dto.D19 = dr["d19"].ToString();
+                    dto.D20 = dr["d20"].ToString();
+                    dto.D21 = dr["d21"].ToString();
+                    dto.D22 = dr["d22"].ToString();
+                    dto.D23 = dr["d23"].ToString();
+                    dto.D24 = dr["d24"].ToString();
+                    dto.D25 = dr["d25"].ToString();
+                    dto.D26 = dr["d26"].ToString();
+                    dto.D27 = dr["d27"].ToString();
+                    dto.D28 = dr["d28"].ToString();
+                    dto.D29 = dr["d29"]?.ToString();
+                    dto.D30 = dr["d30"]?.ToString();
+                    dto.D31 = dr["d31"]?.ToString();
+                }
+            }
+
+            return dto;
+
+        }
+
+        public static EmpPunchBlockDto GetEmpPunchBlock(string empUnqId, string location)
+        {
+
+            string strRemoteServer = GetRemoteServer(location);
+
+
+            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand("sp_rpt_Emp_BlockStatus", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@pEmpUnqId", SqlDbType.NVarChar).Value = empUnqId;
+
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                EmpPunchBlockDto dto = new EmpPunchBlockDto();
+                while (dr.Read())
+                {
+                    dto.EmpUnqId = dr["empUnqId"].ToString();
+
+                    dto.PunchingBlocked = Convert.ToBoolean(dr["PunchingBlocked"]);
+
+                    if (dto.PunchingBlocked)
+                    {
+                        dto.BlockDt = Convert.ToDateTime(dr["BlockDt"].ToString());
+                        dto.BlockRemark = dr["BlockRemark"].ToString();
+                        dto.BlockBy = dr["BlockBy"].ToString();
+                        dto.Tid = Convert.ToInt32(dr["tid"].ToString());
+                    }
+                }
+
+                return dto;
+            }
+            
+        }
+        
         //Get weekly off day
         public static List<DateTime> GetWeeklyOff(DateTime fromDt, DateTime toDt, string empUnqId)
         {
@@ -1112,6 +1205,7 @@ namespace ESS.Helpers
                               "using #tmpEmp as Source " +
                               "on " +
                               "Target.CompCode = Source.CompCode and " +
+                              //"Target.WrkGrp = Source.WrkGrp and " +
                               "Target.EmpUnqId = Source.EmpUnqId " +
                               "when matched then " +
                               "update set " +

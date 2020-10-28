@@ -39,6 +39,10 @@ namespace ESS.Dto
         public float HomeLoanAct { get; set; }
         public float HomeLoanPro { get; set; }
 
+        public int HomeLoanCode2 { get; set; }
+        public float HomeLoanAct2 { get; set; }
+        public float HomeLoanPro2 { get; set; }
+        
         public int NotifiedMfCode { get; set; }
         public float NotifiedMfAct { get; set; }
         public float NotifiedMfPro { get; set; }
@@ -61,11 +65,19 @@ namespace ESS.Dto
         public float MedicalPremium { get; set; }
         public float EduLoanInterest { get; set; }
         public float Nps { get; set; }
+        
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }
         public float RentReceived { get; set; }
         public string BankName { get; set; }
         public string BankPan { get; set; }
+
+        public float InterestOnLoan2 { get; set; }
+        public float InterestPreConstruction2 { get; set; }
+        public float RentReceived2 { get; set; }
+        public string BankName2 { get; set; }
+        public string BankPan2 { get; set; }
+
 
         public string AccomodationType { get; set; }
 

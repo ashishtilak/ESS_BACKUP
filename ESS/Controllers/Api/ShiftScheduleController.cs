@@ -69,8 +69,8 @@ namespace ESS.Controllers.Api
                 .Include(s => s.Company)
                 .Include(s => s.Departments)
                 .Include(s => s.Stations)
-                .Include(s=>s.Employee)
-                .Include(s=>s.ReleaseStatus)
+                .Include(s => s.Employee)
+                .Include(s => s.ReleaseStatus)
                 .Where(s =>
                     s.YearMonth == currentMonth.YearMonth &&
                     s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected)
@@ -97,7 +97,7 @@ namespace ESS.Controllers.Api
             {
                 var relCode = _context.ReleaseAuth
                     .Where(e => e.EmpUnqId == empUnqId)
-                    .Select(e=>e.ReleaseCode)
+                    .Select(e => e.ReleaseCode)
                     .ToArray();
 
                 if (relCode.Length == 0) return BadRequest("Employee is not a releaser.");
@@ -146,7 +146,6 @@ namespace ESS.Controllers.Api
                     ).ToList();
 
 
-
                 //REMOVED ON 03/10/2020:
                 //NOW WE'LL NOT RETURN BAD REQUEST, BUT INSTEAD RETURN SS TEMPLATE
                 //FOR REMAINING EMPLOYEES WHOSE SS IS NOT UPLOADED...
@@ -169,7 +168,7 @@ namespace ESS.Controllers.Api
                 outputTable.Columns.Add("CatName");
 
                 //for (int dt = fromDt.Day; dt <= toDt.Day; dt++)
-                var loopDate = fromDt;
+                DateTime loopDate = fromDt;
                 for (int dt = 1; dt <= toDt.Day; dt++)
                 {
                     string dayStr = dt.ToString("00") + "_" + loopDate.DayOfWeek.ToString().Substring(0, 2);
@@ -183,8 +182,9 @@ namespace ESS.Controllers.Api
                 foreach (ReleaseStrategies relStr in vRelStr)
                 {
                     if (mode == ReportModes.ExcelDownload)
-                        if (shedules.Any(s=>s.ReleaseStrategy == relStr.ReleaseStrategy)) continue;
-                    
+                        if (shedules.Any(s => s.ReleaseStrategy == relStr.ReleaseStrategy))
+                            continue;
+
                     // loop for each day of month
                     DataRow dr = outputTable.NewRow();
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
@@ -291,18 +291,19 @@ namespace ESS.Controllers.Api
         {
             try
             {
-                var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
-                if (openMonth == null) return BadRequest("Open month not configured.");
+                //var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
+                //if (openMonth == null) return BadRequest("Open month not configured.");
 
                 //carry on the good work...
 
                 //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
                 //                                 openMonth.ToString().Substring(0, 4));
 
-                var fromDt = new DateTime(
-                    Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
-                    Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
+                var fromDt = new DateTime(fromDate.Year,
+                    fromDate.Month, 1);
                 DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
+
+                var openMonth = Convert.ToInt32(fromDate.Year.ToString() + fromDate.Month.ToString("00"));
 
                 var shedules = _context.ShiftSchedules
                     .Where(s => s.ReleaseDt >= fromDate && s.AddDt <= toDate &&
@@ -324,9 +325,9 @@ namespace ESS.Controllers.Api
                     dt = dt.AddDays(1);
                 }
 
-                outputTable.Columns.Add("FinalReleaseDate");
+                outputTable.Columns.Add("FinalReleaseDate", typeof(DateTime));
                 outputTable.Columns.Add("ReleaseUser");
-                outputTable.Columns.Add("AddDate");
+                outputTable.Columns.Add("AddDate", typeof(DateTime));
                 outputTable.Columns.Add("AddUser");
 
                 // Loop for each employee under this releaser
@@ -384,15 +385,15 @@ namespace ESS.Controllers.Api
 
                     for (DateTime dt = fromDt; dt <= toDt;)
                     {
+                        Debug.Print(sch.EmpUnqId);
                         dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                         dt = dt.AddDays(1);
-                        Debug.Print(sch.EmpUnqId);
                     }
-                    
-                    dr["FinalReleaseDate"] = sch.ReleaseDt ;
+
+                    dr["FinalReleaseDate"] = sch.ReleaseDt;
                     dr["ReleaseUser"] = sch.ReleaseUser;
-                    dr["AddDate"]= sch.AddDt;
-                    dr["AddUser"]= sch.AddUser;
+                    dr["AddDate"] = sch.AddDt;
+                    dr["AddUser"] = sch.AddUser;
 
                     outputTable.Rows.Add(dr);
                 }
@@ -434,6 +435,9 @@ namespace ESS.Controllers.Api
                         string fileExt = Path.GetExtension(postedFile.FileName);
                         if (fileExt != ".csv") return BadRequest("Invalid file extension.");
 
+                        postedFile.SaveAs(
+                            HostingEnvironment.MapPath(@"~/App_Data/tmp/") +
+                            empUnqId + "-" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".csv");
 
                         SsOpenMonth ssOpenMonth = _context.SsOpenMonth.FirstOrDefault();
                         int openMonth = 0;
@@ -461,19 +465,18 @@ namespace ESS.Controllers.Api
 
                             for (int j = 6; j < header.Length; j++)
                             {
-
                                 if (header[j].Length < 2)
                                     return BadRequest("Invalid template format. Pl don't change column order");
 
-                                bool result = int.TryParse((header[j].Substring(0, 2)),out int val);
-                                if(result && j-5 == val) continue;
+                                bool result = int.TryParse(header[j].Substring(0, 2), out int val);
+                                if (result && j - 5 == val) continue;
 
                                 return BadRequest("Invalid template format. Pl don't change column order");
                             }
-                            
+
                             //column validation over
 
-                            
+
                             var schedules = new List<ShiftScheduleDto>();
 
                             while (!reader.EndOfStream)
@@ -498,7 +501,7 @@ namespace ESS.Controllers.Api
                                     var schLine = new ShiftScheduleDetailDto
                                     {
                                         YearMonth = sch.YearMonth,
-                                        ShiftDay = rowIndex-5,
+                                        ShiftDay = rowIndex - 5,
                                         ShiftCode = row[rowIndex]
                                     };
 
@@ -516,8 +519,8 @@ namespace ESS.Controllers.Api
                             var existingSch = _context.ShiftSchedules
                                 .Where(s => s.YearMonth == openMonth &&
                                             schEmps.Contains(s.EmpUnqId) &&
-                                            (s.ReleaseStatusCode != ReleaseStatus.FullyReleased &&
-                                             s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected))
+                                            s.ReleaseStatusCode != ReleaseStatus.FullyReleased &&
+                                            s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected)
                                 .Select(e => e.EmpUnqId)
                                 .ToArray();
 
@@ -655,11 +658,14 @@ namespace ESS.Controllers.Api
             return Ok();
         }
 
+        //will be used from update schedule controller also...
         public static List<string> SchValidate(List<ShiftScheduleDto> schedule, string empUnqId)
         {
             //get all shifts in a list
-            var shifts = _context.Shifts.Select(s => s.ShiftCode).ToList();
+            if(_context == null) _context = new ApplicationDbContext();
 
+            List<string> shifts = _context.Shifts.Select(s => s.ShiftCode).ToList();
+            
             //REMEMBER TO ADD WO manually AFTER SHIFT SYNC SO THAT IT APPEARS ABOVE...
 
             var errors = new List<string>();
