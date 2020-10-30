@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddTaxDeclarationHistory : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.TaxDeclarationHistories",
-                c => new
+                    "dbo.TaxDeclarationHistories",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -68,11 +68,11 @@ namespace ESS.Migrations
                         UpdateUserId = c.String(maxLength: 8),
                         UpdateDate = c.DateTime(nullable: false),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag});
+
             AddColumn("dbo.TaxDeclarations", "UpdateUserId", c => c.String(maxLength: 8));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.TaxDeclarations", "UpdateUserId");

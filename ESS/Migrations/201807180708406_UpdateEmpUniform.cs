@@ -2,13 +2,13 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class UpdateEmpUniform : DbMigration
     {
         public override void Up()
         {
         }
-        
+
         public override void Down()
         {
         }

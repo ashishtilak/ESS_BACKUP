@@ -66,8 +66,6 @@ namespace ESS.Controllers.Api
                     dto.GradeName = emp.Grades.GradeName;
                     dto.DesgName = emp.Designations.DesgName;
                 }
-
-                
             }
             else
             {

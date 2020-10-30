@@ -74,6 +74,7 @@ namespace ESS.Controllers.Api
                 .Where(s =>
                     s.YearMonth == currentMonth.YearMonth &&
                     s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected)
+                .AsEnumerable()
                 .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>)
                 .ToList();
 
@@ -287,7 +288,7 @@ namespace ESS.Controllers.Api
             }
         }
 
-        public IHttpActionResult GetSchedule(DateTime fromDate, DateTime toDate)
+        public IHttpActionResult GetSchedule(DateTime fromDate, DateTime toDate, int openMonth)
         {
             try
             {
@@ -296,14 +297,14 @@ namespace ESS.Controllers.Api
 
                 //carry on the good work...
 
-                //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
-                //                                 openMonth.ToString().Substring(0, 4));
+                DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
+                                                 openMonth.ToString().Substring(0, 4));
 
-                var fromDt = new DateTime(fromDate.Year,
-                    fromDate.Month, 1);
+                //var fromDt = new DateTime(fromDate.Year,
+                //    fromDate.Month, 1);
                 DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
 
-                var openMonth = Convert.ToInt32(fromDate.Year.ToString() + fromDate.Month.ToString("00"));
+                //var openMonth = Convert.ToInt32(fromDate.Year.ToString() + fromDate.Month.ToString("00"));
 
                 var shedules = _context.ShiftSchedules
                     .Where(s => s.ReleaseDt >= fromDate && s.AddDt <= toDate &&
@@ -662,10 +663,10 @@ namespace ESS.Controllers.Api
         public static List<string> SchValidate(List<ShiftScheduleDto> schedule, string empUnqId)
         {
             //get all shifts in a list
-            if(_context == null) _context = new ApplicationDbContext();
+            if (_context == null) _context = new ApplicationDbContext();
 
             List<string> shifts = _context.Shifts.Select(s => s.ShiftCode).ToList();
-            
+
             //REMEMBER TO ADD WO manually AFTER SHIFT SYNC SO THAT IT APPEARS ABOVE...
 
             var errors = new List<string>();

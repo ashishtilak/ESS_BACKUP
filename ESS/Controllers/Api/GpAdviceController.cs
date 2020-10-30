@@ -39,10 +39,10 @@ namespace ESS.Controllers.Api
                     .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
                 var emp = _context.Employees
-                    .Include(d=>d.Departments)
-                    .Include(s=>s.Stations)
+                    .Include(d => d.Departments)
+                    .Include(s => s.Stations)
                     .FirstOrDefault(e => e.EmpUnqId == advice.EmpUnqId);
-                if (emp!=null)
+                if (emp != null)
                 {
                     advice.EmpName = emp.EmpName;
                     advice.DeptName = emp.Departments.DeptName;
@@ -327,9 +327,9 @@ namespace ESS.Controllers.Api
             public string SapGpNumber { get; set; }
             public string Remarks { get; set; }
         }
-        
+
         [HttpPost]
-        public IHttpActionResult PostGpAdvice([FromBody] object requestData, bool flag )
+        public IHttpActionResult PostGpAdvice([FromBody] object requestData, bool flag)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid model state.");
@@ -337,14 +337,14 @@ namespace ESS.Controllers.Api
             try
             {
                 GpAdvicePostObject obj = JsonConvert.DeserializeObject<GpAdvicePostObject>(requestData.ToString());
-                
+
                 //put this in transaction as multiple tables are updated
                 using (var transaction = _context.Database.BeginTransaction())
                 {
-                //if Posting status is Fully Posted, then only update status
+                    //if Posting status is Fully Posted, then only update status
                     var advice = _context.GpAdvices
                         .FirstOrDefault(g =>
-                            g.YearMonth == obj.YearMonth&&
+                            g.YearMonth == obj.YearMonth &&
                             g.GpAdviceNo == obj.GpAdviceNo);
                     if (advice == null)
                         return BadRequest("Invalid gate pass advice.");
@@ -520,6 +520,5 @@ namespace ESS.Controllers.Api
             result.ApplReleaseStatus.AddRange(appReleaseStrategies);
             return Ok(result);
         }
-
     }
 }

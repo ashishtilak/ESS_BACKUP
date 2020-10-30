@@ -4,13 +4,9 @@ namespace ESS.Models
 {
     public class ReleaseGroups
     {
-        [Key]
-        [Required]
-        [StringLength(2)]
-        public string ReleaseGroupCode { get; set; }
+        [Key] [Required] [StringLength(2)] public string ReleaseGroupCode { get; set; }
 
-        [StringLength(50)]
-        public string ReleaseGroupDesc { get; set; }
+        [StringLength(50)] public string ReleaseGroupDesc { get; set; }
 
         public static readonly string LeaveApplication = "LA";
         public static readonly string OutStationDuty = "OD";
@@ -20,7 +16,5 @@ namespace ESS.Models
         public static readonly string ShiftSchedule = "SS";
         public static readonly string Reimbursement = "RE";
         public static readonly string Mediclaim = "MC";
-
-
     }
 }

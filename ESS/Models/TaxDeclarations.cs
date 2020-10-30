@@ -9,51 +9,46 @@ namespace ESS.Models
 {
     public class TaxDeclarations
     {
-        [Key, Column(Order = 0)]
-        public int YearMonth { get; set; }                  //201920
+        [Key, Column(Order = 0)] public int YearMonth { get; set; } //201920
 
         [Key, Column(Order = 1)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
 
-        [Key, Column(Order = 2)]
-        public bool ActualFlag { get; set; }                      //Provisional v/s Actual
+        [Key, Column(Order = 2)] public bool ActualFlag { get; set; } //Provisional v/s Actual
 
 
         public virtual ICollection<TaxDetailsRent> RentDetails { get; set; }
         public float TotalRentPaid { get; set; }
 
-        [StringLength(200)]
-        public string RentHouseAddress { get; set; }
-        [StringLength(50)]
-        public string LandLordName { get; set; }
-        [StringLength(10)]
-        public string LandLordPan { get; set; }
+        [StringLength(200)] public string RentHouseAddress { get; set; }
+        [StringLength(50)] public string LandLordName { get; set; }
+        [StringLength(10)] public string LandLordPan { get; set; }
 
         public float PrevCompSalary { get; set; }
         public float PrevCompTds { get; set; }
 
         public virtual ICollection<TaxDetailsPpf> PpfDetails { get; set; }
-        public float TotalPpfAmt { get; set; }              //Details in table TaxDetailsPpf
+        public float TotalPpfAmt { get; set; } //Details in table TaxDetailsPpf
 
         public virtual ICollection<TaxDetailsBankDeposit> BankDeposits { get; set; }
         public float TotalBankDepositAmount { get; set; }
 
         public virtual ICollection<TaxDetailsInsurance> InsuranceDetails { get; set; }
-        public float TotalInsurancePremium { get; set; }    //Deatils in table TaxDetailsInsurance
+        public float TotalInsurancePremium { get; set; } //Deatils in table TaxDetailsInsurance
 
         public virtual ICollection<TaxDetailsNsc> NscDetails { get; set; }
-        public float TotalNscAmount { get; set; }           //Deatils in table TaxDetailsNsc
+        public float TotalNscAmount { get; set; } //Deatils in table TaxDetailsNsc
 
         public virtual ICollection<TaxDetailsMutualFunds> MutualFundDetails { get; set; }
-        public float TotalMutualFund { get; set; }          //Deatils in table TaxDetailsMutualFunds
+        public float TotalMutualFund { get; set; } //Deatils in table TaxDetailsMutualFunds
 
         public virtual ICollection<TaxDetailsUlip> UlipDetails { get; set; }
         public float TotalUlip { get; set; }
 
 
         public virtual ICollection<TaxDetailsSukanya> SukanyaDetails { get; set; }
-        public float TotalSukanya { get; set; }      //sukanya samriddhi 1
+        public float TotalSukanya { get; set; } //sukanya samriddhi 1
 
         public float HouseLoanPrincipal { get; set; }
         public float HouseLoanPrincipal2 { get; set; }
@@ -90,7 +85,6 @@ namespace ESS.Models
         public float MedicalExpenditure { get; set; }
 
 
-        
         [StringLength(200)] public string PropertyAddress { get; set; }
         [StringLength(1)] public string PropertyStatus { get; set; } //s=self; v=vacant; l=letout
 
@@ -146,18 +140,13 @@ namespace ESS.Models
         public float InterestPreConstruction2 { get; set; }
 
 
-
-
         public float OtherInterest { get; set; }
-        [StringLength(50)]
-        public string OtherIncomeDesc { get; set; }
+        [StringLength(50)] public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
-        [StringLength(1)]
-        public string TaxRegime { get; set; }     //O=Old regime, N=New Regime (from april 2020).
+        [StringLength(1)] public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
 
-        [StringLength(8)]
-        public string UpdateUserId { get; set; }
+        [StringLength(8)] public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
 
         public bool LockEntry { get; set; }

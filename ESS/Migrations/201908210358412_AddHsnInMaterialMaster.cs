@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddHsnInMaterialMaster : DbMigration
     {
         public override void Up()
         {
             AddColumn("dbo.Materials", "HsnCode", c => c.String(maxLength: 10));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.Materials", "HsnCode");

@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 
 namespace ESS.Controllers.Api
 {
-
     public class EmployeeController : ApiController
     {
         private ApplicationDbContext _context;
@@ -22,7 +21,6 @@ namespace ESS.Controllers.Api
         //get /api/employee
         public IHttpActionResult GetEmployees(string location)
         {
-
             var employeeDto = _context.Employees
                 .Select(
                     e => new EmployeeDto
@@ -64,7 +62,6 @@ namespace ESS.Controllers.Api
                         Location = e.Location,
                         SapId = e.SapId,
                         CompanyAcc = e.CompanyAcc
-
                     }
                 )
                 .Where(e => e.Active && e.WrkGrp == "COMP")
@@ -101,7 +98,7 @@ namespace ESS.Controllers.Api
                 dto.HrUser = empAdd.HrUser;
                 dto.HrVerificationDate = empAdd.HrVerificationDate;
                 dto.UpdDt = empAdd.UpdDt;
-                
+
                 var perAdd = empPerAdd.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (perAdd == null) continue;
@@ -117,7 +114,6 @@ namespace ESS.Controllers.Api
                 dto.PerPin = perAdd.PerPin;
                 dto.PerPhone = perAdd.PerPhone;
                 dto.PerPoliceSt = perAdd.PerPoliceSt;
-                
             }
 
             return Ok(employeeDto);
@@ -169,9 +165,8 @@ namespace ESS.Controllers.Api
                         SapId = e.SapId,
                         CompanyAcc = e.CompanyAcc,
 
-                        BirthDate =   e.BirthDate,
+                        BirthDate = e.BirthDate,
                         Pan = e.Pan
-                        
                     }
                 )
                 .Where(e => e.EmpUnqId == empUnqId)
@@ -202,11 +197,8 @@ namespace ESS.Controllers.Api
                 var result = Helpers.CustomHelper.GetEmpFamilyDetails(empUnqId);
                 return Ok(result);
             }
+
             return NotFound();
-
-
-
-
         }
 
         private class EmpRelease
@@ -218,7 +210,9 @@ namespace ESS.Controllers.Api
             public string DeptCode { get; set; }
             public string DeptName { get; set; }
             public string StatCode { get; set; }
+
             public string StatName { get; set; }
+
             //public string SecCode { get; set; }
             //public string SecName { get; set; }
             public string Email { get; set; }
@@ -236,12 +230,10 @@ namespace ESS.Controllers.Api
             public string ReleaseCode3 { get; set; }
             public string ReleaseEmpUnqId3 { get; set; }
             public string ReleaseName3 { get; set; }
-
         }
 
         public IHttpActionResult GetEmpRelease(bool flag)
         {
-
             var emps = _context.Employees
                 .Include(d => d.Departments)
                 .Include(s => s.Stations)
@@ -319,7 +311,6 @@ namespace ESS.Controllers.Api
                             relName = auth.Employee.EmpName;
                         else
                             relName += "/" + auth.Employee.EmpName;
-
                     }
 
                     e.ReleaseGroup = relStr.ReleaseGroupCode;
@@ -342,10 +333,7 @@ namespace ESS.Controllers.Api
                             e.ReleaseEmpUnqId3 = relEmpUnqId;
                             e.ReleaseName3 = relName;
                             break;
-
                     }
-
-
                 }
 
                 result.Add(e);
@@ -357,7 +345,8 @@ namespace ESS.Controllers.Api
 
         [HttpGet]
         [ActionName("perfattd")]
-        public IHttpActionResult PerfAttd(string empUnqId, string flag, DateTime? fromDate = null, DateTime? toDate = null)
+        public IHttpActionResult PerfAttd(string empUnqId, string flag, DateTime? fromDate = null,
+            DateTime? toDate = null)
         {
             if (flag == "PERF")
             {
@@ -373,7 +362,6 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest("Invalid parameter...");
             }
-
         }
 
         private class UserPassword
@@ -414,6 +402,5 @@ namespace ESS.Controllers.Api
 
             return Ok();
         }
-
     }
 }

@@ -34,10 +34,8 @@ namespace ESS.Models
         [StringLength(3)]
         public string StatCode { get; set; }
 
-        [StringLength(100)]
-        public string StatName { get; set; }
+        [StringLength(100)] public string StatName { get; set; }
 
-        [StringLength(5)]
-        public string Location { get; set; }
+        [StringLength(5)] public string Location { get; set; }
     }
 }

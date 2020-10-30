@@ -19,8 +19,7 @@ namespace ESS.Models
         [StringLength(10)]
         public string EmpUnqId { get; set; }
 
-        [ForeignKey("EmpUnqId")]
-        public Employees Employee { get; set; }
+        [ForeignKey("EmpUnqId")] public Employees Employee { get; set; }
 
         public DateTime? ValidFrom { get; set; }
 

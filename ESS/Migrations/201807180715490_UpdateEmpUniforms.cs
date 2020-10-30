@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class UpdateEmpUniforms : DbMigration
     {
         public override void Up()
@@ -12,7 +12,7 @@ namespace ESS.Migrations
             AddColumn("dbo.EmpUniforms", "UpdUser", c => c.String());
             AddColumn("dbo.EmpUniforms", "UpdTime", c => c.DateTime(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.EmpUniforms", "UpdTime");

@@ -13,7 +13,8 @@ namespace ESS.Helpers
     public class CustomHelper
     {
         //private static readonly string RemoteServer = System.Configuration.ConfigurationManager.ConnectionStrings["RemoteConnection"].ConnectionString;
-        private static readonly string ThisServer = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+        private static readonly string ThisServer = System.Configuration.ConfigurationManager
+            .ConnectionStrings["DefaultConnection"].ConnectionString;
 
 
         public static string GetAttendanceServerApi(string location)
@@ -39,7 +40,8 @@ namespace ESS.Helpers
         /// <param name="compCode"> Company Code</param>
         /// <param name="wrkGrp"> Work Group </param>
         /// <returns></returns>
-        public static List<DateTime> GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp, string location)
+        public static List<DateTime> GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp,
+            string location)
         {
             List<DateTime> holidays = new List<DateTime>();
 
@@ -59,8 +61,8 @@ namespace ESS.Helpers
 
                 while (dr.Read())
                     holidays.Add(DateTime.Parse(dr["tDate"].ToString()));
-
             }
+
             if (DateTime.Parse("2017-12-07") >= fromDt && DateTime.Parse("2017-12-07") <= toDt)
                 holidays.Add(DateTime.Parse("2017-12-07"));
 
@@ -92,6 +94,7 @@ namespace ESS.Helpers
                         HolidayName = dr["HlDesc"].ToString()
                     });
             }
+
             return holidays;
         }
 
@@ -114,7 +117,6 @@ namespace ESS.Helpers
 
         public static List<HolidayDto> GetOptionalHolidays(int tYear, string location)
         {
-
             List<HolidayDto> holidays = new List<HolidayDto>();
 
             string strRemoteServer = GetRemoteServer(location);
@@ -141,7 +143,7 @@ namespace ESS.Helpers
         {
             AttdShiftScheduleDto dto = new AttdShiftScheduleDto();
             string strRemoteServer = GetRemoteServer(location);
-            
+
             using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
@@ -151,7 +153,7 @@ namespace ESS.Helpers
                 SqlCommand cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
-                
+
                 while (dr.Read())
                 {
                     dto.YearMt = int.Parse(dr["yearmt"].ToString());
@@ -191,12 +193,10 @@ namespace ESS.Helpers
             }
 
             return dto;
-
         }
 
         public static EmpPunchBlockDto GetEmpPunchBlock(string empUnqId, string location)
         {
-
             string strRemoteServer = GetRemoteServer(location);
 
 
@@ -227,9 +227,8 @@ namespace ESS.Helpers
 
                 return dto;
             }
-            
         }
-        
+
         //Get weekly off day
         public static List<DateTime> GetWeeklyOff(DateTime fromDt, DateTime toDt, string empUnqId)
         {
@@ -254,7 +253,6 @@ namespace ESS.Helpers
 
                 while (dr.Read())
                     weeklyOff.Add(DateTime.Parse(dr["tDate"].ToString()));
-
             }
 
             return weeklyOff;
@@ -263,7 +261,6 @@ namespace ESS.Helpers
         //Get Leave Balance
         public static List<LeaveBalanceDto> GetLeaveBalance(string empUnqId, int year)
         {
-
             List<LeaveBalanceDto> lDtoList = new List<LeaveBalanceDto>();
 
             ApplicationDbContext context = new ApplicationDbContext();
@@ -308,12 +305,8 @@ namespace ESS.Helpers
                     lBal.Encashed = value;
 
                     lDtoList.Add(lBal);
-
                 }
-
-
             }
-
 
 
             return lDtoList;
@@ -402,7 +395,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpCompanies";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -410,6 +402,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -477,7 +470,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpWrkGrp";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -485,6 +477,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -554,7 +547,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpUnits";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -562,6 +554,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -633,7 +626,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpDepts";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -641,6 +633,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -714,7 +707,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpStat";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -722,6 +714,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -748,7 +741,8 @@ namespace ESS.Helpers
 
 
                         //get data from attendance server
-                        sql = "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, SecCode, SecDesc from MastStatSec";
+                        sql =
+                            "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, SecCode, SecDesc from MastStatSec";
                         SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
                         DataTable dt = new DataTable();
                         da.Fill(dt);
@@ -793,7 +787,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpSec";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -801,6 +794,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -870,7 +864,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpCat";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -878,6 +871,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -947,7 +941,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpDesg";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -955,6 +948,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -1024,7 +1018,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpGrade";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -1032,6 +1025,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -1101,7 +1095,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpEmpTyp";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -1109,6 +1102,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -1143,7 +1137,6 @@ namespace ESS.Helpers
                                   "EmpUnqId as SapId, 0 as CompanyAcc, " +
                                   "convert(datetime2, BirthDT) as BirthDate " +
                                   "from MastEmp where active = 1 ";
-
                         }
                         else
                         {
@@ -1156,7 +1149,6 @@ namespace ESS.Helpers
                                   "SapId as SapId, 0 as CompanyAcc, " +
                                   "convert(datetime2, BirthDT) as BirthDate " +
                                   "from MastEmp ";
-
                         }
 
 
@@ -1214,7 +1206,7 @@ namespace ESS.Helpers
                               "Target.UnitCode = Source.UnitCode, " +
                               "Target.DeptCode = Source.DeptCode, " +
                               "Target.StatCode = Source.StatCode, " +
-                            //"Target.SecCode = Source.SecCode, " +
+                              //"Target.SecCode = Source.SecCode, " +
                               "Target.CatCode = Source.CatCode, " +
                               "Target.DesgCode = Source.DesgCode, " +
                               "Target.GradeCode = Source.GradeCode, " +
@@ -1228,15 +1220,15 @@ namespace ESS.Helpers
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
                               "unitcode, deptcode, statcode, " +
-                            //"seccode, " +
+                              //"seccode, " +
                               "catcode, " +
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
-                              "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc, " + 
+                              "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc, " +
                               "birthdate ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
-                            //"source.seccode, " +
+                              //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
                               "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, 0, " +
@@ -1249,7 +1241,6 @@ namespace ESS.Helpers
                         sql = "drop table #tmpEmp";
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
-
                     }
                 }
             }
@@ -1257,6 +1248,7 @@ namespace ESS.Helpers
             {
                 throw;
             }
+
             #endregion
         }
 
@@ -1333,12 +1325,10 @@ namespace ESS.Helpers
             {
                 throw;
             }
-
         }
 
         public static void UpdateOpenMonth()
         {
-
         }
 
         /// <summary>
@@ -1387,9 +1377,8 @@ namespace ESS.Helpers
 
                     leaves.Add(leave);
                 }
-
-
             }
+
             return leaves;
         }
 
@@ -1417,7 +1406,7 @@ namespace ESS.Helpers
                              "[EarlyGoing],[LateCome] " +
                              "FROM [AttdData] " +
                              "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
-                    //"and compcode = '01' " +
+                             //"and compcode = '01' " +
                              "and wrkgrp  = '" + emp.WrkGrp + "' " +
                              "and empunqid = '" + empUnqId + "' " +
                              "and tdate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
@@ -1435,10 +1424,10 @@ namespace ESS.Helpers
                         ScheDuleShift = dr["ScheDuleShift"].ToString(),
                         ConsShift = dr["ConsShift"].ToString(),
                         ConsIn = dr.IsDBNull(dr.GetOrdinal("ConsIn"))
-                            ? (DateTime?)null
+                            ? (DateTime?) null
                             : Convert.ToDateTime(dr["ConsIn"]),
                         ConsOut = dr.IsDBNull(dr.GetOrdinal("ConsOut"))
-                            ? (DateTime?)null
+                            ? (DateTime?) null
                             : Convert.ToDateTime(dr["ConsOut"]),
                         ConsWrkHrs = float.Parse(dr["ConsWrkHrs"].ToString()),
                         ConsOverTime = float.Parse(dr["ConsOverTime"].ToString()),
@@ -1452,10 +1441,8 @@ namespace ESS.Helpers
                     };
 
 
-
                     result.Add(res);
                 }
-
             }
 
             return result;
@@ -1478,14 +1465,14 @@ namespace ESS.Helpers
                 DateTime toDt = DateTime.Now;
 
 
-
-                string sql = "SELECT [PunchDate],[EmpUnqId],a.[IOFlg],a.[MachineIP], isnull(b.[MachineDesc], 'TRIPOD') as MachineDesc " +
-                             "FROM [AttdLunchGate] a " +
-                             "LEFT JOIN [ReaderConFig] b on a.[MachineIP] = b.MachineIP " +
-                             "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
-                             "and empunqid = '" + empUnqId + "' " +
-                             "and PunchDate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
-                             toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
+                string sql =
+                    "SELECT [PunchDate],[EmpUnqId],a.[IOFlg],a.[MachineIP], isnull(b.[MachineDesc], 'TRIPOD') as MachineDesc " +
+                    "FROM [AttdLunchGate] a " +
+                    "LEFT JOIN [ReaderConFig] b on a.[MachineIP] = b.MachineIP " +
+                    "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
+                    "and empunqid = '" + empUnqId + "' " +
+                    "and PunchDate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
+                    toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
 
                 SqlCommand cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1495,7 +1482,7 @@ namespace ESS.Helpers
                     var res = new PerfPunchDto
                     {
                         PunchDate = dr.IsDBNull(dr.GetOrdinal("PunchDate"))
-                            ? (DateTime?)null
+                            ? (DateTime?) null
                             : Convert.ToDateTime(dr["PunchDate"]),
                         IoFlag = dr["IOFlg"].ToString(),
                         MachineIp = dr["MachineIP"].ToString(),
@@ -1504,7 +1491,6 @@ namespace ESS.Helpers
 
                     result.Add(res);
                 }
-
             }
 
             return result;
@@ -1512,7 +1498,6 @@ namespace ESS.Helpers
 
         public static List<EmpDetailsDto> GetEmpDetails(string empUnqId)
         {
-
             ApplicationDbContext context = new ApplicationDbContext();
 
             string sql = "SELECT [EmpUnqID],[BirthDT],[BirthPlace],[ContactNo],[BLDGRP]" +
@@ -1536,13 +1521,12 @@ namespace ESS.Helpers
 
                 while (dr.Read())
                 {
-
                     var res = new EmpDetailsDto
                     {
                         EmpUnqId = dr["EmpUnqId"].ToString(),
                         BirthDate = dr.IsDBNull(dr.GetOrdinal("BirthDt"))
-                       ? (DateTime?)null
-                       : Convert.ToDateTime(dr["BirthDt"]),
+                            ? (DateTime?) null
+                            : Convert.ToDateTime(dr["BirthDt"]),
                         BirthPlace = dr["BirthPlace"].ToString(),
                         ContactNo = dr["ContactNo"].ToString(),
                         BloodGroup = dr["BLDGRP"].ToString(),
@@ -1573,19 +1557,19 @@ namespace ESS.Helpers
                         IdPrf1 = dr["IDPRF1"].ToString(),
                         IdPrf1No = dr["IDPRF1No"].ToString(),
                         IdPrf1ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF1EXPON"))
-                           ? (DateTime?)null
-                           : Convert.ToDateTime(dr["IDPRF1EXPON"]),
+                            ? (DateTime?) null
+                            : Convert.ToDateTime(dr["IDPRF1EXPON"]),
 
                         IdPrf2 = dr["IDPRF2"].ToString(),
                         IdPrf2No = dr["IDPRF2No"].ToString(),
                         IdPrf2ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF2EXPON"))
-                            ? (DateTime?)null
+                            ? (DateTime?) null
                             : Convert.ToDateTime(dr["IDPRF2EXPON"]),
 
                         IdPrf3 = dr["IDPRF3"].ToString(),
                         IdPrf3No = dr["IDPRF3No"].ToString(),
                         IdPrf3ExpOn = dr.IsDBNull(dr.GetOrdinal("IDPRF3EXPON"))
-                            ? (DateTime?)null
+                            ? (DateTime?) null
                             : Convert.ToDateTime(dr["IDPRF3EXPON"]),
 
                         Religion = dr["RELIGION"].ToString(),
@@ -1593,8 +1577,8 @@ namespace ESS.Helpers
 
                         SapId = dr["SAPID"].ToString(),
                         JoinDt = dr.IsDBNull(dr.GetOrdinal("JoinDt"))
-                           ? (DateTime?)null
-                           : Convert.ToDateTime(dr["JoinDt"]),
+                            ? (DateTime?) null
+                            : Convert.ToDateTime(dr["JoinDt"]),
                         BankAcNo = dr["BankAcNo"].ToString(),
                         BankName = dr["BankName"].ToString(),
                         BankIfsc = dr["BankIFSCCode"].ToString(),
@@ -1623,7 +1607,6 @@ namespace ESS.Helpers
 
                     result.Add(res);
                 }
-
             }
 
             return result;
@@ -1650,7 +1633,6 @@ namespace ESS.Helpers
 
                 while (dr.Read())
                 {
-
                     var res = new EmpDetailsDto
                     {
                         EmpUnqId = dr["EmpUnqId"].ToString(),
@@ -1664,12 +1646,10 @@ namespace ESS.Helpers
                         PerPin = dr["PERPIN"].ToString(),
                         PerPhone = dr["PERPHONE"].ToString(),
                         PerPoliceSt = dr["PERPOLICEST"].ToString(),
-
                     };
 
                     result.Add(res);
                 }
-
             }
 
             return result;
@@ -1710,7 +1690,6 @@ namespace ESS.Helpers
 
                     result.Add(res);
                 }
-
             }
 
             return result;
@@ -1720,7 +1699,7 @@ namespace ESS.Helpers
         public static List<EmpFamilyDto> GetEmpFamilyDetails(string empUnqId)
         {
             var result = new List<EmpFamilyDto>();
-            
+
             var sql =
                 "SELECT [EmpUnqID],[Sr],[Name],[Relation],[BirthDt],[Education],[Occupation] " +
                 "FROM[ATTENDANCE].[dbo].[MastEmpFamily] " +
@@ -1745,14 +1724,13 @@ namespace ESS.Helpers
                         Sr = int.Parse(dr["Sr"].ToString()),
                         Name = dr["Name"].ToString(),
                         Relation = dr["Relation"].ToString(),
-                        BirthDt =  DateTime.Parse(dr["BirthDt"].ToString()),
-                        Education =  dr["Education"].ToString(),
+                        BirthDt = DateTime.Parse(dr["BirthDt"].ToString()),
+                        Education = dr["Education"].ToString(),
                         Occupation = dr["Occupation"].ToString()
                     };
 
                     result.Add(res);
                 }
-
             }
 
             return result;

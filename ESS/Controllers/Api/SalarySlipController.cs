@@ -46,10 +46,9 @@ namespace ESS.Controllers.Api
             DateTime today = DateTime.Today;
             DateTime sixMonth = today.AddMonths(-7);
             var months = new List<Months>();
-            
+
             for (DateTime dt = today; dt > sixMonth;)
             {
-                
                 if (DateTimeFormatInfo.CurrentInfo != null)
                 {
                     Months mon = new Months
@@ -60,7 +59,7 @@ namespace ESS.Controllers.Api
                     months.Add(mon);
                 }
 
-                dt=dt.AddMonths(-1);
+                dt = dt.AddMonths(-1);
             }
 
             return Ok(months);
@@ -70,7 +69,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetSalarySlip([FromBody] object requestData)
         {
             PaySlip payslip;
-            
+
             try
             {
                 payslip = JsonConvert.DeserializeObject<PaySlip>(requestData.ToString());
@@ -82,25 +81,24 @@ namespace ESS.Controllers.Api
 
             // Access folder with yearmonth as suffix
             Locations loc = _context.Location.FirstOrDefault();
-            if (loc == null) 
+            if (loc == null)
                 return BadRequest("Location configuration error.");
-            
-            string path = HostingEnvironment.MapPath(@"~/App_Data/"+payslip.YearMonth);
+
+            string path = HostingEnvironment.MapPath(@"~/App_Data/" + payslip.YearMonth);
 
             if (string.IsNullOrEmpty(path))
                 return BadRequest("Path not found.");
-                
-            path +=  "\\" + payslip.EmpUnqId + ".pdf";
+
+            path += "\\" + payslip.EmpUnqId + ".pdf";
 
             return new FileResult(path, "application/pdf");
-
         }
 
         [HttpPost]
         public IHttpActionResult UploadPaySlip(string folderName)
         {
-            HttpContext httpContext = HttpContext.Current;  
-  
+            HttpContext httpContext = HttpContext.Current;
+
             // Check for any uploaded file  
             if (httpContext.Request.Files.Count <= 0) return BadRequest("NO FILES???");
 
@@ -124,7 +122,7 @@ namespace ESS.Controllers.Api
 
                     // Construct file save path
                     var fileSavePath = Path.Combine(folder ?? throw new InvalidOperationException("Folder not found"),
-                                                        httpPostedFile.FileName);
+                        httpPostedFile.FileName);
 
                     // Save the uploaded file  
                     httpPostedFile.SaveAs(fileSavePath);

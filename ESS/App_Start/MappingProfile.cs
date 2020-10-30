@@ -123,7 +123,6 @@ namespace ESS.App_Start
 
             CreateMap<MedicalFitness, MedicalFitnessDto>();
             CreateMap<MedicalFitnessDto, MedicalFitness>();
-
         }
     }
 }

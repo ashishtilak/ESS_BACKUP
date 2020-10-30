@@ -53,7 +53,7 @@ namespace ESS.Controllers.Api
                 .Include(s => s.SukanyaDetails)
                 .Include(u => u.UlipDetails)
                 .Include(r => r.RentDetails)
-                .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth )
+                .Where(t => t.EmpUnqId == empUnqId && t.YearMonth == yearMonth)
                 .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
                 .ToList();
             // if (taxDetails.Count == 0)
@@ -122,7 +122,7 @@ namespace ESS.Controllers.Api
                     empRec.StartDt = taxconfig.StartDt;
                     empRec.EndDt = taxconfig.EndDt;
 
-                    empRec.InsCode = 1;                                 //TODO: MAKE DYNAMIC - PROBABLY FROM A TABLE
+                    empRec.InsCode = 1; //TODO: MAKE DYNAMIC - PROBABLY FROM A TABLE
                     empRec.InsPro = prov.TotalInsurancePremium;
 
                     empRec.UlipCode = 4;
@@ -142,7 +142,7 @@ namespace ESS.Controllers.Api
 
                     empRec.HomeLoanCode2 = 14;
                     empRec.HomeLoanPro2 = prov.HouseLoanPrincipal2;
-                    
+
                     empRec.NotifiedMfCode = 18;
                     empRec.NotifiedMfPro = prov.TotalSukanya;
 
@@ -156,11 +156,12 @@ namespace ESS.Controllers.Api
                     empRec.TermDepoPro = prov.TotalBankDepositAmount;
 
                     empRec.Total80C = empRec.InsPro + empRec.UlipPro + empRec.MfPro + empRec.PpfPro + empRec.NscPro +
-                                      empRec.HomeLoanPro + empRec.HomeLoanPro2 + empRec.NotifiedMfPro + empRec.Child1Pro + 
+                                      empRec.HomeLoanPro + empRec.HomeLoanPro2 + empRec.NotifiedMfPro +
+                                      empRec.Child1Pro +
                                       empRec.Child2Pro + empRec.TermDepoPro;
 
 
-                    empRec.LongTermMf = 0;          //TODO: CONFIRM
+                    empRec.LongTermMf = 0; //TODO: CONFIRM
                     empRec.MedicalPremium = prov.MedicalPremiumSelf + prov.MedicalPremiumParents;
                     empRec.EduLoanInterest = prov.EducationLoanInterest;
                     empRec.Nps = prov.NationalPensionScheme;
@@ -254,7 +255,7 @@ namespace ESS.Controllers.Api
                     empRec.StartDt = taxconfig.StartDt;
                     empRec.EndDt = taxconfig.EndDt;
 
-                    empRec.InsCode = 1;                                 //TODO: MAKE DYNAMIC - PROBABLY FROM A TABLE
+                    empRec.InsCode = 1; //TODO: MAKE DYNAMIC - PROBABLY FROM A TABLE
                     empRec.InsAct = act.TotalInsurancePremium;
 
                     empRec.UlipCode = 4;
@@ -288,11 +289,12 @@ namespace ESS.Controllers.Api
                     empRec.TermDepoAct = act.TotalBankDepositAmount;
 
                     empRec.Total80C = empRec.InsAct + empRec.UlipAct + empRec.MfAct + empRec.PpfAct + empRec.NscAct +
-                                      empRec.HomeLoanAct + empRec.HomeLoanAct2 + empRec.NotifiedMfAct + empRec.Child1Act + 
-                                      empRec.Child2Act +  empRec.TermDepoAct;
+                                      empRec.HomeLoanAct + empRec.HomeLoanAct2 + empRec.NotifiedMfAct +
+                                      empRec.Child1Act +
+                                      empRec.Child2Act + empRec.TermDepoAct;
 
 
-                    empRec.LongTermMf = 0;          //TODO: CONFIRM
+                    empRec.LongTermMf = 0; //TODO: CONFIRM
                     empRec.MedicalPremium = act.MedicalPremiumSelf + act.MedicalPremiumParents;
                     empRec.EduLoanInterest = act.EducationLoanInterest;
                     empRec.Nps = act.NationalPensionScheme;
@@ -302,16 +304,15 @@ namespace ESS.Controllers.Api
                     empRec.RentReceived = act.RentalIncomePerMonth;
                     empRec.BankName = act.LoanBank;
                     empRec.BankPan = act.LoanBankPan;
-                    
+
                     empRec.InterestOnLoan2 = act.InterestOnLoan2;
                     empRec.InterestPreConstruction2 = act.InterestPreConstruction2;
                     empRec.RentReceived2 = act.RentalIncomePerMonth2;
                     empRec.BankName2 = act.LoanBank2;
                     empRec.BankPan2 = act.LoanBankPan2;
 
-                    
-                    empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
+                    empRec.AccomodationType = empobj.CompanyAcc ? "3" : "1";
 
 
                     //Average out rent
@@ -408,8 +409,8 @@ namespace ESS.Controllers.Api
 
             var found = _context.TaxDeclarations
                 .Any(t => t.EmpUnqId == sentData.EmpUnqId &&
-                    t.YearMonth == sentData.YearMonth &&
-                    t.ActualFlag == sentData.ActualFlag);
+                          t.YearMonth == sentData.YearMonth &&
+                          t.ActualFlag == sentData.ActualFlag);
 
 
             TaxDeclarations taxDeclaration;
@@ -429,11 +430,10 @@ namespace ESS.Controllers.Api
             }
             else
             {
-
                 taxDeclaration = _context.TaxDeclarations
                     .FirstOrDefault(t => t.EmpUnqId == sentData.EmpUnqId &&
-                              t.YearMonth == sentData.YearMonth &&
-                              t.ActualFlag == sentData.ActualFlag);
+                                         t.YearMonth == sentData.YearMonth &&
+                                         t.ActualFlag == sentData.ActualFlag);
 
                 if (taxDeclaration != null && taxDeclaration.LockEntry)
                 {
@@ -458,11 +458,11 @@ namespace ESS.Controllers.Api
 
             foreach (PropertyInfo prop in tmp.GetType().GetProperties())
             {
-                if (!prop.CanRead) continue;            //if property is readable... 
-                if (prop.PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)) continue;
+                if (!prop.CanRead) continue; //if property is readable... 
+                if (prop.PropertyType != typeof(string) &&
+                    typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)) continue;
                 object value = prop.GetValue(tmp, null);
                 prop.SetValue(taxDeclaration, value);
-
             }
 
 
@@ -470,11 +470,10 @@ namespace ESS.Controllers.Api
 
             foreach (PropertyInfo prop in tmpH.GetType().GetProperties())
             {
-                if (!prop.CanRead) continue;            //if property is readable... 
+                if (!prop.CanRead) continue; //if property is readable... 
 
                 object value = prop.GetValue(tmpH, null);
                 prop.SetValue(history, value);
-
             }
 
 
@@ -528,6 +527,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsInsuranceDto, TaxDetailsInsurance>(insuranceDto));
                 }
             }
+
             if (sentData.MutualFundDetails.Count > 0)
             {
                 foreach (var mfDto in sentData.MutualFundDetails)
@@ -536,6 +536,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsMutualFundsDto, TaxDetailsMutualFunds>(mfDto));
                 }
             }
+
             if (sentData.NscDetails.Count > 0)
             {
                 foreach (var nscDto in sentData.NscDetails)
@@ -544,6 +545,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsNscDto, TaxDetailsNsc>(nscDto));
                 }
             }
+
             if (sentData.PpfDetails.Count > 0)
             {
                 foreach (var ppfDto in sentData.PpfDetails)
@@ -552,6 +554,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsPpfDto, TaxDetailsPpf>(ppfDto));
                 }
             }
+
             if (sentData.BankDeposits.Count > 0)
             {
                 foreach (var bankDto in sentData.BankDeposits)
@@ -560,6 +563,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsBankDepositDto, TaxDetailsBankDeposit>(bankDto));
                 }
             }
+
             if (sentData.UlipDetails.Count > 0)
             {
                 foreach (var ulipDto in sentData.UlipDetails)
@@ -568,6 +572,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsUlipDto, TaxDetailsUlip>(ulipDto));
                 }
             }
+
             if (sentData.SukanyaDetails.Count > 0)
             {
                 foreach (var sukanyaDto in sentData.SukanyaDetails)
@@ -576,6 +581,7 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsSukanyaDto, TaxDetailsSukanya>(sukanyaDto));
                 }
             }
+
             if (sentData.RentDetails.Count > 0)
             {
                 foreach (var rentDto in sentData.RentDetails)
@@ -596,6 +602,5 @@ namespace ESS.Controllers.Api
             _context.SaveChanges();
             return Ok(Mapper.Map<TaxDeclarations, TaxDeclarationDto>(taxDeclaration));
         }
-
     }
 }

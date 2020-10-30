@@ -36,6 +36,5 @@ namespace ESS.Dto
         public string GradeName { get; set; }
         public string DesgName { get; set; }
         public string EmpName { get; set; }
-
     }
 }

@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddLocationCodeInModels : DbMigration
     {
         public override void Up()
@@ -18,7 +18,7 @@ namespace ESS.Migrations
             AddColumn("dbo.Stations", "Location", c => c.String(maxLength: 5));
             AddColumn("dbo.Sections", "Location", c => c.String(maxLength: 5));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.Sections", "Location");

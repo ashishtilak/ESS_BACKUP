@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class GatePassDbCreated : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.GatePasses",
-                c => new
+                    "dbo.GatePasses",
+                    c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
                         GatePassDate = c.DateTime(nullable: false),
@@ -28,9 +28,8 @@ namespace ESS.Migrations
                         GateInIp = c.String(),
                     })
                 .PrimaryKey(t => t.Id);
-            
         }
-        
+
         public override void Down()
         {
             DropTable("dbo.GatePasses");

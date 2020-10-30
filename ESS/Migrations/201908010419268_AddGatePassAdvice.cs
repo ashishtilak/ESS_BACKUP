@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddGatePassAdvice : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.GpAdviceDetails",
-                c => new
+                    "dbo.GpAdviceDetails",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         GpAdviceNo = c.Int(nullable: false),
@@ -20,13 +20,13 @@ namespace ESS.Migrations
                         ApproxValue = c.Single(nullable: false),
                         HsnCode = c.String(maxLength: 10),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.GpAdviceNo, t.GpAdviceItem })
-                .ForeignKey("dbo.GpAdvices", t => new { t.YearMonth, t.GpAdviceNo })
-                .Index(t => new { t.YearMonth, t.GpAdviceNo });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.GpAdviceNo, t.GpAdviceItem})
+                .ForeignKey("dbo.GpAdvices", t => new {t.YearMonth, t.GpAdviceNo})
+                .Index(t => new {t.YearMonth, t.GpAdviceNo});
+
             CreateTable(
-                "dbo.GpAdvices",
-                c => new
+                    "dbo.GpAdvices",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         GpAdviceNo = c.Int(nullable: false),
@@ -52,14 +52,13 @@ namespace ESS.Migrations
                         UpdDt = c.DateTime(),
                         UpdUser = c.String(maxLength: 10),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.GpAdviceNo });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.GpAdviceNo});
         }
-        
+
         public override void Down()
         {
-            DropForeignKey("dbo.GpAdviceDetails", new[] { "YearMonth", "GpAdviceNo" }, "dbo.GpAdvices");
-            DropIndex("dbo.GpAdviceDetails", new[] { "YearMonth", "GpAdviceNo" });
+            DropForeignKey("dbo.GpAdviceDetails", new[] {"YearMonth", "GpAdviceNo"}, "dbo.GpAdvices");
+            DropIndex("dbo.GpAdviceDetails", new[] {"YearMonth", "GpAdviceNo"});
             DropTable("dbo.GpAdvices");
             DropTable("dbo.GpAdviceDetails");
         }

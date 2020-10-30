@@ -57,7 +57,7 @@ namespace ESS.Dto
             {
                 Type myType = typeof(AttdShiftScheduleDto);
                 PropertyInfo myPropInfo = myType.GetProperty(propertyName);
-                if (myPropInfo != null) 
+                if (myPropInfo != null)
                     myPropInfo.SetValue(this, value, null);
                 else
                     throw new Exception("Error in setting property");

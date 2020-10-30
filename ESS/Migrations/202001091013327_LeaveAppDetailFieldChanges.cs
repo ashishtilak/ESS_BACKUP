@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class LeaveAppDetailFieldChanges : DbMigration
     {
         public override void Up()
@@ -13,7 +13,7 @@ namespace ESS.Migrations
             AlterColumn("dbo.LeaveApplicationDetails", "ContactAddress", c => c.String(maxLength: 255));
             AlterColumn("dbo.LeaveApplicationDetails", "PostUser", c => c.String(maxLength: 10));
         }
-        
+
         public override void Down()
         {
             AlterColumn("dbo.LeaveApplicationDetails", "PostUser", c => c.String());

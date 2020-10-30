@@ -72,7 +72,6 @@ namespace ESS.Controllers.Api
             );
 
 
-
             // IF Flag = true, return only Week Off applications
             if (woFlag)
             {
@@ -89,7 +88,7 @@ namespace ESS.Controllers.Api
                 ));
             }
 
-            
+
             foreach (var lApp in leaveAppDto)
             {
                 var app = _context.ApplReleaseStatus
@@ -196,7 +195,8 @@ namespace ESS.Controllers.Api
 
                 foreach (var applReleaseStatusDto in app)
                 {
-                    applReleaseStatusDto.ReleaserName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)?.EmpName;
+                    applReleaseStatusDto.ReleaserName = _context.Employees
+                        .FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)?.EmpName;
                     lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
             }
@@ -427,7 +427,7 @@ namespace ESS.Controllers.Api
                                     continue;
                                 }
 
-                                
+
                                 //if partial posted, then do not post in attendance
                                 //only post fully posted leaves in attendance server.
                                 if (dto.IsPosted == LeaveApplicationDetails.PartiallyPosted)
@@ -493,7 +493,8 @@ namespace ESS.Controllers.Api
                                                         Location = emp.Location
                                                     };
 
-                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out var result);
+                                                attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location,
+                                                    out var result);
 
                                                 // if there was error in leave posting,
                                                 // save partial  posting flag in ESS
@@ -677,8 +678,9 @@ namespace ESS.Controllers.Api
                                             //CAN'T USE THIS OBJECT BECAUSE IT'LL BREAK THE LOOP
 
                                             LeaveApplications tmpLd = _context.LeaveApplications
-                                                .FirstOrDefault(l => l.YearMonth == leaveApplicationDetails.YearMonth && 
-                                                                     l.LeaveAppId == leaveApplicationDetails.LeaveAppId);
+                                                .FirstOrDefault(l => l.YearMonth == leaveApplicationDetails.YearMonth &&
+                                                                     l.LeaveAppId == leaveApplicationDetails
+                                                                         .LeaveAppId);
 
                                             int maxDetailId =
                                                 tmpLd.LeaveApplicationDetails.Max(d => d.LeaveAppItem);
@@ -711,7 +713,7 @@ namespace ESS.Controllers.Api
                                             leaveApplicationDetails.TotalDays = 3;
                                             leaveApplicationDetails.IsPosted = LeaveApplicationDetails.FullyPosted;
 
-                                            dt = newDetail.ToDt??DateTime.Today;
+                                            dt = newDetail.ToDt ?? DateTime.Today;
                                         }
 
                                         slCount++;

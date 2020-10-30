@@ -22,10 +22,8 @@ namespace ESS.Models
         [StringLength(3)]
         public string GradeCode { get; set; }
 
-        [StringLength(100)]
-        public string GradeName { get; set; }
+        [StringLength(100)] public string GradeName { get; set; }
 
-        [StringLength(5)]
-        public string Location { get; set; }
+        [StringLength(5)] public string Location { get; set; }
     }
 }

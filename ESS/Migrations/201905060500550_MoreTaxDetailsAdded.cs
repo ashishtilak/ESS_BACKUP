@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class MoreTaxDetailsAdded : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.TaxDetailsBankDeposits",
-                c => new
+                    "dbo.TaxDetailsBankDeposits",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -18,13 +18,13 @@ namespace ESS.Migrations
                         DepositDate = c.DateTime(),
                         DepositAmount = c.Single(nullable: false),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag, t.BankAccountNo })
-                .ForeignKey("dbo.TaxDeclarations", t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag })
-                .Index(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag, t.BankAccountNo})
+                .ForeignKey("dbo.TaxDeclarations", t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag})
+                .Index(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag});
+
             CreateTable(
-                "dbo.TaxDetailsSukanyas",
-                c => new
+                    "dbo.TaxDetailsSukanyas",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -33,13 +33,13 @@ namespace ESS.Migrations
                         SukanyaDate = c.DateTime(),
                         SukanyaAmount = c.Single(nullable: false),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag, t.SukanyaName })
-                .ForeignKey("dbo.TaxDeclarations", t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag })
-                .Index(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag, t.SukanyaName})
+                .ForeignKey("dbo.TaxDeclarations", t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag})
+                .Index(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag});
+
             CreateTable(
-                "dbo.TaxDetailsUlips",
-                c => new
+                    "dbo.TaxDetailsUlips",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -48,10 +48,10 @@ namespace ESS.Migrations
                         UlipDate = c.DateTime(),
                         UlipAmount = c.Single(nullable: false),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag, t.UlipNo })
-                .ForeignKey("dbo.TaxDeclarations", t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag })
-                .Index(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag });
-            
+                .PrimaryKey(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag, t.UlipNo})
+                .ForeignKey("dbo.TaxDeclarations", t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag})
+                .Index(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag});
+
             AddColumn("dbo.TaxDeclarations", "TotalBankDepositAmount", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "TotalUlip", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "TotalSukanya", c => c.Single(nullable: false));
@@ -64,7 +64,7 @@ namespace ESS.Migrations
             DropColumn("dbo.TaxDeclarations", "NotifiedMutualFund2");
             DropColumn("dbo.TaxDetailsInsurances", "PremiumAmount");
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.TaxDetailsInsurances", "PremiumAmount", c => c.Single(nullable: false));
@@ -73,12 +73,14 @@ namespace ESS.Migrations
             AddColumn("dbo.TaxDeclarations", "Ulip", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "BankDepositAmount", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "BankDepositAcNo", c => c.String(maxLength: 20));
-            DropForeignKey("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" }, "dbo.TaxDeclarations");
-            DropForeignKey("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" }, "dbo.TaxDeclarations");
-            DropForeignKey("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" }, "dbo.TaxDeclarations");
-            DropIndex("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            DropForeignKey("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"}, "dbo.TaxDeclarations");
+            DropForeignKey("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"},
+                "dbo.TaxDeclarations");
+            DropForeignKey("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"},
+                "dbo.TaxDeclarations");
+            DropIndex("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
             DropColumn("dbo.TaxDetailsMutualFunds", "MutualFundDate");
             DropColumn("dbo.TaxDetailsInsurances", "PolicyDate");
             DropColumn("dbo.TaxDeclarations", "TotalSukanya");

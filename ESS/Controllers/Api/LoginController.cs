@@ -88,7 +88,6 @@ namespace ESS.Controllers.Api
             }
 
             return Ok(employeeDto);
-
         }
     }
 }

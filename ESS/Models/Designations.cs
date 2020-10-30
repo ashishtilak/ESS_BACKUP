@@ -22,10 +22,8 @@ namespace ESS.Models
         [StringLength(3)]
         public string DesgCode { get; set; }
 
-        [StringLength(100)]
-        public string DesgName { get; set; }
+        [StringLength(100)] public string DesgName { get; set; }
 
-        [StringLength(5)]
-        public string Location { get; set; }
+        [StringLength(5)] public string Location { get; set; }
     }
 }

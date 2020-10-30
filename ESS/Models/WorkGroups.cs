@@ -17,16 +17,14 @@ namespace ESS.Models
         [StringLength(10)]
         public string WrkGrp { get; set; }
 
-        [StringLength(50)]
-        public string WrkGrpDesc { get; set; }
+        [StringLength(50)] public string WrkGrpDesc { get; set; }
 
 
-        [StringLength(5)]
-        public string Location { get; set; }
+        [StringLength(5)] public string Location { get; set; }
 
         public DateTime? AddDt { get; set; }
 
-        [StringLength(8)]                       // Ex. 20005116
+        [StringLength(8)] // Ex. 20005116
         public string AddUser { get; set; }
     }
 }

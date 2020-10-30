@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class ChangeInLeaveRules : DbMigration
     {
         public override void Up()
@@ -15,7 +15,7 @@ namespace ESS.Migrations
             AlterColumn("dbo.LeaveRules", "LeaveRule", c => c.String(maxLength: 50));
             DropColumn("dbo.LeaveRules", "AllowedCl");
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.LeaveRules", "AllowedCl", c => c.Single(nullable: false));

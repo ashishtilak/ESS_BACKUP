@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class MediclaimInitialConfig : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.MedDependents",
-                c => new
+                    "dbo.MedDependents",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         DepSr = c.Int(nullable: false),
@@ -30,17 +30,17 @@ namespace ESS.Migrations
                         AddUser = c.String(maxLength: 10),
                         AddDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                     })
-                .PrimaryKey(t => new { t.EmpUnqId, t.DepSr })
+                .PrimaryKey(t => new {t.EmpUnqId, t.DepSr})
                 .ForeignKey("dbo.ReleaseGroups", t => t.ReleaseGroupCode)
                 .ForeignKey("dbo.ReleaseStatus", t => t.ReleaseStatusCode)
-                .ForeignKey("dbo.ReleaseStrategies", t => new { t.ReleaseGroupCode, t.ReleaseStrategy })
+                .ForeignKey("dbo.ReleaseStrategies", t => new {t.ReleaseGroupCode, t.ReleaseStrategy})
                 .Index(t => t.ReleaseGroupCode)
-                .Index(t => new { t.ReleaseGroupCode, t.ReleaseStrategy })
+                .Index(t => new {t.ReleaseGroupCode, t.ReleaseStrategy})
                 .Index(t => t.ReleaseStatusCode);
-            
+
             CreateTable(
-                "dbo.MedEmpUhids",
-                c => new
+                    "dbo.MedEmpUhids",
+                    c => new
                     {
                         PolicyYear = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -48,13 +48,13 @@ namespace ESS.Migrations
                         Uhid = c.String(maxLength: 25),
                         Active = c.Boolean(nullable: false),
                     })
-                .PrimaryKey(t => new { t.PolicyYear, t.EmpUnqId, t.DepSr })
-                .ForeignKey("dbo.MedDependents", t => new { t.EmpUnqId, t.DepSr })
-                .Index(t => new { t.EmpUnqId, t.DepSr });
-            
+                .PrimaryKey(t => new {t.PolicyYear, t.EmpUnqId, t.DepSr})
+                .ForeignKey("dbo.MedDependents", t => new {t.EmpUnqId, t.DepSr})
+                .Index(t => new {t.EmpUnqId, t.DepSr});
+
             CreateTable(
-                "dbo.MedPolicies",
-                c => new
+                    "dbo.MedPolicies",
+                    c => new
                     {
                         PolicyYear = c.Int(nullable: false),
                         PolicyNumber = c.String(nullable: false, maxLength: 20),
@@ -71,30 +71,29 @@ namespace ESS.Migrations
                         ValidFrom = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         ValidTo = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                     })
-                .PrimaryKey(t => new { t.PolicyYear, t.PolicyNumber })
+                .PrimaryKey(t => new {t.PolicyYear, t.PolicyNumber})
                 .ForeignKey("dbo.Companies", t => t.CompCode)
-                .ForeignKey("dbo.Units", t => new { t.CompCode, t.WrkGrp, t.UnitCode })
-                .ForeignKey("dbo.WorkGroups", t => new { t.CompCode, t.WrkGrp })
+                .ForeignKey("dbo.Units", t => new {t.CompCode, t.WrkGrp, t.UnitCode})
+                .ForeignKey("dbo.WorkGroups", t => new {t.CompCode, t.WrkGrp})
                 .Index(t => t.CompCode)
-                .Index(t => new { t.CompCode, t.WrkGrp, t.UnitCode });
-            
+                .Index(t => new {t.CompCode, t.WrkGrp, t.UnitCode});
         }
-        
+
         public override void Down()
         {
-            DropForeignKey("dbo.MedPolicies", new[] { "CompCode", "WrkGrp" }, "dbo.WorkGroups");
-            DropForeignKey("dbo.MedPolicies", new[] { "CompCode", "WrkGrp", "UnitCode" }, "dbo.Units");
+            DropForeignKey("dbo.MedPolicies", new[] {"CompCode", "WrkGrp"}, "dbo.WorkGroups");
+            DropForeignKey("dbo.MedPolicies", new[] {"CompCode", "WrkGrp", "UnitCode"}, "dbo.Units");
             DropForeignKey("dbo.MedPolicies", "CompCode", "dbo.Companies");
-            DropForeignKey("dbo.MedEmpUhids", new[] { "EmpUnqId", "DepSr" }, "dbo.MedDependents");
-            DropForeignKey("dbo.MedDependents", new[] { "ReleaseGroupCode", "ReleaseStrategy" }, "dbo.ReleaseStrategies");
+            DropForeignKey("dbo.MedEmpUhids", new[] {"EmpUnqId", "DepSr"}, "dbo.MedDependents");
+            DropForeignKey("dbo.MedDependents", new[] {"ReleaseGroupCode", "ReleaseStrategy"}, "dbo.ReleaseStrategies");
             DropForeignKey("dbo.MedDependents", "ReleaseStatusCode", "dbo.ReleaseStatus");
             DropForeignKey("dbo.MedDependents", "ReleaseGroupCode", "dbo.ReleaseGroups");
-            DropIndex("dbo.MedPolicies", new[] { "CompCode", "WrkGrp", "UnitCode" });
-            DropIndex("dbo.MedPolicies", new[] { "CompCode" });
-            DropIndex("dbo.MedEmpUhids", new[] { "EmpUnqId", "DepSr" });
-            DropIndex("dbo.MedDependents", new[] { "ReleaseStatusCode" });
-            DropIndex("dbo.MedDependents", new[] { "ReleaseGroupCode", "ReleaseStrategy" });
-            DropIndex("dbo.MedDependents", new[] { "ReleaseGroupCode" });
+            DropIndex("dbo.MedPolicies", new[] {"CompCode", "WrkGrp", "UnitCode"});
+            DropIndex("dbo.MedPolicies", new[] {"CompCode"});
+            DropIndex("dbo.MedEmpUhids", new[] {"EmpUnqId", "DepSr"});
+            DropIndex("dbo.MedDependents", new[] {"ReleaseStatusCode"});
+            DropIndex("dbo.MedDependents", new[] {"ReleaseGroupCode", "ReleaseStrategy"});
+            DropIndex("dbo.MedDependents", new[] {"ReleaseGroupCode"});
             DropTable("dbo.MedPolicies");
             DropTable("dbo.MedEmpUhids");
             DropTable("dbo.MedDependents");

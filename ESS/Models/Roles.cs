@@ -8,10 +8,8 @@ namespace ESS.Models
 {
     public class Roles
     {
-        [Key]
-        public int RoleId { get; set; }
+        [Key] public int RoleId { get; set; }
 
-        [StringLength(50)]
-        public string RoleName { get; set; }
+        [StringLength(50)] public string RoleName { get; set; }
     }
 }

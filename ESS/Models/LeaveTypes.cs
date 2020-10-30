@@ -23,8 +23,7 @@ namespace ESS.Models
         [StringLength(2)]
         public string LeaveTypeCode { get; set; }
 
-        [StringLength(50)]
-        public string LeaveTypeName { get; set; }
+        [StringLength(50)] public string LeaveTypeName { get; set; }
 
         public bool Active { get; set; }
 
@@ -39,16 +38,18 @@ namespace ESS.Models
         //public static readonly string PaidLeave = ConfigurationManager.AppSettings["PaidLeave"];
 
         //And add a property for getting from appsettings of web.config
-        public static string PaidLeave { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
+        public static string PaidLeave
+        {
+            get { return ConfigurationManager.AppSettings["PaidLeave"]; }
+        }
 
         public static readonly string OptionalLeave = "OH";
         public static readonly string LeaveWithoutPay = "LW";
         public static readonly string CompOff = "CO";
-        public static readonly string OutdoorDuty   = "OD";
+        public static readonly string OutdoorDuty = "OD";
         public static readonly string WeekOff = "WO";
         public static readonly string Lockdown = "LD";
-        
-        //public static string NewType { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
 
+        //public static string NewType { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
     }
 }

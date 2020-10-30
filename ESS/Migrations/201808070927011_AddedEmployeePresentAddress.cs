@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedEmployeePresentAddress : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.EmpAddresses",
-                c => new
+                    "dbo.EmpAddresses",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         PreAdd1 = c.String(maxLength: 100),
@@ -24,9 +24,8 @@ namespace ESS.Migrations
                         PreResPhone = c.String(maxLength: 20),
                     })
                 .PrimaryKey(t => t.EmpUnqId);
-            
         }
-        
+
         public override void Down()
         {
             DropTable("dbo.EmpAddresses");

@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedCancellationInLeaveAppDtl : DbMigration
     {
         public override void Up()
@@ -10,7 +10,7 @@ namespace ESS.Migrations
             AddColumn("dbo.LeaveApplicationDetails", "Cancelled", c => c.Boolean());
             AddColumn("dbo.LeaveApplicationDetails", "ParentId", c => c.Int(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.LeaveApplicationDetails", "ParentId");

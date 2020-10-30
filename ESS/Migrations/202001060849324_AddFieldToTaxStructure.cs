@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddFieldToTaxStructure : DbMigration
     {
         public override void Up()
@@ -14,7 +14,7 @@ namespace ESS.Migrations
             AddColumn("dbo.TaxDeclarations", "MedicalExpenditure", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "MunicipalTax", c => c.Single(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.TaxDeclarations", "MunicipalTax");

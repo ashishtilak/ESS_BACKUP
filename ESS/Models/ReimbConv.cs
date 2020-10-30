@@ -19,12 +19,11 @@ namespace ESS.Models
         public DateTime ConvDate { get; set; }
         [StringLength(15)] public string VehicleNo { get; set; }
         [StringLength(100)] public string Particulars { get; set; }
-        public int MeterFrom { get; set; }  
-        public int Distance { get; set; }   
-        public int MeterTo { get; set; }    
+        public int MeterFrom { get; set; }
+        public int Distance { get; set; }
+        public int MeterTo { get; set; }
         public float Rate { get; set; }
         public float Amount { get; set; }
         [StringLength(20)] public string Remarks { get; set; }
-
     }
 }

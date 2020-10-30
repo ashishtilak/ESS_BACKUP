@@ -51,6 +51,7 @@ namespace ESS.Controllers.Api
             {
                 maxId = 0;
             }
+
             leaveCancelDto.LeaveAppId = maxId + 1;
 
 
@@ -101,7 +102,8 @@ namespace ESS.Controllers.Api
                     var relStrat = _context.ReleaseStrategy
                         .Single(
                             r =>
-                                r.ReleaseGroupCode == leaveCancelDto.ReleaseGroupCode &&     //Get the same as LeaveApplication
+                                r.ReleaseGroupCode ==
+                                leaveCancelDto.ReleaseGroupCode && //Get the same as LeaveApplication
                                 r.ReleaseStrategy == leaveCancelDto.EmpUnqId &&
                                 //r.CompCode == leaveCancelDto.CompCode &&
                                 //r.WrkGrp == leaveCancelDto.WrkGrp &&
@@ -126,7 +128,8 @@ namespace ESS.Controllers.Api
                     var relStratLevels = _context.ReleaseStrategyLevels
                         .Where(
                             rl =>
-                                rl.ReleaseGroupCode == ReleaseGroups.LeaveApplication && //Release group to be LeaveApplication
+                                rl.ReleaseGroupCode ==
+                                ReleaseGroups.LeaveApplication && //Release group to be LeaveApplication
                                 rl.ReleaseStrategy == relStrat.ReleaseStrategy
                         ).ToList();
 
@@ -152,8 +155,8 @@ namespace ESS.Controllers.Api
                             ReleaseStrategyLevel = relStratReleaseStrategyLevel.ReleaseStrategyLevel,
                             ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
                             ReleaseStatusCode =
-                                relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1 ?
-                                    ReleaseStatus.InRelease
+                                relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1
+                                    ? ReleaseStatus.InRelease
                                     : ReleaseStatus.NotReleased,
                             ReleaseDate = null,
                             ReleaseAuth = (relAuth.EmpUnqId ?? ""),
@@ -164,19 +167,18 @@ namespace ESS.Controllers.Api
                     }
 
 
-
                     _context.LeaveApplications.Add(Mapper.Map<LeaveApplicationDto, LeaveApplications>(leaveCancelDto));
 
 
                     _context.SaveChanges();
                     transaction.Commit();
-
                 }
             }
             catch (Exception e)
             {
                 return BadRequest(e.ToString());
             }
+
             return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveCancelDto.LeaveAppId), leaveCancelDto);
         }
 

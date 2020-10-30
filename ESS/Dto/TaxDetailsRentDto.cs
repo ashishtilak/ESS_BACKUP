@@ -7,9 +7,9 @@ namespace ESS.Dto
 {
     public class TaxDetailsRentDto
     {
-        public int YearMonth { get; set; }                  //201920
+        public int YearMonth { get; set; } //201920
         public string EmpUnqId { get; set; }
-        public bool ActualFlag { get; set; }                      //Provisional v/s Actual
+        public bool ActualFlag { get; set; } //Provisional v/s Actual
         public string EmpUnqIdYear { get; set; }
         public int April { get; set; }
         public int May { get; set; }

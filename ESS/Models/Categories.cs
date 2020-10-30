@@ -22,10 +22,8 @@ namespace ESS.Models
         [StringLength(3)]
         public string CatCode { get; set; }
 
-        [StringLength(50)]
-        public string CatName { get; set; }
+        [StringLength(50)] public string CatName { get; set; }
 
-        [StringLength(5)]
-        public string Location { get; set; }
+        [StringLength(5)] public string Location { get; set; }
     }
 }

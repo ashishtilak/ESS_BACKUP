@@ -8,9 +8,9 @@ namespace ESS.Dto
 {
     public class TaxDeclarationDto
     {
-        public int YearMonth { get; set; }                  //201920
+        public int YearMonth { get; set; } //201920
         public string EmpUnqId { get; set; }
-        public bool ActualFlag { get; set; }                      //Provisional v/s Actual
+        public bool ActualFlag { get; set; } //Provisional v/s Actual
         public float TotalRentPaid { get; set; }
         public string RentHouseAddress { get; set; }
         public string LandLordName { get; set; }
@@ -18,11 +18,11 @@ namespace ESS.Dto
         public float PrevCompSalary { get; set; }
         public float PrevCompTds { get; set; }
 
-        public float TotalPpfAmt { get; set; }              //Details in table TaxDetailsPpf
+        public float TotalPpfAmt { get; set; } //Details in table TaxDetailsPpf
         public float TotalBankDepositAmount { get; set; }
-        public float TotalInsurancePremium { get; set; }    //Deatils in table TaxDetailsInsurance
-        public float TotalNscAmount { get; set; }           //Deatils in table TaxDetailsNsc
-        public float TotalMutualFund { get; set; }          //Deatils in table TaxDetailsMutualFunds
+        public float TotalInsurancePremium { get; set; } //Deatils in table TaxDetailsInsurance
+        public float TotalNscAmount { get; set; } //Deatils in table TaxDetailsNsc
+        public float TotalMutualFund { get; set; } //Deatils in table TaxDetailsMutualFunds
         public float TotalUlip { get; set; }
         public float TotalSukanya { get; set; }
 
@@ -58,22 +58,22 @@ namespace ESS.Dto
         public float MedicalExpenditure { get; set; }
 
         public string PropertyAddress { get; set; }
-        public string PropertyStatus { get; set; }          //s=self; v=vacant; l=letout
-        public string LoanBank { get; set; }                //Bank drop down required...
+        public string PropertyStatus { get; set; } //s=self; v=vacant; l=letout
+        public string LoanBank { get; set; } //Bank drop down required...
         public string LoanBankPan { get; set; }
 
         public float LoanAmount { get; set; }
         public DateTime? LoanDate { get; set; }
 
-        public string Purpose { get; set; }                 //P-purchase; c=construction; r=repairs
+        public string Purpose { get; set; } //P-purchase; c=construction; r=repairs
         public DateTime? ConstructionCompDate { get; set; }
         public DateTime? PossessionDate { get; set; }
 
-        public string Ownership { get; set; }               // j=joint; s=sole
+        public string Ownership { get; set; } // j=joint; s=sole
         public string JointOwnerName { get; set; }
         public string JointOwnerRelation { get; set; }
 
-        public float JointOwnerShare { get; set; }          //percentage
+        public float JointOwnerShare { get; set; } //percentage
         public float RentalIncomePerMonth { get; set; }
         public float MunicipalTax { get; set; }
 
@@ -105,7 +105,6 @@ namespace ESS.Dto
 
         public float InterestOnLoan2 { get; set; }
         public float InterestPreConstruction2 { get; set; }
-
 
 
         public float OtherInterest { get; set; }

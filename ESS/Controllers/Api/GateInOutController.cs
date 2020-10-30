@@ -18,7 +18,5 @@ namespace ESS.Controllers.Api
         {
             _context = new ApplicationDbContext();
         }
-
-
     }
 }

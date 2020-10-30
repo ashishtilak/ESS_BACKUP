@@ -17,13 +17,9 @@ namespace ESS.Models
         [StringLength(15)]
         public string ReleaseStrategy { get; set; }
 
-        [Key, Column(Order = 2)]
-        [Required]
-        public int ReleaseStrategyLevel { get; set; }
+        [Key, Column(Order = 2)] [Required] public int ReleaseStrategyLevel { get; set; }
 
-        [Required]
-        [StringLength(20)]
-        public string ReleaseCode { get; set; }
+        [Required] [StringLength(20)] public string ReleaseCode { get; set; }
 
         public bool IsFinalRelease { get; set; }
 

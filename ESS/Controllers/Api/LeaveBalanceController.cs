@@ -136,15 +136,15 @@ namespace ESS.Controllers.Api
                     allLeaveAppIds.Contains(d.LeaveAppId) &&
                     d.IsCancellationPosted == false
                 )
-                .Select(l=> l.LeaveAppId)
+                .Select(l => l.LeaveAppId)
                 .ToArray();
 
 
             var leaveAppDtl = _context.LeaveApplications
                 .Where(l =>
-                    l.EmpUnqId == empUnqId &&
-                    l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
-                    leavAppIds.Contains(l.LeaveAppId)
+                        l.EmpUnqId == empUnqId &&
+                        l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                        leavAppIds.Contains(l.LeaveAppId)
 //                    l.LeaveApplicationDetails.Any(d =>
 //                        (
 //                            (d.IsPosted == LeaveApplicationDetails.NotPosted ||

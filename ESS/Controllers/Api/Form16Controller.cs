@@ -39,10 +39,9 @@ namespace ESS.Controllers.Api
 
             for (DateTime dt = today; dt > threeYears;)
             {
-
                 if (DateTimeFormatInfo.CurrentInfo != null)
                 {
-                    string assYear = (dt.Year - 1)+ "-" + (dt.Year);
+                    string assYear = (dt.Year - 1) + "-" + (dt.Year);
                     assYears.Add(assYear);
                 }
 
@@ -60,7 +59,7 @@ namespace ESS.Controllers.Api
 
             try
             {
-                form16= JsonConvert.DeserializeObject<Form16>(requestData.ToString());
+                form16 = JsonConvert.DeserializeObject<Form16>(requestData.ToString());
             }
             catch (Exception e)
             {
@@ -81,21 +80,20 @@ namespace ESS.Controllers.Api
                 return BadRequest("Path not found.");
 
 
-            if(form16.FormNumber == "16")
+            if (form16.FormNumber == "16")
                 path += "\\form16\\" + pan + ".pdf";
             else
                 path += "\\form12\\" + pan + ".pdf";
-                
+
             return new FileResult(path, "application/pdf");
         }
 
 
-        
         [HttpPost]
         public IHttpActionResult UploadForm(string folderName)
         {
-            HttpContext httpContext = HttpContext.Current;  
-  
+            HttpContext httpContext = HttpContext.Current;
+
             // Check for any uploaded file  
             if (httpContext.Request.Files.Count <= 0) return BadRequest("NO FILES???");
 
@@ -119,7 +117,7 @@ namespace ESS.Controllers.Api
 
                     // Construct file save path
                     var fileSavePath = Path.Combine(folder ?? throw new InvalidOperationException("Folder not found"),
-                                                        httpPostedFile.FileName);
+                        httpPostedFile.FileName);
 
                     // Save the uploaded file  
                     httpPostedFile.SaveAs(fileSavePath);
@@ -133,6 +131,5 @@ namespace ESS.Controllers.Api
             // Return status code  
             return Ok();
         }
-
     }
 }

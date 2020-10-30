@@ -16,6 +16,5 @@ namespace ESS.Dto
 
         public DateTime? UpdDt { get; set; }
         public string UpdUser { get; set; }
-
     }
 }

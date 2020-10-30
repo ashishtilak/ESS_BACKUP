@@ -23,7 +23,6 @@ namespace ESS.Controllers.Api
             public string ReleaseCode { get; set; }
             public string EmpUnqId { get; set; }
             public string EmpName { get; set; }
-
         }
 
         public IHttpActionResult GetReleaseAuth(string empUnqId)
@@ -60,7 +59,6 @@ namespace ESS.Controllers.Api
                         res.EmpName = empname.EmpName;
 
                     result.Add(res);
-
                 }
             }
 
@@ -70,17 +68,16 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult ChangeReleaseStrategy([FromBody] object requestData)
         {
-
             ReleaseStrategyDto dto = JsonConvert.DeserializeObject<ReleaseStrategyDto>(requestData.ToString());
 
             //check if release strategy exist. If exist, do nothing,
             //if not, create new release strategy object and add to context
 
             ReleaseStrategies releaseStrategy = _context.ReleaseStrategy
-                                                    .SingleOrDefault(r =>
-                                                        r.ReleaseGroupCode == dto.ReleaseGroupCode &&
-                                                        r.ReleaseStrategy == dto.ReleaseStrategy
-                                                    );
+                .SingleOrDefault(r =>
+                    r.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                    r.ReleaseStrategy == dto.ReleaseStrategy
+                );
 
             if (releaseStrategy == null)
             {
@@ -96,7 +93,6 @@ namespace ESS.Controllers.Api
                 };
 
                 _context.ReleaseStrategy.Add(releaseStrategy);
-
             }
             else
             {
@@ -116,15 +112,16 @@ namespace ESS.Controllers.Api
 
             ReleaseStrategyLevelDto last = dto.ReleaseStrategyLevels.LastOrDefault();
 
-            foreach (ReleaseStrategyLevels newRelStrLevel in dto.ReleaseStrategyLevels.Select(level => new ReleaseStrategyLevels
-            {
-                ReleaseGroupCode = dto.ReleaseGroupCode,
-                ReleaseStrategy = dto.ReleaseStrategy,
-                ReleaseStrategyLevel = level.ReleaseStrategyLevel,
-                ReleaseCode = level.ReleaseCode,
-                //check if this is last line, in that case 
-                IsFinalRelease = (last != null && last.Equals(level))
-            }))
+            foreach (ReleaseStrategyLevels newRelStrLevel in dto.ReleaseStrategyLevels.Select(level =>
+                new ReleaseStrategyLevels
+                {
+                    ReleaseGroupCode = dto.ReleaseGroupCode,
+                    ReleaseStrategy = dto.ReleaseStrategy,
+                    ReleaseStrategyLevel = level.ReleaseStrategyLevel,
+                    ReleaseCode = level.ReleaseCode,
+                    //check if this is last line, in that case 
+                    IsFinalRelease = (last != null && last.Equals(level))
+                }))
             {
                 _context.ReleaseStrategyLevels.Add(newRelStrLevel);
             }
@@ -144,7 +141,8 @@ namespace ESS.Controllers.Api
             try
             {
                 //TODO: Remove hard coded "COMP"
-                var emps = _context.Employees.Where(e => e.WrkGrp == "COMP" && e.Active == false).Select(e => e.EmpUnqId).ToArray();
+                var emps = _context.Employees.Where(e => e.WrkGrp == "COMP" && e.Active == false)
+                    .Select(e => e.EmpUnqId).ToArray();
                 var releaseStrategies = _context.ReleaseStrategy
                     .Where(r => emps.Contains(r.ReleaseStrategy) && r.Active)
                     .ToList();
@@ -180,14 +178,11 @@ namespace ESS.Controllers.Api
 
 
                 return Ok();
-
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
             }
-
         }
-
     }
 }

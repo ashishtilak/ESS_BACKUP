@@ -94,10 +94,10 @@ namespace ESS.Controllers.Api
                 if (!leaveExist &&
                     (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
                      details.LeaveTypeCode != LeaveTypes.CompOff &&
-                     details.LeaveTypeCode != LeaveTypes.OutdoorDuty && 
-                     details.LeaveTypeCode != LeaveTypes.WeekOff && 
+                     details.LeaveTypeCode != LeaveTypes.OutdoorDuty &&
+                     details.LeaveTypeCode != LeaveTypes.WeekOff &&
                      details.LeaveTypeCode != LeaveTypes.Lockdown
-                     ))
+                    ))
                 {
                     error.Add("There is no balance available for leave type: " + details.LeaveTypeCode);
                     continue;
@@ -111,13 +111,13 @@ namespace ESS.Controllers.Api
                                                     monthLast.ToShortDateString());
                 //check3 over
 
-                
+
                 if (details.LeaveTypeCode == LeaveTypes.OutdoorDuty ||
-                    details.LeaveTypeCode == LeaveTypes.WeekOff || 
+                    details.LeaveTypeCode == LeaveTypes.WeekOff ||
                     details.LeaveTypeCode == LeaveTypes.Lockdown
-                    )
+                )
                     continue;
-                
+
                 // Re calculate days because, days passed from client are from grid
                 // which are actual days (total days - holidays - weekoffs)
                 // which are again deducted
@@ -135,7 +135,7 @@ namespace ESS.Controllers.Api
                 if (emp.Location == Locations.Jfl &&
                     details.LeaveTypeCode == LeaveTypes.CompOff && details.HalfDayFlag == true)
                     details.TotalDays = 0.5f;
-                
+
 
                 //check4 that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails
@@ -343,7 +343,6 @@ namespace ESS.Controllers.Api
                     if (nextLeaveRules != null && nextLeaveRules.Active)
                         if (details.TotalDays > nextLeaveRules.DaysAllowed || !nextLeaveRules.LeaveAllowed)
                             error.Add("Cannot take this OL. Check leaves taken on next days.");
-
                 }
             }
 

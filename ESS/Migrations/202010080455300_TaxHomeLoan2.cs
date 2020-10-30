@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class TaxHomeLoan2 : DbMigration
     {
         public override void Up()
@@ -42,7 +42,7 @@ namespace ESS.Migrations
             AddColumn("dbo.TaxDeclarations", "InterestOnLoan2", c => c.Single(nullable: false));
             AddColumn("dbo.TaxDeclarations", "InterestPreConstruction2", c => c.Single(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.TaxDeclarations", "InterestPreConstruction2");

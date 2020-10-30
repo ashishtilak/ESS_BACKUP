@@ -8,9 +8,7 @@ namespace ESS.Models
 {
     public class Locations
     {
-        [Key]
-        [StringLength(5)]
-        public string Location { get; set; }
+        [Key] [StringLength(5)] public string Location { get; set; }
 
         public string RemoteConnection { get; set; }
         public string AttendanceServerApi { get; set; }
@@ -26,6 +24,5 @@ namespace ESS.Models
         public static readonly string Kjqtl = "KJQTL";
         public static readonly string Bellary = "BEL";
         public static readonly string Jfl = "JFL";
-
     }
 }

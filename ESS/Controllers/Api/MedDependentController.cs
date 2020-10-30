@@ -19,7 +19,7 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
-        public IHttpActionResult GetDependents(bool mode, int policyYear, string empUnqId=null)
+        public IHttpActionResult GetDependents(bool mode, int policyYear, string empUnqId = null)
         {
             // MODE will be true if all records of all employees are requested
             // If Mode is false, then empUnqId must have been provided
@@ -29,8 +29,8 @@ namespace ESS.Controllers.Api
                 List<MedEmpUhidDto> uhids;
 
                 //get dependents 
-                
-                if (!mode)  //for single emp
+
+                if (!mode) //for single emp
                 {
                     if (empUnqId == null)
                         return BadRequest("Provide empunqid.");
@@ -51,7 +51,6 @@ namespace ESS.Controllers.Api
                         .AsEnumerable()
                         .Select(Mapper.Map<MedEmpUhid, MedEmpUhidDto>)
                         .ToList();
-
                 }
                 else
                 {
@@ -60,7 +59,7 @@ namespace ESS.Controllers.Api
                         .AsEnumerable()
                         .Select(Mapper.Map<MedDependent, MedDependentDto>)
                         .ToList();
-                    
+
                     if (dep.Count == 0)
                         return BadRequest("No records found.");
 
@@ -69,7 +68,7 @@ namespace ESS.Controllers.Api
                     var empList = dep.Select(d => d.EmpUnqId).ToArray();
 
                     uhids = _context.MedEmpUhids
-                        .Where(e => e.PolicyYear == policyYear 
+                        .Where(e => e.PolicyYear == policyYear
                                     && empList.Contains(e.EmpUnqId)
                                     && e.Active)
                         .AsEnumerable()

@@ -2,18 +2,18 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class RemovedPKFromTaxTables : DbMigration
     {
         public override void Up()
         {
-            DropIndex("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsInsurances", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsMutualFunds", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsNscs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsPpfs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            DropIndex("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsInsurances", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsMutualFunds", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsNscs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsPpfs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
             DropPrimaryKey("dbo.TaxDetailsBankDeposits");
             DropPrimaryKey("dbo.TaxDetailsInsurances");
             DropPrimaryKey("dbo.TaxDetailsMutualFunds");
@@ -49,24 +49,24 @@ namespace ESS.Migrations
             AddPrimaryKey("dbo.TaxDetailsPpfs", "Id");
             AddPrimaryKey("dbo.TaxDetailsSukanyas", "Id");
             AddPrimaryKey("dbo.TaxDetailsUlips", "Id");
-            CreateIndex("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsInsurances", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsMutualFunds", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsNscs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsPpfs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            CreateIndex("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsInsurances", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsMutualFunds", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsNscs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsPpfs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
         }
-        
+
         public override void Down()
         {
-            DropIndex("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsPpfs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsNscs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsMutualFunds", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsInsurances", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            DropIndex("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            DropIndex("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsPpfs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsNscs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsMutualFunds", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsInsurances", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            DropIndex("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
             DropPrimaryKey("dbo.TaxDetailsUlips");
             DropPrimaryKey("dbo.TaxDetailsSukanyas");
             DropPrimaryKey("dbo.TaxDetailsPpfs");
@@ -95,20 +95,20 @@ namespace ESS.Migrations
             DropColumn("dbo.TaxDetailsMutualFunds", "Id");
             DropColumn("dbo.TaxDetailsInsurances", "Id");
             DropColumn("dbo.TaxDetailsBankDeposits", "Id");
-            AddPrimaryKey("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "UlipNo" });
-            AddPrimaryKey("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "SukanyaName" });
-            AddPrimaryKey("dbo.TaxDetailsPpfs", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "PpfAcNo" });
-            AddPrimaryKey("dbo.TaxDetailsNscs", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "NscNumber" });
-            AddPrimaryKey("dbo.TaxDetailsMutualFunds", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "MutualFundName" });
-            AddPrimaryKey("dbo.TaxDetailsInsurances", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "PolicyNo" });
-            AddPrimaryKey("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag", "BankAccountNo" });
-            CreateIndex("dbo.TaxDetailsUlips", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsSukanyas", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsPpfs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsNscs", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsMutualFunds", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsInsurances", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
-            CreateIndex("dbo.TaxDetailsBankDeposits", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            AddPrimaryKey("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "UlipNo"});
+            AddPrimaryKey("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "SukanyaName"});
+            AddPrimaryKey("dbo.TaxDetailsPpfs", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "PpfAcNo"});
+            AddPrimaryKey("dbo.TaxDetailsNscs", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "NscNumber"});
+            AddPrimaryKey("dbo.TaxDetailsMutualFunds", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "MutualFundName"});
+            AddPrimaryKey("dbo.TaxDetailsInsurances", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "PolicyNo"});
+            AddPrimaryKey("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag", "BankAccountNo"});
+            CreateIndex("dbo.TaxDetailsUlips", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsSukanyas", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsPpfs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsNscs", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsMutualFunds", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsInsurances", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
+            CreateIndex("dbo.TaxDetailsBankDeposits", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
         }
     }
 }

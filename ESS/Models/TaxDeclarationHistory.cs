@@ -9,41 +9,36 @@ namespace ESS.Models
 {
     public class TaxDeclarationHistory
     {
-        [Key, Column(Order = 0)]
-        public int Id { get; set; }
+        [Key, Column(Order = 0)] public int Id { get; set; }
 
-        public int YearMonth { get; set; }                  //201920
+        public int YearMonth { get; set; } //201920
 
-        [StringLength(10)]
-        public string EmpUnqId { get; set; }
+        [StringLength(10)] public string EmpUnqId { get; set; }
 
-        public bool ActualFlag { get; set; }                      //Provisional v/s Actual
+        public bool ActualFlag { get; set; } //Provisional v/s Actual
 
         public float TotalRentPaid { get; set; }
 
-        [StringLength(200)]
-        public string RentHouseAddress { get; set; }
-        [StringLength(50)]
-        public string LandLordName { get; set; }
-        [StringLength(10)]
-        public string LandLordPan { get; set; }
+        [StringLength(200)] public string RentHouseAddress { get; set; }
+        [StringLength(50)] public string LandLordName { get; set; }
+        [StringLength(10)] public string LandLordPan { get; set; }
 
         public float PrevCompSalary { get; set; }
         public float PrevCompTds { get; set; }
 
-        public float TotalPpfAmt { get; set; }              //Details in table TaxDetailsPpf
+        public float TotalPpfAmt { get; set; } //Details in table TaxDetailsPpf
 
         public float TotalBankDepositAmount { get; set; }
 
-        public float TotalInsurancePremium { get; set; }    //Deatils in table TaxDetailsInsurance
+        public float TotalInsurancePremium { get; set; } //Deatils in table TaxDetailsInsurance
 
-        public float TotalNscAmount { get; set; }           //Deatils in table TaxDetailsNsc
+        public float TotalNscAmount { get; set; } //Deatils in table TaxDetailsNsc
 
-        public float TotalMutualFund { get; set; }          //Deatils in table TaxDetailsMutualFunds
+        public float TotalMutualFund { get; set; } //Deatils in table TaxDetailsMutualFunds
 
         public float TotalUlip { get; set; }
 
-        public float TotalSukanya { get; set; }      //sukanya samriddhi 1
+        public float TotalSukanya { get; set; } //sukanya samriddhi 1
 
         public float HouseLoanPrincipal { get; set; }
         public float HouseLoanPrincipal2 { get; set; }
@@ -79,33 +74,25 @@ namespace ESS.Models
         // 80DDB
         public float MedicalExpenditure { get; set; }
 
-        [StringLength(200)]
-        public string PropertyAddress { get; set; }
-        [StringLength(1)]
-        public string PropertyStatus { get; set; }          //s=self; v=vacant; l=letout
+        [StringLength(200)] public string PropertyAddress { get; set; }
+        [StringLength(1)] public string PropertyStatus { get; set; } //s=self; v=vacant; l=letout
 
-        [StringLength(150)]
-        public string LoanBank { get; set; }                //Bank drop down required...
-        [StringLength(10)]
-        public string LoanBankPan { get; set; }
+        [StringLength(150)] public string LoanBank { get; set; } //Bank drop down required...
+        [StringLength(10)] public string LoanBankPan { get; set; }
 
         public float LoanAmount { get; set; }
         public DateTime? LoanDate { get; set; }
 
-        [StringLength(1)]
-        public string Purpose { get; set; }                 //P-purchase; c=construction; r=repairs
+        [StringLength(1)] public string Purpose { get; set; } //P-purchase; c=construction; r=repairs
         public DateTime? ConstructionCompDate { get; set; }
         public DateTime? PossessionDate { get; set; }
 
-        [StringLength(1)]
-        public string Ownership { get; set; }               // j=joint; s=sole
+        [StringLength(1)] public string Ownership { get; set; } // j=joint; s=sole
 
-        [StringLength(50)]
-        public string JointOwnerName { get; set; }
-        [StringLength(20)]
-        public string JointOwnerRelation { get; set; }
+        [StringLength(50)] public string JointOwnerName { get; set; }
+        [StringLength(20)] public string JointOwnerRelation { get; set; }
 
-        public float JointOwnerShare { get; set; }          //percentage
+        public float JointOwnerShare { get; set; } //percentage
         public float RentalIncomePerMonth { get; set; }
 
         public float MunicipalTax { get; set; }
@@ -144,15 +131,12 @@ namespace ESS.Models
 
         public float OtherInterest { get; set; }
 
-        [StringLength(1)] 
-        public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
+        [StringLength(1)] public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
 
-        [StringLength(50)]
-        public string OtherIncomeDesc { get; set; }
+        [StringLength(50)] public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
-        [StringLength(8)]
-        public string UpdateUserId { get; set; }
+        [StringLength(8)] public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
     }
 }

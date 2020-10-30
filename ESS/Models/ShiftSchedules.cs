@@ -9,14 +9,13 @@ namespace ESS.Models
 {
     public class ShiftSchedules
     {
-        [Key, Column(Order = 0)]
-        public int YearMonth { get; set; }
+        [Key, Column(Order = 0)] public int YearMonth { get; set; }
 
-        [Key, Column(Order = 1)]
-        public int ScheduleId { get; set; }
+        [Key, Column(Order = 1)] public int ScheduleId { get; set; }
 
         [Key, Column(Order = 2)]
-        [StringLength(10)] public string EmpUnqId { get; set; }
+        [StringLength(10)]
+        public string EmpUnqId { get; set; }
 
         [ForeignKey("EmpUnqId")] public Employees Employee { get; set; }
 
@@ -59,7 +58,7 @@ namespace ESS.Models
         [Column(TypeName = "datetime2")] public DateTime? ReleaseDt { get; set; }
 
         [StringLength(10)] public string ReleaseUser { get; set; }
-        
+
         [Column(TypeName = "datetime2")] public DateTime? AddDt { get; set; }
 
         [StringLength(10)] public string AddUser { get; set; }

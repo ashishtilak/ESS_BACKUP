@@ -7,7 +7,7 @@ namespace ESS.Dto
 {
     public class TaxDeclReportDto
     {
-        public int YearMonth { get; set; }                  //201920
+        public int YearMonth { get; set; } //201920
         public string EmpUnqId { get; set; }
         public string SapId { get; set; }
         public string EmpName { get; set; }
@@ -42,7 +42,7 @@ namespace ESS.Dto
         public int HomeLoanCode2 { get; set; }
         public float HomeLoanAct2 { get; set; }
         public float HomeLoanPro2 { get; set; }
-        
+
         public int NotifiedMfCode { get; set; }
         public float NotifiedMfAct { get; set; }
         public float NotifiedMfPro { get; set; }
@@ -65,7 +65,7 @@ namespace ESS.Dto
         public float MedicalPremium { get; set; }
         public float EduLoanInterest { get; set; }
         public float Nps { get; set; }
-        
+
         public float InterestOnLoan { get; set; }
         public float InterestPreConstruction { get; set; }
         public float RentReceived { get; set; }
@@ -106,6 +106,5 @@ namespace ESS.Dto
         public float MunicipalTax { get; set; }
 
         public string TaxRegime { get; set; } //O=Old regime, N=New Regime (from april 2020).
-
     }
 }

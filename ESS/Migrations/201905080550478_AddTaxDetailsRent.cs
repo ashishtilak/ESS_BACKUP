@@ -8,8 +8,8 @@ namespace ESS.Migrations
         public override void Up()
         {
             CreateTable(
-                "dbo.TaxDetailsRents",
-                c => new
+                    "dbo.TaxDetailsRents",
+                    c => new
                     {
                         YearMonth = c.Int(nullable: false),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
@@ -28,9 +28,9 @@ namespace ESS.Migrations
                         February = c.Int(nullable: false),
                         March = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag, t.EmpUnqIdYear })
-                .ForeignKey("dbo.TaxDeclarations", t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag })
-                .Index(t => new { t.YearMonth, t.EmpUnqId, t.ActualFlag });
+                .PrimaryKey(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag, t.EmpUnqIdYear})
+                .ForeignKey("dbo.TaxDeclarations", t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag})
+                .Index(t => new {t.YearMonth, t.EmpUnqId, t.ActualFlag});
 
             AddColumn("dbo.TaxDeclarations", "TotalRentPaid", c => c.Single(nullable: false));
             DropColumn("dbo.TaxDeclarations", "RentPaidPerMonth");
@@ -39,8 +39,8 @@ namespace ESS.Migrations
         public override void Down()
         {
             AddColumn("dbo.TaxDeclarations", "RentPaidPerMonth", c => c.Single(nullable: false));
-            DropForeignKey("dbo.TaxDetailsRents", new[] { "YearMonth", "EmpUnqId", "ActualFlag" }, "dbo.TaxDeclarations");
-            DropIndex("dbo.TaxDetailsRents", new[] { "YearMonth", "EmpUnqId", "ActualFlag" });
+            DropForeignKey("dbo.TaxDetailsRents", new[] {"YearMonth", "EmpUnqId", "ActualFlag"}, "dbo.TaxDeclarations");
+            DropIndex("dbo.TaxDetailsRents", new[] {"YearMonth", "EmpUnqId", "ActualFlag"});
             DropColumn("dbo.TaxDeclarations", "TotalRentPaid");
             DropTable("dbo.TaxDetailsRents");
         }

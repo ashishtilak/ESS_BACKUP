@@ -44,23 +44,18 @@ namespace ESS.Models
 
         [StringLength(1)] public string GpAdviceStatus { get; set; }
 
-        [StringLength(2)]
-        public string ReleaseGroupCode { get; set; }
+        [StringLength(2)] public string ReleaseGroupCode { get; set; }
 
-        [ForeignKey("ReleaseGroupCode")]
-        public ReleaseGroups ReleaseGroup { get; set; }
+        [ForeignKey("ReleaseGroupCode")] public ReleaseGroups ReleaseGroup { get; set; }
 
-        [StringLength(15)]
-        public string GaReleaseStrategy { get; set; }
+        [StringLength(15)] public string GaReleaseStrategy { get; set; }
 
         [ForeignKey("ReleaseGroupCode, GaReleaseStrategy")]
         public GaReleaseStrategies RelStrategy { get; set; }
 
-        [StringLength(1)]
-        public string ReleaseStatusCode { get; set; }
+        [StringLength(1)] public string ReleaseStatusCode { get; set; }
 
-        [ForeignKey("ReleaseStatusCode")]
-        public ReleaseStatus ReleaseStatus { get; set; }
+        [ForeignKey("ReleaseStatusCode")] public ReleaseStatus ReleaseStatus { get; set; }
 
         public DateTime AddDt { get; set; }
         [StringLength(10)] public string AddUser { get; set; }
@@ -68,11 +63,9 @@ namespace ESS.Models
         public DateTime? UpdDt { get; set; }
         [StringLength(10)] public string UpdUser { get; set; }
 
-        [StringLength(100)]
-        public string Remarks { get; set; }
+        [StringLength(100)] public string Remarks { get; set; }
 
-        [StringLength(10)]
-        public string PostedUser { get; set; }
+        [StringLength(10)] public string PostedUser { get; set; }
         public DateTime? PostedDt { get; set; }
 
         public ICollection<GpAdviceDetails> GpAdviceDetails { get; set; }

@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class GPReleaseFieldsAdded : DbMigration
     {
         public override void Up()
@@ -17,21 +17,22 @@ namespace ESS.Migrations
             AlterColumn("dbo.GatePasses", "GateOutUser", c => c.String(maxLength: 10));
             AlterColumn("dbo.GatePasses", "GateInUser", c => c.String(maxLength: 10));
             CreateIndex("dbo.GatePasses", "ReleaseGroupCode");
-            CreateIndex("dbo.GatePasses", new[] { "ReleaseGroupCode", "ReleaseStrategy" });
+            CreateIndex("dbo.GatePasses", new[] {"ReleaseGroupCode", "ReleaseStrategy"});
             CreateIndex("dbo.GatePasses", "ReleaseStatusCode");
             AddForeignKey("dbo.GatePasses", "ReleaseGroupCode", "dbo.ReleaseGroups", "ReleaseGroupCode");
             AddForeignKey("dbo.GatePasses", "ReleaseStatusCode", "dbo.ReleaseStatus", "ReleaseStatusCode");
-            AddForeignKey("dbo.GatePasses", new[] { "ReleaseGroupCode", "ReleaseStrategy" }, "dbo.ReleaseStrategies", new[] { "ReleaseGroupCode", "ReleaseStrategy" });
+            AddForeignKey("dbo.GatePasses", new[] {"ReleaseGroupCode", "ReleaseStrategy"}, "dbo.ReleaseStrategies",
+                new[] {"ReleaseGroupCode", "ReleaseStrategy"});
         }
-        
+
         public override void Down()
         {
-            DropForeignKey("dbo.GatePasses", new[] { "ReleaseGroupCode", "ReleaseStrategy" }, "dbo.ReleaseStrategies");
+            DropForeignKey("dbo.GatePasses", new[] {"ReleaseGroupCode", "ReleaseStrategy"}, "dbo.ReleaseStrategies");
             DropForeignKey("dbo.GatePasses", "ReleaseStatusCode", "dbo.ReleaseStatus");
             DropForeignKey("dbo.GatePasses", "ReleaseGroupCode", "dbo.ReleaseGroups");
-            DropIndex("dbo.GatePasses", new[] { "ReleaseStatusCode" });
-            DropIndex("dbo.GatePasses", new[] { "ReleaseGroupCode", "ReleaseStrategy" });
-            DropIndex("dbo.GatePasses", new[] { "ReleaseGroupCode" });
+            DropIndex("dbo.GatePasses", new[] {"ReleaseStatusCode"});
+            DropIndex("dbo.GatePasses", new[] {"ReleaseGroupCode", "ReleaseStrategy"});
+            DropIndex("dbo.GatePasses", new[] {"ReleaseGroupCode"});
             AlterColumn("dbo.GatePasses", "GateInUser", c => c.String());
             AlterColumn("dbo.GatePasses", "GateOutUser", c => c.String());
             AlterColumn("dbo.GatePasses", "AddUser", c => c.String());

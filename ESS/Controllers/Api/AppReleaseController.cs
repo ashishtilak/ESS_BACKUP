@@ -497,7 +497,6 @@ namespace ESS.Controllers.Api
 
                     foreach (ShiftScheduleDto dto in sch)
                     {
-
                         dto.ShiftScheduleDetails = new List<ShiftScheduleDetailDto>();
 
                         var schDtl = _context.ShiftScheduleDetails
@@ -585,7 +584,8 @@ namespace ESS.Controllers.Api
                                 YearMonth = dto.YearMonth,
                                 ScheduleId = dto.ScheduleId,
                                 AddUser = dto.AddUser,
-                                AddUserName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.AddUser)?.EmpName,
+                                AddUserName =
+                                    _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.AddUser)?.EmpName,
                                 Schedules = new List<ShiftScheduleDto>()
                             };
 
@@ -619,8 +619,8 @@ namespace ESS.Controllers.Api
                     //get list of all reimb app which are "In Release"
                     var app = _context.ApplReleaseStatus
                         .Where(l => rAuth.ReleaseCode == l.ReleaseCode &&
-                                                                    l.ReleaseStatusCode == ReleaseStatus.InRelease &&
-                                                                    l.ReleaseGroupCode == ReleaseGroups.Reimbursement)
+                                    l.ReleaseStatusCode == ReleaseStatus.InRelease &&
+                                    l.ReleaseGroupCode == ReleaseGroups.Reimbursement)
                         .ToList();
 
                     var appIds = app.Select(a => a.ApplicationId).ToArray();
@@ -656,7 +656,7 @@ namespace ESS.Controllers.Api
                             ).ToList()
                             .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
-                         //for each app release lines
+                        //for each app release lines
                         foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
                         {
                             var relCode = _context.ReleaseAuth
@@ -718,6 +718,7 @@ namespace ESS.Controllers.Api
 
                 return Ok(resultData);
             }
+
             return BadRequest("Not implemented");
         }
 
@@ -970,7 +971,7 @@ namespace ESS.Controllers.Api
                     return BadRequest(ex.ToString());
                 }
 
-            if(releaseGroupCode == ReleaseGroups.Reimbursement)
+            if (releaseGroupCode == ReleaseGroups.Reimbursement)
                 try
                 {
                     Reimbursements reimb = ReimbRelease(requestData, empUnqId, releaseStatusCode);
@@ -1089,7 +1090,7 @@ namespace ESS.Controllers.Api
                                 today <= r.ValidTo
                         );
 
-                    if(relAuth == null)
+                    if (relAuth == null)
                         throw new Exception("Employee not authorized for night release.");
                 }
 
@@ -1355,10 +1356,10 @@ namespace ESS.Controllers.Api
 
 
             //TODO: THIS CODES IS TO BE REMOVED...
-            
+
             var releaseCodes = _context.ReleaseAuth
                 .Where(r => r.EmpUnqId == empUnqId && r.Active)
-                .Select(r=>r.ReleaseCode)
+                .Select(r => r.ReleaseCode)
                 .ToArray();
 
             var allRelStrLevel = _context.ReleaseStrategyLevels
@@ -1379,10 +1380,10 @@ namespace ESS.Controllers.Api
                     allAppReleaseObj.Remove(appRelObj);
                 }
             }
-            
+
             //TODO: THIS CODES IS TO BE REMOVED...
 
-            
+
             foreach (ApplReleaseStatus appRelobj in allAppReleaseObj)
             {
                 ApplReleaseStatus applicationDetail = _context.ApplReleaseStatus
@@ -1537,11 +1538,11 @@ namespace ESS.Controllers.Api
                                       a.ReleaseGroupCode == dto.ReleaseGroupCode &&
                                       a.ApplicationId == dto.ApplicationId &&
                                       a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel);
-            if(appRelease == null)
+            if (appRelease == null)
                 throw new Exception("Invalid app release status details...");
 
-            if(appRelease.ReleaseStatusCode != ReleaseStatus.InRelease)
-                throw  new Exception("Application is not in release state...");
+            if (appRelease.ReleaseStatusCode != ReleaseStatus.InRelease)
+                throw new Exception("Application is not in release state...");
 
             appRelease.Remarks = dto.Remarks;
 
@@ -1549,7 +1550,7 @@ namespace ESS.Controllers.Api
             ReleaseAuth relAuth = _context.ReleaseAuth.SingleOrDefault(r => r.ReleaseCode == appRelease.ReleaseCode &&
                                                                             r.EmpUnqId == empUnqId &&
                                                                             r.Active);
-            if(relAuth ==null)
+            if (relAuth == null)
                 throw new Exception("Invalid release code. Check if active");
 
             //get the release strategy levels
@@ -1559,14 +1560,14 @@ namespace ESS.Controllers.Api
                                       r.ReleaseStrategy == vRelStr &&
                                       r.ReleaseStrategyLevel == appRelease.ReleaseStrategyLevel &&
                                       r.ReleaseCode == appRelease.ReleaseCode);
-            if(relStrLevel ==null)
+            if (relStrLevel == null)
                 throw new Exception("Release strategy details not found...");
 
             Reimbursements reimb = _context.Reimbursement.SingleOrDefault(
                 r => r.YearMonth == appRelease.YearMonth &&
                      r.ReimbId == appRelease.ApplicationId);
-            
-            if(reimb ==null)
+
+            if (reimb == null)
                 throw new Exception("Reimbursement id not found!");
 
             reimb.Remarks = dto.Remarks;
@@ -1591,8 +1592,8 @@ namespace ESS.Controllers.Api
                                  a.ApplicationId == appRelease.ApplicationId &&
                                  a.ReleaseStrategy == appRelease.ReleaseStrategy &&
                                  a.ReleaseStrategyLevel == appRelease.ReleaseStrategyLevel + 1
-                                 );
-                        if(nextLevel ==null)
+                        );
+                        if (nextLevel == null)
                             throw new Exception("This is not final release, and next level not found! Chk app release");
 
                         nextLevel.ReleaseStatusCode = ReleaseStatus.InRelease;

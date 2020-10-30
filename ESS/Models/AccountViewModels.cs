@@ -5,9 +5,7 @@ namespace ESS.Models
 {
     public class ExternalLoginConfirmationViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Required] [Display(Name = "Email")] public string Email { get; set; }
     }
 
     public class ExternalLoginListViewModel
@@ -28,12 +26,9 @@ namespace ESS.Models
 
     public class VerifyCodeViewModel
     {
-        [Required]
-        public string Provider { get; set; }
+        [Required] public string Provider { get; set; }
 
-        [Required]
-        [Display(Name = "Code")]
-        public string Code { get; set; }
+        [Required] [Display(Name = "Code")] public string Code { get; set; }
 
         public string ReturnUrl { get; set; }
 
@@ -45,9 +40,7 @@ namespace ESS.Models
 
     public class ForgotViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Required] [Display(Name = "Email")] public string Email { get; set; }
     }
 
     public class LoginViewModel
@@ -62,8 +55,7 @@ namespace ESS.Models
         [Display(Name = "Password")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
     }
 
     public class RegisterViewModel

@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class ChangeInMedDependentModel : DbMigration
     {
         public override void Up()
@@ -13,7 +13,7 @@ namespace ESS.Migrations
             DropColumn("dbo.MedDependents", "ProofType");
             DropColumn("dbo.MedDependents", "ProofNo");
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.MedDependents", "ProofNo", c => c.String(maxLength: 20));

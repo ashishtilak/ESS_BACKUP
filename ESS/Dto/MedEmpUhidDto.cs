@@ -13,6 +13,5 @@ namespace ESS.Dto
         public MedDependentDto Dependent { get; set; }
         public string Uhid { get; set; }
         public bool Active { get; set; }
-
     }
 }

@@ -19,7 +19,9 @@ namespace ESS.Dto
         public string WrkGrp { get; set; }
         public string UnitCode { get; set; }
         public string DeptCode { get; set; }
+
         public string StatCode { get; set; }
+
         //public string SecCode { get; set; }
         public string CatCode { get; set; }
         public string EmpTypeCode { get; set; }
@@ -63,7 +65,7 @@ namespace ESS.Dto
         public string PrePhone { get; set; }
         public string PreResPhone { get; set; }
         public string PreEmail { get; set; }
-        public DateTime? UpdDt { get; set; }  //present address update date
+        public DateTime? UpdDt { get; set; } //present address update date
 
         public string PerAdd1 { get; set; }
         public string PerAdd2 { get; set; }
@@ -89,6 +91,5 @@ namespace ESS.Dto
 
         public DateTime? BirthDate { get; set; }
         public string Pan { get; set; }
-
     }
 }

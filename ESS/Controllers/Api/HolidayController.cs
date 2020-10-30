@@ -10,9 +10,9 @@ namespace ESS.Controllers.Api
 {
     public class HolidayController : ApiController
     {
-        public IHttpActionResult GetHolidays(string compCode, string wrkGrp, int tYear, string location, bool optionalFlg)
+        public IHttpActionResult GetHolidays(string compCode, string wrkGrp, int tYear, string location,
+            bool optionalFlg)
         {
-
             if (!optionalFlg)
             {
                 try
@@ -24,7 +24,6 @@ namespace ESS.Controllers.Api
                 {
                     return BadRequest(e.ToString());
                 }
-
             }
             else
             {
@@ -37,12 +36,12 @@ namespace ESS.Controllers.Api
                 {
                     return BadRequest(e.ToString());
                 }
-
             }
         }
 
 
-        public IHttpActionResult GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp, string location)
+        public IHttpActionResult GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp,
+            string location)
         {
             try
             {
@@ -54,6 +53,5 @@ namespace ESS.Controllers.Api
                 return BadRequest(e.ToString());
             }
         }
-
     }
 }

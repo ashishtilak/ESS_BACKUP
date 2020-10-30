@@ -12,6 +12,7 @@ namespace ESS.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int YearMonth { get; set; }
+
         public bool PostingEnabled { get; set; }
     }
 }

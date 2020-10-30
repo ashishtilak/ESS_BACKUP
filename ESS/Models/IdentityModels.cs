@@ -82,7 +82,7 @@ namespace ESS.Models
         public DbSet<ShiftSchedules> ShiftSchedules { get; set; }
         public DbSet<ShiftScheduleDetails> ShiftScheduleDetails { get; set; }
         public DbSet<SsOpenMonth> SsOpenMonth { get; set; }
-        public DbSet<Reimbursements> Reimbursement { get; set; } 
+        public DbSet<Reimbursements> Reimbursement { get; set; }
         public DbSet<ReimbConv> ReimbConvs { get; set; }
 
         public DbSet<MedPolicy> MedPolicies { get; set; }
@@ -155,8 +155,9 @@ namespace ESS.Models
                     let current = currVal[propertyName] == null ? "" : currVal[propertyName]
                     where original != current
                     select "Changed " + propertyName + " From " + original.ToString() + " to " + current.ToString()
-                    );
+                );
             }
+
             try
             {
                 return base.SaveChanges();
@@ -166,11 +167,9 @@ namespace ESS.Models
                 throw;
                 //return 0;
             }
-
         }
 
 
         ////End Changes for Auditing
-
     }
 }

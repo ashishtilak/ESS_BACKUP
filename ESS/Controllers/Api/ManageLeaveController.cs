@@ -54,7 +54,8 @@ namespace ESS.Controllers.Api
 
             //Get list of holidays
             List<DateTime> holidays =
-                ESS.Helpers.CustomHelper.GetHolidays(changedLeave.FromDt, changedLeave.ToDt, lDto.CompCode, lDto.WrkGrp, emp.Location);
+                ESS.Helpers.CustomHelper.GetHolidays(changedLeave.FromDt, changedLeave.ToDt, lDto.CompCode, lDto.WrkGrp,
+                    emp.Location);
 
             lDto.TotalDays -= holidays.Count;
 

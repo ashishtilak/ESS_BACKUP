@@ -35,7 +35,7 @@ namespace ESS.Controllers.Api
                              l.ReleaseStatusCode == ReleaseStatus.InRelease))
                 .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
                 .ToList();
-                
+
 
             if (pendingLeaves.Count == 0)
                 return Ok("No records found.");
@@ -48,7 +48,7 @@ namespace ESS.Controllers.Api
                             leaveAppId.Contains(a.ApplicationId))
                 .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
                 .ToList();
-            
+
 
             foreach (LeaveApplicationDto leave in pendingLeaves)
             {
@@ -121,7 +121,7 @@ namespace ESS.Controllers.Api
                     lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
                 }
             }
-            
+
             return Ok(leaves);
         }
 

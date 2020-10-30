@@ -9,15 +9,13 @@ namespace ESS.Models
 {
     public class EmpUniform
     {
-        [Key, Column(Order = 0)]
-        public int Year { get; set; }
+        [Key, Column(Order = 0)] public int Year { get; set; }
 
         [Key, Column(Order = 1)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
 
-        [ForeignKey("EmpUnqId")]
-        public Employees Employee { get; set; }
+        [ForeignKey("EmpUnqId")] public Employees Employee { get; set; }
 
         public int TrouserSize { get; set; }
         public int ShirtSize { get; set; }

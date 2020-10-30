@@ -9,14 +9,12 @@ namespace ESS.Models
 {
     public class RoleAuth
     {
-        [Key, Column(Order = 0)]
-        public int RoleId { get; set; }
+        [Key, Column(Order = 0)] public int RoleId { get; set; }
 
         [Key, Column(Order = 1)]
         [StringLength(100)]
         public string MenuId { get; set; }
 
-        [StringLength(100)]
-        public string MenuName { get; set; }
+        [StringLength(100)] public string MenuName { get; set; }
     }
 }

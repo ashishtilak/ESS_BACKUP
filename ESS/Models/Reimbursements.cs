@@ -11,10 +11,10 @@ namespace ESS.Models
     {
         [Key, Column(Order = 0)] public int YearMonth { get; set; } //201920
         [Key, Column(Order = 1)] public int ReimbId { get; set; }
-        
+
         [StringLength(3)] public string ReimbType { get; set; }
         [StringLength(10)] public string EmpUnqId { get; set; }
-        
+
         public DateTime ReimbDate { get; set; }
 
         public int PeriodFrom { get; set; }
@@ -33,7 +33,9 @@ namespace ESS.Models
         [ForeignKey("ReleaseGroupCode")] public ReleaseGroups ReleaseGroup { get; set; }
 
         [StringLength(15)] public string ReleaseStrategy { get; set; }
-        [ForeignKey("ReleaseGroupCode, ReleaseStrategy")]  public ReleaseStrategies RelStrategy { get; set; }
+
+        [ForeignKey("ReleaseGroupCode, ReleaseStrategy")]
+        public ReleaseStrategies RelStrategy { get; set; }
 
         [StringLength(1)] public string ReleaseStatusCode { get; set; }
         [ForeignKey("ReleaseStatusCode")] public ReleaseStatus ReleaseStatus { get; set; }

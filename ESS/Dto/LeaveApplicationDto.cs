@@ -48,6 +48,5 @@ namespace ESS.Dto
 
         public List<LeaveApplicationDetailDto> LeaveApplicationDetails { get; set; }
         public List<ApplReleaseStatusDto> ApplReleaseStatus { get; set; }
-
     }
 }

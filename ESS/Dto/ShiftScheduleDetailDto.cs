@@ -12,6 +12,5 @@ namespace ESS.Dto
         public int ShiftDay { get; set; } //Should be 1 to 31 max
         public string ShiftCode { get; set; }
         public ShiftDto Shift { get; set; }
-
     }
 }

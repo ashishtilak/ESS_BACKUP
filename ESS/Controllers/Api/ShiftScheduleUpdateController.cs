@@ -328,7 +328,6 @@ namespace ESS.Controllers.Api
 
                                 if (attdSchedule != null)
                                 {
-                                    
                                     // If there's a wo in existing schedule in attendnace,
                                     if (attdSchedule["D" + rowIndex.ToString("00")].ToString() == "WO")
                                     {

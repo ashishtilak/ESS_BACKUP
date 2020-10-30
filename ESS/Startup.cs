@@ -2,6 +2,7 @@
 using Owin;
 
 [assembly: OwinStartupAttribute(typeof(ESS.Startup))]
+
 namespace ESS
 {
     public partial class Startup

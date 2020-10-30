@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class MedicalFitness : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.MedicalFitnesses",
-                c => new
+                    "dbo.MedicalFitnesses",
+                    c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
                         TestDate = c.DateTime(precision: 7, storeType: "datetime2"),
@@ -25,13 +25,12 @@ namespace ESS.Migrations
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Employees", t => t.EmpUnqId)
                 .Index(t => t.EmpUnqId);
-            
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.MedicalFitnesses", "EmpUnqId", "dbo.Employees");
-            DropIndex("dbo.MedicalFitnesses", new[] { "EmpUnqId" });
+            DropIndex("dbo.MedicalFitnesses", new[] {"EmpUnqId"});
             DropTable("dbo.MedicalFitnesses");
         }
     }

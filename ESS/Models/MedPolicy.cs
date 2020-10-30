@@ -38,8 +38,7 @@ namespace ESS.Models
 
         [StringLength(50)] public string ContactEmail { get; set; }
 
-        [Column(TypeName = "datetime2")]  public DateTime ValidFrom { get; set; }
-        [Column(TypeName = "datetime2")]  public DateTime ValidTo { get; set; }
-
+        [Column(TypeName = "datetime2")] public DateTime ValidFrom { get; set; }
+        [Column(TypeName = "datetime2")] public DateTime ValidTo { get; set; }
     }
 }

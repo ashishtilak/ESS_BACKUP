@@ -2,7 +2,7 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedFieldsToLeaveAppDtl : DbMigration
     {
         public override void Up()
@@ -11,7 +11,7 @@ namespace ESS.Migrations
             AddColumn("dbo.LeaveApplicationDetails", "PlaceOfVisit", c => c.String());
             AddColumn("dbo.LeaveApplicationDetails", "ContactAddress", c => c.String());
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.LeaveApplicationDetails", "ContactAddress");

@@ -27,9 +27,9 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetReimb(string reimbType, DateTime fromDate, DateTime toDate)
         {
             var reimb = _context.Reimbursement
-                .Where(r => 
+                .Where(r =>
                     r.ReimbType == reimbType &&
-                    r.ReimbDate >= fromDate && r.ReimbDate <=toDate)
+                    r.ReimbDate >= fromDate && r.ReimbDate <= toDate)
                 .Select(Mapper.Map<Reimbursements, ReimbursementDto>)
                 .ToList();
 
@@ -120,7 +120,7 @@ namespace ESS.Controllers.Api
                             rl.ReleaseGroupCode == reimbDto.ReleaseGroupCode &&
                             rl.ReleaseStrategy == relStrat.ReleaseStrategy
                     ).ToList();
-                
+
                 //add them to release strategy object
                 relStrat.ReleaseStrategyLevels = relStratLevels;
 
@@ -167,7 +167,7 @@ namespace ESS.Controllers.Api
 
                 reimbDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
                 reimbDto.ApplReleaseStatus.AddRange(apps);
-                
+
                 return Ok(reimbDto);
             }
             catch (Exception ex)
@@ -190,7 +190,7 @@ namespace ESS.Controllers.Api
             var reimb = _context.Reimbursement.SingleOrDefault(r => r.ReimbId == req.ReimbId);
             if (reimb == null)
                 return BadRequest("Reimbursement Id not found.");
-            
+
             reimb.AmountReleased = req.AmountReleased;
             _context.SaveChanges();
             return Ok();
@@ -225,9 +225,8 @@ namespace ESS.Controllers.Api
 
             reimbDto.ReimbConv.RemoveAll(e => e.ReimbId != 0);
             reimbDto.ReimbConv.AddRange(conv);
-            
+
             return reimbDto;
         }
-
     }
 }

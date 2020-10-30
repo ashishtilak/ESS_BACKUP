@@ -9,9 +9,8 @@ namespace ESS.Models
 {
     public class TaxConfig
     {
-        [Key]
-        public int Id { get; set; }                         //Only dummy, as there'll be only one record
-        public int YearMonth { get; set; }                  //201920
+        [Key] public int Id { get; set; } //Only dummy, as there'll be only one record
+        public int YearMonth { get; set; } //201920
         public bool ActualFlag { get; set; }
         public DateTime StartDt { get; set; }
         public DateTime EndDt { get; set; }

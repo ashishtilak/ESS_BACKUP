@@ -8,12 +8,9 @@ namespace ESS.Models
 {
     public class Banks
     {
-        [Key]
-        public int BankId { get; set; }
+        [Key] public int BankId { get; set; }
 
-        [StringLength(150)]
-        public string BankName { get; set; }
-        [StringLength(10)]
-        public string BankPan { get; set; }
+        [StringLength(150)] public string BankName { get; set; }
+        [StringLength(10)] public string BankPan { get; set; }
     }
 }

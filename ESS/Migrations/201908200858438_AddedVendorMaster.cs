@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedVendorMaster : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.Vendors",
-                c => new
+                    "dbo.Vendors",
+                    c => new
                     {
                         VendorCode = c.String(nullable: false, maxLength: 10),
                         VendorName = c.String(maxLength: 100),
@@ -20,9 +20,8 @@ namespace ESS.Migrations
                         UpdUser = c.String(maxLength: 10),
                     })
                 .PrimaryKey(t => t.VendorCode);
-            
         }
-        
+
         public override void Down()
         {
             DropTable("dbo.Vendors");

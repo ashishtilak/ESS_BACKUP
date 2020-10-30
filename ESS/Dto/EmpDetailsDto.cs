@@ -58,6 +58,5 @@ namespace ESS.Dto
         public string BankName { get; set; }
         public string BankIfsc { get; set; }
         public string AadharNo { get; set; }
-
     }
 }

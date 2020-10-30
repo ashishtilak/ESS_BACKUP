@@ -44,6 +44,7 @@ namespace ESS.Controllers.Api
             public string GatePassStatus { get; set; }
             public string ErrorMessage { get; set; }
         }
+
         /// <summary>
         /// This method is used by VMS. It'll post appropriate status.
         /// </summary>
@@ -61,7 +62,6 @@ namespace ESS.Controllers.Api
 
             try
             {
-
                 var gpDto = _context.GatePass.FirstOrDefault(
                     g => g.Id == gpNumber && g.EmpUnqId == empUnqId);
 
@@ -72,7 +72,7 @@ namespace ESS.Controllers.Api
                     .Include(e => e.Departments)
                     .Include(e => e.Stations)
                     .FirstOrDefault
-                    (e => e.EmpUnqId == gpDto.EmpUnqId);
+                        (e => e.EmpUnqId == gpDto.EmpUnqId);
 
                 if (emp == null)
                     return BadRequest("Employee not found");
@@ -167,7 +167,6 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest(e.ToString());
             }
-
         }
 
         //for printing purpose
@@ -207,13 +206,12 @@ namespace ESS.Controllers.Api
                 //search for employee who match the release criteria
                 foreach (var strategy in relStrategy)
                 {
-
                     var relEmployee = _context.Employees
                         .Include(d => d.Departments)
                         .Include(s => s.Stations)
                         .Where(
                             e => e.EmpUnqId == strategy.GpReleaseStrategy &&
-                                    strategy.Active
+                                 strategy.Active
                         )
                         .Select(Mapper.Map<Employees, EmployeeDto>).ToList();
 
@@ -247,7 +245,6 @@ namespace ESS.Controllers.Api
                             .ToList();
 
 
-
                         foreach (var dto in gatepass)
                         {
                             dto.EmpName = emp.EmpName;
@@ -261,7 +258,6 @@ namespace ESS.Controllers.Api
 
                         result.AddRange(gatepass);
                     }
-
                 }
             }
 
@@ -293,6 +289,7 @@ namespace ESS.Controllers.Api
                 dto.StatusName = dto.GetStatus(dto.GatePassStatus);
                 dto.BarCode = dto.GetBarcode(dto.EmpUnqId, dto.Id);
             }
+
             result.AddRange(labourGp);
 
             result = result.GroupBy(r => r.Id).Select(r => r.First()).ToList();
@@ -352,10 +349,9 @@ namespace ESS.Controllers.Api
                          g.GatePassDate >= fromDt &&
                          g.GatePassDate <= toDt &&
                          g.GatePassStatus != GatePass.GatePassStatuses.ForceClosed
-                      )
+                )
                 .Select(Mapper.Map<GatePass, GatePassDto>)
                 .ToList();
-
 
 
             foreach (var dto in gatepass)
@@ -377,7 +373,6 @@ namespace ESS.Controllers.Api
         //Report for HR and Admin-security
         public IHttpActionResult GetGatePass(DateTime fromDt, DateTime toDt)
         {
-
             var gatepass = _context.GatePass
                 .Where(
                     g => g.GatePassDate >= fromDt &&
@@ -451,7 +446,8 @@ namespace ESS.Controllers.Api
                 try
                 {
                     maxGpId = _context.GatePass.Where(
-                        i => DbFunctions.TruncateTime(i.GatePassDate) == DbFunctions.TruncateTime(DateTime.Now)).Max(g => g.GatePassNo);
+                            i => DbFunctions.TruncateTime(i.GatePassDate) == DbFunctions.TruncateTime(DateTime.Now))
+                        .Max(g => g.GatePassNo);
                 }
                 catch
                 {
@@ -480,7 +476,6 @@ namespace ESS.Controllers.Api
                                     r.ReleaseGroupCode == gp.ReleaseGroupCode &&
                                     r.GpReleaseStrategy == gp.EmpUnqId &&
                                     r.Active
-
                             );
 
                         if (relStrat == null)
@@ -554,7 +549,6 @@ namespace ESS.Controllers.Api
                             result.Add(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>(appRelStat));
 
                             _context.ApplReleaseStatus.Add(appRelStat);
-                            
                         }
 
                         _context.GatePass.Add(newGp);
@@ -599,7 +593,8 @@ namespace ESS.Controllers.Api
                 try
                 {
                     maxGpId = _context.GatePass.Where(
-                        i => DbFunctions.TruncateTime(i.GatePassDate) == DbFunctions.TruncateTime(DateTime.Now)).Max(g => g.GatePassNo);
+                            i => DbFunctions.TruncateTime(i.GatePassDate) == DbFunctions.TruncateTime(DateTime.Now))
+                        .Max(g => g.GatePassNo);
                 }
                 catch
                 {
@@ -649,6 +644,5 @@ namespace ESS.Controllers.Api
                 return BadRequest(exception.ToString());
             }
         }
-
     }
 }

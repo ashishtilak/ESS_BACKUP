@@ -28,8 +28,7 @@ namespace ESS.Models
         [StringLength(3)]
         public string ContCode { get; set; }
 
-        [StringLength(150)]
-        public string ContName { get; set; }
+        [StringLength(150)] public string ContName { get; set; }
 
         public bool Active { get; set; }
     }

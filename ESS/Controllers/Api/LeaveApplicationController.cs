@@ -196,7 +196,7 @@ namespace ESS.Controllers.Api
                 //posting status to "N"
                 leaveApplicationDetailDto.IsPosted = LeaveApplicationDetails.NotPosted;
             }
-            
+
             //add code for application release status table
 
             //first get release strategy details based on comp, wrkgrp, unit, dept, stat and cat code
@@ -211,12 +211,13 @@ namespace ESS.Controllers.Api
             if (relStrat == null)
                 return BadRequest("Release strategy not configured.");
 
-            leaveApplicationDto.ReleaseGroupCode = leaveApplicationDto.ReleaseGroupCode; //what am I doing here!!! :D hahahaha
+            leaveApplicationDto.ReleaseGroupCode =
+                leaveApplicationDto.ReleaseGroupCode; //what am I doing here!!! :D hahahaha
             leaveApplicationDto.ReleaseStrategy = relStrat.ReleaseStrategy;
             leaveApplicationDto.ReleaseStatusCode = ReleaseStatus.NotReleased;
 
             leaveApplicationDto.AddDt = DateTime.Now;
-            
+
 
             //get release strategy levels
             var relStratLevels = _context.ReleaseStrategyLevels
@@ -250,9 +251,9 @@ namespace ESS.Controllers.Api
                     ReleaseStrategyLevel = relStratReleaseStrategyLevel.ReleaseStrategyLevel,
                     ReleaseCode = relStratReleaseStrategyLevel.ReleaseCode,
                     ReleaseStatusCode =
-                        relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1 ?
-                                                                ReleaseStatus.InRelease
-                                                                : ReleaseStatus.NotReleased,
+                        relStratReleaseStrategyLevel.ReleaseStrategyLevel == 1
+                            ? ReleaseStatus.InRelease
+                            : ReleaseStatus.NotReleased,
                     ReleaseDate = null,
                     ReleaseAuth = relAuth.EmpUnqId,
                     IsFinalRelease = relStratReleaseStrategyLevel.IsFinalRelease
@@ -265,7 +266,6 @@ namespace ESS.Controllers.Api
             }
 
 
-
             _context.LeaveApplications.Add(Mapper.Map<LeaveApplicationDto, LeaveApplications>(leaveApplicationDto));
 
             _context.SaveChanges();
@@ -274,7 +274,8 @@ namespace ESS.Controllers.Api
             leaveApplicationDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
             leaveApplicationDto.ApplReleaseStatus.AddRange(apps);
 
-            return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveApplicationDto.LeaveAppId), leaveApplicationDto);
+            return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveApplicationDto.LeaveAppId),
+                leaveApplicationDto);
         }
     }
 }

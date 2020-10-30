@@ -48,7 +48,7 @@ namespace ESS.Controllers.Api
                 .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>)
                 .FirstOrDefault(s => s.ScheduleId == id);
 
-            if(ssDto == null)
+            if (ssDto == null)
                 throw new Exception("Invalid shift schedule id");
 
             // get corresponding app release objects
@@ -65,7 +65,7 @@ namespace ESS.Controllers.Api
             // add them to dto
             ssDto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
 
-            if(app != null)
+            if (app != null)
                 ssDto.ApplReleaseStatus.Add(app);
             else
                 throw new Exception("Releaser is invalid! No app release line found.");
@@ -163,7 +163,6 @@ namespace ESS.Controllers.Api
                 BodyEncoding = System.Text.Encoding.UTF8,
                 IsBodyHtml = true,
                 Body = body
-
             };
 
             //now loop through all app release lines -- there'll be only one line, but anyway...
@@ -174,9 +173,10 @@ namespace ESS.Controllers.Api
                     .Where(r => r.ReleaseCode == dto.ReleaseCode).ToList();
 
                 //in case of multiple releasers for single release code,
-                foreach (Employees releaser in 
-                    releasers.Select(r => 
-                        _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId)).Where(releaser => releaser != null).Where(releaser => !string.IsNullOrEmpty(releaser.Email)))
+                foreach (Employees releaser in
+                    releasers.Select(r =>
+                            _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId))
+                        .Where(releaser => releaser != null).Where(releaser => !string.IsNullOrEmpty(releaser.Email)))
                 {
                     mail.To.Add(new MailAddress(releaser.Email));
                     smtpClient.Send(mail);
@@ -237,7 +237,7 @@ namespace ESS.Controllers.Api
                 gpDto.StatName = emp.Stations.StatName;
                 gpDto.ModeName = gpDto.GetMode(gpDto.Mode);
             }
-            
+
             var empCode = gpDto.EmpUnqId;
             var empName = gpDto.EmpName;
             var deptstat = gpDto.DeptName + " / " + gpDto.StatName;
@@ -302,7 +302,6 @@ namespace ESS.Controllers.Api
                 BodyEncoding = System.Text.Encoding.UTF8,
                 IsBodyHtml = true,
                 Body = body
-
             };
 
             //now loop through all app release lines -- there'll be only one line, but anyway...
@@ -328,7 +327,6 @@ namespace ESS.Controllers.Api
                     smtpClient.Send(mail);
                     mail.To.Remove(new MailAddress(releaser.Email));
                 }
-
             }
 
             return true;
@@ -361,7 +359,7 @@ namespace ESS.Controllers.Api
                     l.YearMonth == leaveAppDto.YearMonth &&
                     l.ReleaseGroupCode == leaveAppDto.ReleaseGroupCode &&
                     l.ApplicationId == leaveAppDto.LeaveAppId
-                    )
+                )
                 .ToList()
                 .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
 
@@ -417,10 +415,10 @@ namespace ESS.Controllers.Api
                 ";
 
             string body = "Dear Sir, <br /><br /> " +
-                "Following leave application requires your attention: <br/> <br />" +
-                "Employee Code: " + empCode + " <br/>" +
-                "Employee Name: " + empName + " <br/>" +
-                "Dept/Station: " + deptstat + " <br/><br/>";
+                          "Following leave application requires your attention: <br/> <br />" +
+                          "Employee Code: " + empCode + " <br/>" +
+                          "Employee Name: " + empName + " <br/>" +
+                          "Dept/Station: " + deptstat + " <br/><br/>";
 
             body = header + body;
 
@@ -441,17 +439,16 @@ namespace ESS.Controllers.Api
                                "<tbody>";
 
 
-
             foreach (var detail in leaveAppDto.LeaveApplicationDetails)
             {
                 string bodyLine = "<tr>" +
-                              "<td>" + detail.LeaveTypeCode + "</td>" +
-                              "<td>" + detail.FromDt.ToString("dd/MM/yyyy") + "</td>" +
-                              "<td>" + detail.ToDt.ToString("dd/MM/yyyy") + "</td>" +
-                              "<td>" + detail.TotalDays + "</td>" +
-                              "<td>" + (detail.HalfDayFlag ? "Yes" : "No") + "</td>" +
-                              "<td>" + detail.Remarks + "</td>" +
-                              "</tr>";
+                                  "<td>" + detail.LeaveTypeCode + "</td>" +
+                                  "<td>" + detail.FromDt.ToString("dd/MM/yyyy") + "</td>" +
+                                  "<td>" + detail.ToDt.ToString("dd/MM/yyyy") + "</td>" +
+                                  "<td>" + detail.TotalDays + "</td>" +
+                                  "<td>" + (detail.HalfDayFlag ? "Yes" : "No") + "</td>" +
+                                  "<td>" + detail.Remarks + "</td>" +
+                                  "</tr>";
 
                 bodyTable += bodyLine;
             }
@@ -461,7 +458,7 @@ namespace ESS.Controllers.Api
             body += bodyTable;
 
             body += "<br/>Kindly review the same in <a href='" + ConfigurationManager.AppSettings["PortalAddress"] +
-                "'>ESS Portal</a>.";
+                    "'>ESS Portal</a>.";
 
             body += "</body></html>";
 
@@ -475,14 +472,12 @@ namespace ESS.Controllers.Api
 
             MailMessage mail = new MailMessage
             {
-
                 From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
                 //From = new MailAddress("attnd.nkp@jindalsaw.com", "ESS Portal"),
                 Subject = "Notification from ESS Portal",
                 BodyEncoding = System.Text.Encoding.UTF8,
                 IsBodyHtml = true,
                 Body = body
-
             };
 
 
@@ -495,9 +490,9 @@ namespace ESS.Controllers.Api
 
 
                 //in case of multiple releasers for single release code,
-                foreach (var releaser in 
-                    releasers.Select(r => 
-                        _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId))
+                foreach (var releaser in
+                    releasers.Select(r =>
+                            _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId))
                         .Where(releaser => releaser != null)
                         .Where(releaser => !string.IsNullOrEmpty(releaser.Email)))
                 {
@@ -510,7 +505,6 @@ namespace ESS.Controllers.Api
             }
 
             return true;
-
         }
 
         [HttpGet]
@@ -628,7 +622,6 @@ namespace ESS.Controllers.Api
                                "<tbody>";
 
 
-
             foreach (var detail in leaveAppDto.LeaveApplicationDetails)
             {
                 string bodyLine = "<tr>" +
@@ -662,13 +655,11 @@ namespace ESS.Controllers.Api
 
             MailMessage mail = new MailMessage
             {
-
                 From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
                 Subject = "Notification from ESS Portal",
                 BodyEncoding = System.Text.Encoding.UTF8,
                 IsBodyHtml = true,
                 Body = body
-
             };
 
 
@@ -698,11 +689,9 @@ namespace ESS.Controllers.Api
                     smtpClient.Send(mail);
                     mail.To.Remove(new MailAddress(releaser.Email));
                 }
-
             }
 
             return Ok();
-
         }
     }
 }

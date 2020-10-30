@@ -16,7 +16,6 @@ namespace ESS.Controllers.Api
             {
                 var leaves = Helpers.CustomHelper.GetLeaveEntries(empUnqId);
                 return Ok(leaves);
-
             }
             catch (Exception ex)
             {

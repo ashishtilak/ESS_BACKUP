@@ -68,7 +68,6 @@ namespace ESS.Controllers.Api
             {
                 //Check if data is changed or not
                 if (
-
                     empAdd.HouseNumber == dto.HouseNumber &&
                     empAdd.SocietyName == dto.SocietyName &&
                     empAdd.AreaName == dto.AreaName &&
@@ -95,7 +94,7 @@ namespace ESS.Controllers.Api
                 Counter = maxId,
                 HouseNumber = dto.HouseNumber,
                 SocietyName = dto.SocietyName,
-                AreaName= dto.AreaName,
+                AreaName = dto.AreaName,
                 LandMark = dto.LandMark,
                 Tehsil = dto.Tehsil,
                 PoliceStation = dto.PoliceStation,
@@ -107,7 +106,7 @@ namespace ESS.Controllers.Api
                 PreResPhone = dto.PreResPhone,
                 PreEmail = dto.PreEmail,
                 UpdDt = DateTime.Now,
-                HrVerified =  false
+                HrVerified = false
             };
 
             _context.EmpAddress.Add(newAdd);
@@ -115,7 +114,6 @@ namespace ESS.Controllers.Api
             _context.SaveChanges();
 
             return Ok();
-
         }
 
 

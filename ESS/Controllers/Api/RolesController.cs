@@ -36,7 +36,6 @@ namespace ESS.Controllers.Api
                 .Select(Mapper.Map<RoleAuth, RoleAuthDto>);
 
             return Ok(roleAuth);
-
         }
     }
 }
