@@ -99,6 +99,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
+                        .Where(e=> e.EmpUnqId == relStr.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,
@@ -197,13 +198,15 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult UpldateSchedule(string empUnqId)
         {
+            
+            
+            // Get file from Http Context of current request
             HttpContext httpContext = HttpContext.Current;
 
             // Check for any uploaded file  
             if (httpContext.Request.Files.Count <= 0) return BadRequest("NO FILES???");
 
             // Create new folder if does not exist.
-
             try
             {
                 string folder = HostingEnvironment.MapPath(@"~/App_Data/tmp/");
@@ -216,9 +219,11 @@ namespace ESS.Controllers.Api
                 return BadRequest(ex.ToString());
             }
 
+            // Schedule update will be from today to end of month...
             DateTime fromDt = DateTime.Now.Date;
             DateTime todt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
 
+            // Although there'll be only one file, it's nice to loop through it
             for (int i = 0; i < httpContext.Request.Files.Count;)
             {
                 HttpPostedFile postedFile = httpContext.Request.Files[i];
@@ -244,6 +249,7 @@ namespace ESS.Controllers.Api
                     {
                         // This will just rip off the first Header line off the excel file
                         var header = reader.ReadLine()?.Split(',');
+
                         // Add check for column header here...
                         // first 7 columns are :
                         // empunqid, name, deptname, statname, desig, category, remarks
@@ -261,6 +267,7 @@ namespace ESS.Controllers.Api
                             var row = reader.ReadLine()?.Split(',');
                             if (row == null) continue;
 
+                            // the employee of current row
                             string tmpEmpId = row[0];
 
                             if (row[6].Trim() == "")
@@ -284,6 +291,7 @@ namespace ESS.Controllers.Api
 
                             int extScheduleId = _context.ShiftSchedules
                                 .Where(s => s.EmpUnqId == tmpEmpId &&
+                                            s.YearMonth == openMonth && 
                                             s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
                                 .Max(s => s.ScheduleId);
 
@@ -304,13 +312,18 @@ namespace ESS.Controllers.Api
 
                             for (int rowIndex = 1; rowIndex < fromDt.Day; rowIndex++)
                             {
-                                ShiftScheduleDetails existingLine =
-                                    existingSch.FirstOrDefault(s => s.ShiftDay == rowIndex);
-
-                                if (existingLine == null) continue;
+                                var existingLine = new ShiftScheduleDetails
+                                {
+                                    YearMonth = openMonth, ShiftDay = rowIndex
+                                };
 
                                 if (attdSchedule != null)
                                     existingLine.ShiftCode = attdSchedule["D" + rowIndex.ToString("00")].ToString();
+                                else
+                                    existingLine = existingSch.FirstOrDefault(s => s.ShiftDay == rowIndex);
+
+                                if (existingLine == null)
+                                    return BadRequest($"Error: already uploaded shift schedule not found for {sch.EmpUnqId}");
 
                                 var schLine = new ShiftScheduleDetailDto
                                 {
@@ -400,7 +413,7 @@ namespace ESS.Controllers.Api
                             {
                                 Employees emp = _context.Employees.FirstOrDefault(e => e.EmpUnqId == sch.EmpUnqId);
 
-                                if (emp == null) return BadRequest("Employee is null!!!");
+                                if (emp == null) return BadRequest($"Employee {sch.EmpUnqId} is null!!!");
 
                                 sch.ScheduleId = maxId;
                                 sch.CompCode = emp.CompCode;
@@ -410,7 +423,11 @@ namespace ESS.Controllers.Api
                                 sch.StatCode = emp.StatCode;
 
                                 foreach (ShiftScheduleDetailDto detail in sch.ShiftScheduleDetails)
+                                {
                                     detail.ScheduleId = maxId;
+                                    if (detail.ShiftDay == 0)
+                                        return BadRequest($"Shift day is 0 for employee {sch.EmpUnqId}");
+                                }
 
                                 // get the release strategy
                                 ReleaseStrategies relStrat = _context.ReleaseStrategy

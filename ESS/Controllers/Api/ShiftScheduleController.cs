@@ -191,6 +191,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
+                        .Where(e=>e.EmpUnqId == relStr.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,
@@ -297,8 +298,14 @@ namespace ESS.Controllers.Api
 
                 //carry on the good work...
 
-                DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
-                                                 openMonth.ToString().Substring(0, 4));
+                //DateTime fromDt = DateTime.Parse("01/" + openMonth.ToString().Substring(4, 2) + "/" +
+                //                                 openMonth.ToString().Substring(0, 4));
+
+                DateTime fromDt = new DateTime(
+                    Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                    Convert.ToInt32(openMonth.ToString().Substring(4, 2)),
+                    1
+                    );
 
                 //var fromDt = new DateTime(fromDate.Year,
                 //    fromDate.Month, 1);
@@ -339,6 +346,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = sch.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
+                        .Where(e=>e.EmpUnqId == sch.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,

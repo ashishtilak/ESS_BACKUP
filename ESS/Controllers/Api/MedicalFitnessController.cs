@@ -28,9 +28,11 @@ namespace ESS.Controllers.Api
             if (toDt < fromDt)
                 return BadRequest("From date is less than To date.");
 
+            toDt = toDt.AddDays(1);
+
             List<MedicalFitnessDto> fitnessRec;
 
-            if (empUnqId == null)
+            if (empUnqId != null)
             {
                 fitnessRec = _context.MedicalFitness
                     .Where(m => m.TestDate >= fromDt && m.TestDate <= toDt && m.EmpUnqId == empUnqId)
@@ -70,7 +72,7 @@ namespace ESS.Controllers.Api
             else
             {
                 fitnessRec = _context.MedicalFitness
-                    .Where(m => m.TestDate >= fromDt && m.TestDate <= toDt)
+                    .Where(m => m.TestDate >= fromDt && m.TestDate < toDt)
                     .AsEnumerable()
                     .Select(Mapper.Map<MedicalFitness, MedicalFitnessDto>)
                     .ToList();

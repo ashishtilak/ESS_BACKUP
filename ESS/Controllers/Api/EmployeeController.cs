@@ -22,6 +22,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetEmployees(string location)
         {
             var employeeDto = _context.Employees
+                .Where(e => e.Active && e.WrkGrp == "COMP")
                 .Select(
                     e => new EmployeeDto
                     {
@@ -64,7 +65,6 @@ namespace ESS.Controllers.Api
                         CompanyAcc = e.CompanyAcc
                     }
                 )
-                .Where(e => e.Active && e.WrkGrp == "COMP")
                 .ToList();
 
             //get all employee per address
@@ -124,6 +124,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetEmployee(string empUnqId)
         {
             var employee = _context.Employees
+                .Where(e => e.EmpUnqId == empUnqId)
                 .Select(
                     e => new EmployeeDto
                     {
@@ -169,7 +170,6 @@ namespace ESS.Controllers.Api
                         Pan = e.Pan
                     }
                 )
-                .Where(e => e.EmpUnqId == empUnqId)
                 .ToList();
 
             if (employee.Count == 0)
