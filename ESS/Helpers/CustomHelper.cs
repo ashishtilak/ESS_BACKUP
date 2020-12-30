@@ -20,15 +20,15 @@ namespace ESS.Helpers
         public static string GetAttendanceServerApi(string location)
         {
             //return System.Configuration.ConfigurationManager.ConnectionStrings["AttendanceServerApi"].ConnectionString;
-            ApplicationDbContext context = new ApplicationDbContext();
-            var loc = context.Location.FirstOrDefault(c => c.Location == location);
+            var context = new ApplicationDbContext();
+            Locations loc = context.Location.FirstOrDefault(c => c.Location == location);
             return loc != null ? loc.AttendanceServerApi : "";
         }
 
         public static string GetRemoteServer(string location)
         {
-            ApplicationDbContext context = new ApplicationDbContext();
-            var loc = context.Location.FirstOrDefault(c => c.Location == location);
+            var context = new ApplicationDbContext();
+            Locations loc = context.Location.FirstOrDefault(c => c.Location == location);
             return loc != null ? loc.RemoteConnection : "";
         }
 
@@ -43,11 +43,11 @@ namespace ESS.Helpers
         public static List<DateTime> GetHolidays(DateTime fromDt, DateTime toDt, string compCode, string wrkGrp,
             string location)
         {
-            List<DateTime> holidays = new List<DateTime>();
+            var holidays = new List<DateTime>();
 
             string strRemoteServer = GetRemoteServer(location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -56,7 +56,7 @@ namespace ESS.Helpers
                              "and WrkGrp = '" + wrkGrp + "' " +
                              "and tDate between '" + fromDt.ToString("yyyy-MM-dd") + "' " +
                              "and '" + toDt.ToString("yyyy-MM-dd") + "' ";
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -72,11 +72,11 @@ namespace ESS.Helpers
 
         public static List<HolidayDto> GetHolidays(string compCode, string wrkGrp, int tYear, string location)
         {
-            List<HolidayDto> holidays = new List<HolidayDto>();
+            var holidays = new List<HolidayDto>();
 
             string strRemoteServer = GetRemoteServer(location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select tDate, HlDesc from HolidayMast where " +
@@ -84,7 +84,7 @@ namespace ESS.Helpers
                              "WrkGrp = '" + wrkGrp + "' and " +
                              "tYear = " + tYear + "";
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -102,12 +102,12 @@ namespace ESS.Helpers
         public static bool GetOptionalHolidays(DateTime leaveDate, string location)
         {
             string strRemoteServer = GetRemoteServer(location);
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select * from HolidayOptMast " +
                              "where tDate = '" + leaveDate.ToString("yyyy-MM-dd") + "'";
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 return dr.HasRows;
@@ -117,15 +117,15 @@ namespace ESS.Helpers
 
         public static List<HolidayDto> GetOptionalHolidays(int tYear, string location)
         {
-            List<HolidayDto> holidays = new List<HolidayDto>();
+            var holidays = new List<HolidayDto>();
 
             string strRemoteServer = GetRemoteServer(location);
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select * from HolidayOptMast " +
                              "where tYear = " + tYear + "";
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -141,7 +141,7 @@ namespace ESS.Helpers
 
         public static AttdShiftScheduleDto GetattdShiftSchedule(int yearMt, string empUnqId, string location)
         {
-            AttdShiftScheduleDto dto = new AttdShiftScheduleDto();
+            var dto = new AttdShiftScheduleDto();
             string strRemoteServer = GetRemoteServer(location);
 
             using (var cn = new SqlConnection(strRemoteServer))
@@ -150,7 +150,7 @@ namespace ESS.Helpers
                 string sql = "select * from MastShiftSchedule " +
                              "where yearMt = '" + yearMt.ToString() + "' and " +
                              "EmpUnqId = '" + empUnqId + "'";
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
 
@@ -200,16 +200,16 @@ namespace ESS.Helpers
             string strRemoteServer = GetRemoteServer(location);
 
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
-                SqlCommand cmd = new SqlCommand("sp_rpt_Emp_BlockStatus", cn);
+                var cmd = new SqlCommand("sp_rpt_Emp_BlockStatus", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@pEmpUnqId", SqlDbType.NVarChar).Value = empUnqId;
 
                 SqlDataReader dr = cmd.ExecuteReader();
 
-                EmpPunchBlockDto dto = new EmpPunchBlockDto();
+                var dto = new EmpPunchBlockDto();
                 while (dr.Read())
                 {
                     dto.EmpUnqId = dr["empUnqId"].ToString();
@@ -232,14 +232,14 @@ namespace ESS.Helpers
         //Get weekly off day
         public static List<DateTime> GetWeeklyOff(DateTime fromDt, DateTime toDt, string empUnqId)
         {
-            List<DateTime> weeklyOff = new List<DateTime>();
+            var weeklyOff = new List<DateTime>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var context = new ApplicationDbContext();
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
 
             string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -248,7 +248,7 @@ namespace ESS.Helpers
                              "and tDate between '" + fromDt.ToString("yyyy-MM-dd") + "' " +
                              "and '" + toDt.ToString("yyyy-MM-dd") + "' " +
                              "and ScheduleShift = 'WO' ";
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -261,14 +261,14 @@ namespace ESS.Helpers
         //Get Leave Balance
         public static List<LeaveBalanceDto> GetLeaveBalance(string empUnqId, int year)
         {
-            List<LeaveBalanceDto> lDtoList = new List<LeaveBalanceDto>();
+            var lDtoList = new List<LeaveBalanceDto>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var context = new ApplicationDbContext();
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
 
             string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select " +
@@ -280,12 +280,12 @@ namespace ESS.Helpers
                              "ENC as Encashed" +
                              " from LeaveBal where tyear=" + year + " and empUnqId = '" + empUnqId + "'";
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
                 {
-                    LeaveBalanceDto lBal = new LeaveBalanceDto
+                    var lBal = new LeaveBalanceDto
                     {
                         EmpUnqId = dr["EmpUnqId"].ToString(),
                         LeaveTypeCode = dr["LeaveTypeCode"].ToString()
@@ -315,7 +315,7 @@ namespace ESS.Helpers
         //Sync Data from Remote server to this server
         public static void SyncData(string location)
         {
-            List<DateTime> holidays = new List<DateTime>();
+            var holidays = new List<DateTime>();
 
             string strRemoteServer = GetRemoteServer(location);
 
@@ -339,7 +339,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -351,7 +351,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpCompanies from Companies";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -360,11 +360,11 @@ namespace ESS.Helpers
                               "'" + location + "' as location " +
                               " from MastComp";
 
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpCompanies";
 
@@ -412,7 +412,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -424,7 +424,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpWrkGrp from WorkGroups";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -432,11 +432,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, WrkGrpDesc, " +
                               "'" + location + "' as location " +
                               " from MastWorkGrp";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpWrkGrp";
 
@@ -487,7 +487,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -499,7 +499,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpUnits from Units";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -507,11 +507,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, UnitCode, UnitName, " +
                               "'" + location + "' as location " +
                               " from MastUnit";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpUnits";
 
@@ -564,7 +564,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -576,7 +576,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpDepts from Departments";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -584,11 +584,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, UnitCode, DeptCode, DeptDesc, " +
                               "'" + location + "' as location " +
                               " from MastDept";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpDepts";
 
@@ -643,7 +643,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -655,7 +655,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpStat from Stations";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -663,11 +663,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, StatDesc, " +
                               "'" + location + "' as location " +
                               " from MastStat";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpStat";
 
@@ -724,7 +724,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -736,18 +736,18 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpSec from Sections";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
                         //get data from attendance server
                         sql =
                             "select CompCode, WrkGrp, UnitCode, DeptCode, StatCode, SecCode, SecDesc from MastStatSec";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpSec";
 
@@ -804,7 +804,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -816,7 +816,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpCat from Categories";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -824,11 +824,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, CatCode, CatDesc, " +
                               "'" + location + "' as location " +
                               " from MastCat";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpCat";
 
@@ -881,7 +881,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -893,7 +893,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpDesg from Designations";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -901,11 +901,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, DesgCode, DesgDesc, " +
                               "'" + location + "' as location " +
                               " from MastDesg";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpDesg";
 
@@ -958,7 +958,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -970,7 +970,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpGrade from Grades";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -978,11 +978,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, GradeCode, GradeDesc,  " +
                               "'" + location + "' as location " +
                               "from MastGrade";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpGrade";
 
@@ -1035,7 +1035,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -1047,7 +1047,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpEmpTyp from EmpTypes";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -1055,11 +1055,11 @@ namespace ESS.Helpers
                         sql = "select CompCode, WrkGrp, EmpTypeCode, EmpTypeDesc, " +
                               "'" + location + "' as location " +
                               " from MastEmpType";
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpEmpTyp";
 
@@ -1112,7 +1112,7 @@ namespace ESS.Helpers
 
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -1124,22 +1124,20 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpEmp from Employees";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
                         if (location == Locations.Kjqtl || location == Locations.Kjsaw)
-                        {
                             sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
                                   "DesgCode, GradCode, 0 as IsHod, 0 as IsReleaser, 0 as IsHrUser, OtFlg as OtFlag, " +
                                   "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
                                   "EmpUnqId as SapId, 0 as CompanyAcc, " +
-                                  "convert(datetime2, BirthDT) as BirthDate " +
+                                  "convert(datetime2, BirthDT) as BirthDate, " +
+                                  "convert(datetime2, JoinDT) as JoinDate " +
                                   "from MastEmp where active = 1 ";
-                        }
                         else
-                        {
                             //get data from attendance server
                             sql = "select CompCode, EmpUnqId, WrkGrp, EmpName, FatherName, " +
                                   "Active, EmpTypeCode, UnitCode, DeptCode, StatCode, CatCode, " +
@@ -1147,16 +1145,16 @@ namespace ESS.Helpers
                                   "0 as IsAdmin, 0 as IsGpReleaser,  0 as IsGaReleaser, 0 as IsSecUser, " +
                                   "'" + location + "' as location, " +
                                   "SapId as SapId, 0 as CompanyAcc, " +
-                                  "convert(datetime2, BirthDT) as BirthDate " +
+                                  "convert(datetime2, BirthDT) as BirthDate, " +
+                                  "convert(datetime2, JoinDT) as JoinDate " +
                                   "from MastEmp ";
-                        }
 
 
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpEmp";
 
@@ -1186,6 +1184,7 @@ namespace ESS.Helpers
                             bulk.ColumnMappings.Add("SapId", "SapId");
                             bulk.ColumnMappings.Add("CompanyAcc", "CompanyAcc");
                             bulk.ColumnMappings.Add("BirthDate", "BirthDate");
+                            bulk.ColumnMappings.Add("JoinDate", "JoinDate");
 
 
                             bulk.WriteToServer(dt);
@@ -1216,7 +1215,8 @@ namespace ESS.Helpers
                               "Target.Active = Source.Active, " +
                               "Target.Location = Source.Location, " +
                               "Target.SapId = Source.SapId, " +
-                              "Target.BirthDate = Source.BirthDate " +
+                              "Target.BirthDate = Source.BirthDate, " +
+                              "Target.JoinDate = Source.JoinDate " +
                               "when not matched then " +
                               "insert (empunqid, compcode, wrkgrp, emptypecode, " +
                               "unitcode, deptcode, statcode, " +
@@ -1225,14 +1225,14 @@ namespace ESS.Helpers
                               "desgcode, gradecode, empname, fathername, " +
                               "active, OtFlag, ishod, isreleaser, ishruser, pass, " +
                               "isadmin, isgpreleaser, isgareleaser, issecuser, location, sapid, companyacc, " +
-                              "birthdate ) " +
+                              "birthdate, joindate ) " +
                               "values (source.empunqid, source.compcode, source.wrkgrp, source.emptypecode, " +
                               "source.unitcode, source.deptcode, source.statcode, " +
                               //"source.seccode, " +
                               "source.catcode, " +
                               "source.desgcode, source.gradecode, source.empname, source.fathername, " +
                               "source.active, source.OtFlag, 0, 0, 0, source.empunqid, 0, 0, 0, 0, " +
-                              "'" + location + "', source.SapId, 0, source.BirthDate ); ";
+                              "'" + location + "', source.SapId, 0, source.BirthDate, source.JoinDate ); ";
 
                         cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
@@ -1256,7 +1256,7 @@ namespace ESS.Helpers
         {
             try
             {
-                using (SqlConnection cnRemote = new SqlConnection(strRemoteServer))
+                using (var cnRemote = new SqlConnection(strRemoteServer))
                 {
                     cnRemote.Open();
                     //first get all masters:
@@ -1268,7 +1268,7 @@ namespace ESS.Helpers
                     {
                         string sql = "select top 0 * into #tmpShifts from Shifts";
                         cnLocal.Open();
-                        SqlCommand cmd = new SqlCommand(sql, cnLocal);
+                        var cmd = new SqlCommand(sql, cnLocal);
                         cmd.ExecuteNonQuery();
 
 
@@ -1277,11 +1277,11 @@ namespace ESS.Helpers
                               "'" + location + "' as location " +
                               " from MastShift where CompCode = '01'";
 
-                        SqlDataAdapter da = new SqlDataAdapter(sql, cnRemote);
-                        DataTable dt = new DataTable();
+                        var da = new SqlDataAdapter(sql, cnRemote);
+                        var dt = new DataTable();
                         da.Fill(dt);
 
-                        using (SqlBulkCopy bulk = new SqlBulkCopy(cnLocal))
+                        using (var bulk = new SqlBulkCopy(cnLocal))
                         {
                             bulk.DestinationTableName = "#tmpShifts";
 
@@ -1339,15 +1339,15 @@ namespace ESS.Helpers
         /// <returns>List of LeaveEntryDto</returns>
         public static List<LeaveEntryDto> GetLeaveEntries(string empUnqId)
         {
-            List<LeaveEntryDto> leaves = new List<LeaveEntryDto>();
+            var leaves = new List<LeaveEntryDto>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var context = new ApplicationDbContext();
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
 
             string strRemoteServer = GetRemoteServer(emp.Location);
 
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
                 string sql = "select top 20 " +
@@ -1356,12 +1356,12 @@ namespace ESS.Helpers
                              "from LeaveEntry where empUnqId = '" + empUnqId + "' " +
                              "order by todt desc";
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
                 {
-                    LeaveEntryDto leave = new LeaveEntryDto
+                    var leave = new LeaveEntryDto
                     {
                         YearMonth = Convert.ToInt32(dr["tYear"].ToString()),
                         EmpUnqId = dr["EmpUnqId"].ToString(),
@@ -1384,16 +1384,16 @@ namespace ESS.Helpers
 
         public static List<PerfAttdDto> GetPerfAttd(string empUnqId, DateTime? fromDate = null, DateTime? toDate = null)
         {
-            List<PerfAttdDto> result = new List<PerfAttdDto>();
+            var result = new List<PerfAttdDto>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
+            var context = new ApplicationDbContext();
 
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
 
             string strRemoteServer = GetRemoteServer(emp.Location);
 
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1412,7 +1412,7 @@ namespace ESS.Helpers
                              "and tdate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
                              toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -1450,14 +1450,14 @@ namespace ESS.Helpers
 
         public static List<PerfPunchDto> GetPerfPunch(string empUnqId)
         {
-            List<PerfPunchDto> result = new List<PerfPunchDto>();
+            var result = new List<PerfPunchDto>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
+            var context = new ApplicationDbContext();
 
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
             string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
@@ -1474,7 +1474,7 @@ namespace ESS.Helpers
                     "and PunchDate between '" + fromDt.ToString("yyyy-MM-dd") + "' and '" +
                     toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -1498,7 +1498,7 @@ namespace ESS.Helpers
 
         public static List<EmpDetailsDto> GetEmpDetails(string empUnqId)
         {
-            ApplicationDbContext context = new ApplicationDbContext();
+            var context = new ApplicationDbContext();
 
             string sql = "SELECT [EmpUnqID],[BirthDT],[BirthPlace],[ContactNo],[BLDGRP]" +
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
@@ -1508,15 +1508,15 @@ namespace ESS.Helpers
                          ",[AdharNo]" +
                          " FROM [MastEmp] where EmpUnqId = '" + empUnqId + "'";
 
-            List<EmpDetailsDto> result = new List<EmpDetailsDto>();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var result = new List<EmpDetailsDto>();
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
             string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -1585,7 +1585,7 @@ namespace ESS.Helpers
                         AadharNo = dr["AdharNo"].ToString(),
                     };
 
-                    var empAdd = context.EmpAddress
+                    EmpAddress empAdd = context.EmpAddress
                         .OrderByDescending(e => e.Counter)
                         .FirstOrDefault(e => e.EmpUnqId == res.EmpUnqId);
                     if (empAdd != null)
@@ -1614,7 +1614,7 @@ namespace ESS.Helpers
 
         public static List<EmpDetailsDto> GetEmpPerAddress(string location)
         {
-            ApplicationDbContext context = new ApplicationDbContext();
+            var context = new ApplicationDbContext();
 
             string sql = "SELECT [EmpUnqID]" +
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
@@ -1622,13 +1622,13 @@ namespace ESS.Helpers
 
             string strRemoteServer = GetRemoteServer(location);
 
-            List<EmpDetailsDto> result = new List<EmpDetailsDto>();
+            var result = new List<EmpDetailsDto>();
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -1662,17 +1662,17 @@ namespace ESS.Helpers
                 "FROM [MastEmpEDU] where EmpUnqId = '" + empUnqId + "'";
 
 
-            List<EmpEduDto> result = new List<EmpEduDto>();
+            var result = new List<EmpEduDto>();
 
-            ApplicationDbContext context = new ApplicationDbContext();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            var context = new ApplicationDbContext();
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
             string strRemoteServer = GetRemoteServer(emp.Location);
 
-            using (SqlConnection cn = new SqlConnection(strRemoteServer))
+            using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand(sql, cn);
+                var cmd = new SqlCommand(sql, cn);
                 SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
@@ -1680,11 +1680,11 @@ namespace ESS.Helpers
                     var res = new EmpEduDto
                     {
                         EmpUnqId = dr["EmpUnqId"].ToString(),
-                        PassingYear = Int32.Parse(dr["PassingYear"].ToString()),
+                        PassingYear = int.Parse(dr["PassingYear"].ToString()),
                         EduName = dr["EduName"].ToString(),
                         Subject = dr["Subject"].ToString(),
                         University = dr["University"].ToString(),
-                        Percentage = Int32.Parse(dr["Per"].ToString()),
+                        Percentage = int.Parse(dr["Per"].ToString()),
                         Remarks = dr["OtherInfo"].ToString()
                     };
 
@@ -1700,21 +1700,21 @@ namespace ESS.Helpers
         {
             var result = new List<EmpFamilyDto>();
 
-            var sql =
+            string sql =
                 "SELECT [EmpUnqID],[Sr],[Name],[Relation],[BirthDt],[Education],[Occupation] " +
                 "FROM[ATTENDANCE].[dbo].[MastEmpFamily] " +
                 "where empunqid = '" + empUnqId + "'";
 
             var context = new ApplicationDbContext();
-            var emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
-            var strRemoteServer = GetRemoteServer(emp.Location);
+            Employees emp = context.Employees.Single(e => e.EmpUnqId == empUnqId);
+            string strRemoteServer = GetRemoteServer(emp.Location);
 
             using (var cn = new SqlConnection(strRemoteServer))
             {
                 cn.Open();
 
                 var cmd = new SqlCommand(sql, cn);
-                var dr = cmd.ExecuteReader();
+                SqlDataReader dr = cmd.ExecuteReader();
 
                 while (dr.Read())
                 {
@@ -1734,6 +1734,69 @@ namespace ESS.Helpers
             }
 
             return result;
+        }
+
+        // for IPU only...
+        public static List<NoDuesIt> GetNoDuesIt(string empUnqId)
+        {
+            var noDuesIt = new List<NoDuesIt>();
+            try
+            {
+                const string meConStr =
+                    "Data Source=172.16.12.14;Initial Catalog=servicedesk;Integrated Security=False; User Id=sa; Password=testomonials@123";
+
+                using (var cn = new SqlConnection(meConStr))
+                {
+                    cn.Open();
+                    string sql = "select " +
+                                 "citype.typename , " +
+                                 "componentdefinition.componentname, " +
+                                 "resources.resourcename as Asset, " +
+                                 "resourcecost.cost as Cost " +
+                                 "from resources " +
+                                 "JOIN resourceowner on resourceowner.resourceid = resources.resourceid " +
+                                 "JOIN sduser on sduser.userid = resourceowner.userid " +
+                                 "JOIN aaauser on aaauser.user_id = sduser.userid " +
+                                 "JOIN userdepartment on userdepartment.userid = aaauser.user_id " +
+                                 "JOIN departmentdefinition on departmentdefinition.deptid = userdepartment.deptid " +
+                                 "JOIN sdorganization ON sdorganization.org_id = departmentdefinition.siteid " +
+                                 "LEFT JOIN resourcecost ON resourcecost.resourceid = resources.resourceid " +
+                                 "JOIN ci on ci.ciid = resources.ciid " +
+                                 "JOIN citype on citype.typeid = ci.citypeid " +
+                                 "JOIN componentdefinition on componentdefinition.componentid = resources.componentid " +
+                                 "where " +
+                                 "employeeid = '" + empUnqId + "' " +
+                                 "and (citype.typename in('Workstation', 'Windows Workstation', 'Monitor', 'Printer', 'Scanner', " +
+                                 "'Equipments', 'Smart Phone', 'IDs & IP', 'Storage Device', 'IP Phone')) " +
+                                 "order by employeeid ";
+                    var cmd = new SqlCommand(sql, cn);
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    while (dr.Read())
+                    {
+                        float.TryParse(dr["Cost"].ToString(), out float value);
+                        var nd = new NoDuesIt
+                        {
+                            EmpUnqId = empUnqId,
+                            TypeName = dr["typename"].ToString(),
+                            ComponentName = dr["componentname"].ToString(),
+                            Asset = dr["Asset"].ToString(),
+                            Cost = value
+                        };
+
+                        noDuesIt.Add(nd);
+                    }
+
+                    cn.Close();
+                    return noDuesIt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return noDuesIt;
+            }
+
+            return noDuesIt;
         }
     }
 }

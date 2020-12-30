@@ -167,13 +167,19 @@ namespace ESS.Controllers.Api
                         CompanyAcc = e.CompanyAcc,
 
                         BirthDate = e.BirthDate,
-                        Pan = e.Pan
+                        Pan = e.Pan,
+                        JoinDate =  e.JoinDate
                     }
                 )
                 .ToList();
 
             if (employee.Count == 0)
                 return NotFound();
+
+            foreach (EmployeeDto employeeDto in employee)
+            {
+                employeeDto.NoDuesFlag = _context.NoDuesMaster.Any(e => e.EmpUnqId == employeeDto.EmpUnqId);
+            }
 
             return Ok(employee);
         }

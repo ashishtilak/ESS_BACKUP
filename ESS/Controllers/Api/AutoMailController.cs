@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Http;
@@ -693,5 +694,138 @@ namespace ESS.Controllers.Api
 
             return Ok();
         }
+
+        [HttpGet]
+        public IHttpActionResult SendMailNoDues(string releaseGroupCode, string empUnqId, string dept)
+        {
+            string[] emails;
+
+            // record created, send mail to dept head for intimation
+            if (dept.ToUpper() == "HOD")
+            {
+                // get list of releaers
+                var relCodes = _context.NoDuesReleaseStatus
+                    .Where(e => e.EmpUnqId == empUnqId)
+                    .Select(e => e.ReleaseCode).ToArray();
+
+                var releasers = _context.ReleaseAuth
+                    .Where(r => relCodes.Contains(r.ReleaseCode))
+                    .Select(e => e.EmpUnqId).ToArray();
+
+                emails = _context.Employees
+                    .Where(e => releasers.Contains(e.EmpUnqId))
+                    .Select(e => e.Email)
+                    .ToArray();
+            }
+            else
+            {
+                // Dept head has released, intimate all other GSS depts
+                var releasers = _context.NoDuesReleaser
+                    .Select(e => e.EmpUnqId).ToArray();
+                emails = _context.Employees
+                    .Where(e => releasers.Contains(e.EmpUnqId))
+                    .Select(e => e.Email)
+                    .ToArray();
+            }
+
+            if (emails.Length == 0)
+                return BadRequest("No emails found to send...");
+
+
+            Employees emp = _context.Employees
+                    .Include(e=>e.Departments)
+                    .Include(e=>e.Stations)
+                    .FirstOrDefault(e => e.EmpUnqId == empUnqId);
+
+            if (emp == null)
+                return BadRequest("Employee not found!");
+
+            NoDuesMaster noDuesMaster = _context.NoDuesMaster
+                .FirstOrDefault(e => e.EmpUnqId == empUnqId);
+
+            if(noDuesMaster == null)
+                return BadRequest("No Dues master not found!");
+
+
+            const string header = @"
+                <html lang=""en"">
+                    <head>    
+                        <meta content=""text/html; charset=utf-8"" http-equiv=""Content-Type"">
+                        <title>
+                            ESS Portal - Automessage
+                        </title>
+                        <style type=""text/css"">
+                            body { font-family: arial, sans-serif; }
+                            table {
+                                font-family: arial, sans-serif;
+                                border-collapse: collapse;
+                                width: 80%;
+                            }
+
+                            td, th {
+                                border: 1px solid #dddddd;
+                                text-align: left;
+                                padding: 8px;
+                            }
+
+                            tr:nth-child(even) {
+                                background-color: #dddddd;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                ";
+
+            string body = "Dear Sir, <br /><br /> " +
+                          "Following No Dues/outstanding certification application requires your attention: <br/> <br />" +
+                          "Employee Code: " + emp.EmpUnqId + " <br/>" +
+                          "Name: " + emp.EmpName + " <br/>" +
+                          "Dept/Station: " + emp.Departments.DeptName + "/" + emp.Stations.StatName + " <br/></br>";
+
+            body = header + body;
+
+            body += "The same will be awailable to you from " + noDuesMaster.NoDuesStartDate.Date.ToString(CultureInfo.InvariantCulture);
+
+            body += "<br/>Kindly review the same in <a href='" + ConfigurationManager.AppSettings["PortalAddress"] +
+                    "'>ESS Portal</a>.";
+
+            body += "</body></html>";
+            try
+            {
+
+                var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
+                {
+                    //Credentials = new System.Net.NetworkCredential("tilaka@jindalsaw.com", "ashish123$$"),
+                    UseDefaultCredentials = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = false
+                };
+
+
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
+                    //From = new MailAddress("attnd.nkp@jindalsaw.com", "ESS Portal"),
+                    Subject = "Notification from ESS Portal for No Dues certification",
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    IsBodyHtml = true,
+                    Body = body
+                };
+
+                foreach (string email in emails)
+                {
+                    mail.To.Add(new MailAddress(email));
+                    smtpClient.Send(mail);
+                    mail.To.Remove(new MailAddress(email));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error:" + ex);
+            }
+
+            return Ok();
+        }
+
     }
 }

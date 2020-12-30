@@ -11,26 +11,35 @@ namespace ESS.Dto
         public string EmpUnqId { get; set; }
         public int DepSr { get; set; }
         public string DepName { get; set; }
-        public string Rleation { get; set; }
+        public string Relation { get; set; }
         public DateTime BirthDate { get; set; }
         public string Gender { get; set; }
         public DateTime? MarriageDate { get; set; }
         public string Pan { get; set; }
         public string Aadhar { get; set; }
-        public string BirthCertiicateNo { get; set; }
+        public string BirthCertificateNo { get; set; }
         public DateTime EffectiveDate { get; set; } //by default add date
+
         public string ReleaseGroupCode { get; set; }
-        public ReleaseGroupDto ReleaseGroup { get; set; }
         public string ReleaseStrategy { get; set; }
-        public ReleaseStrategyDto RelStrategy { get; set; }
         public string ReleaseStatusCode { get; set; }
         public DateTime? ReleaseDt { get; set; }
         public string ReleaseUser { get; set; }
+
+        // Dependent Deletion Release fields...
+        public string DelReleaseGroupCode { get; set; }
+        public string DelReleaseStrategy { get; set; }
+        public string DelReleaseStatusCode { get; set; }
+        public DateTime? DelReleaseDt { get; set; }
+        public string DelReleaseUser { get; set; }
+        
         public bool Active { get; set; }
+
         public string AddUser { get; set; }
         public DateTime AddDate { get; set; }
-        public List<ApplReleaseStatusDto> ApplReleaseStatus { get; set; }
 
-        public List<MedEmpUhidDto> UhIds { get; set; }
+        public bool IsChanged { get; set; }
+
+        public MedEmpUhidDto UhIds { get; set; }
     }
 }

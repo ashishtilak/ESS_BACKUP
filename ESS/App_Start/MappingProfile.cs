@@ -123,6 +123,18 @@ namespace ESS.App_Start
 
             CreateMap<MedicalFitness, MedicalFitnessDto>();
             CreateMap<MedicalFitnessDto, MedicalFitness>();
+
+            CreateMap<NoDuesMaster, NoDuesMasterDto>();
+            CreateMap<NoDuesMasterDto, NoDuesMaster>();
+
+            CreateMap<NoDuesReleaseStatus, NoDuesReleaseStatusDto>();
+            CreateMap<NoDuesReleaseStatusDto, NoDuesReleaseStatus>();
+
+            CreateMap<NoDuesDept, NoDuesDeptDto>();
+            CreateMap<NoDuesDeptDto, NoDuesDept>();
+
+            CreateMap<NoDuesDeptDetails, NoDuesDeptDetailsDto>();
+            CreateMap<NoDuesDeptDetailsDto, NoDuesDeptDetails>();
         }
     }
 }

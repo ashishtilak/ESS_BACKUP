@@ -289,6 +289,110 @@ namespace ESS.Controllers.Api
             }
         }
 
+        public IHttpActionResult GetSchedule(string empUnqId)
+        {
+            // set output table
+            var outputTable = new DataTable("ShiftSchedule");
+            outputTable.Columns.Add("EmpUnqId");
+
+            outputTable.Columns.Add("EmpName");
+            outputTable.Columns.Add("DeptName");
+            outputTable.Columns.Add("StatName");
+            outputTable.Columns.Add("Designation");
+            outputTable.Columns.Add("CatName");
+
+
+            var openMonth = _context.SsOpenMonth.FirstOrDefault()?.YearMonth;
+            if (openMonth == null) return BadRequest("Open month not configured.");
+
+            var fromDt = new DateTime(
+                Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
+                Convert.ToInt32(openMonth.ToString().Substring(4, 2)), 1);
+
+            DateTime toDt = fromDt.AddMonths(1).AddDays(-1);
+
+            // fill output table with columns = days of months
+            DateTime loopDate = fromDt;
+            for (int dt = 1; dt <= toDt.Day; dt++)
+            {
+                string dayStr = dt.ToString("00") ;
+                outputTable.Columns.Add(dayStr);
+                loopDate = loopDate.AddDays(1);
+            }
+
+            
+            EmployeeDto employeeDto = _context.Employees
+                .Where(e=>e.EmpUnqId == empUnqId)
+                .Select(e => new EmployeeDto
+                {
+                    EmpUnqId = e.EmpUnqId,
+                    EmpName = e.EmpName,
+                    FatherName = e.FatherName,
+                    Active = e.Active,
+                    Pass = e.Pass,
+
+                    CompCode = e.CatCode,
+                    WrkGrp = e.WrkGrp,
+                    UnitCode = e.UnitCode,
+                    DeptCode = e.DeptCode,
+                    StatCode = e.StatCode,
+                    CatCode = e.CatCode,
+                    EmpTypeCode = e.EmpTypeCode,
+                    GradeCode = e.GradeCode,
+                    DesgCode = e.DesgCode,
+                    IsHod = e.IsHod,
+
+                    CompName = e.Company.CompName,
+                    WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                    UnitName = e.Units.UnitName,
+                    DeptName = e.Departments.DeptName,
+                    StatName = e.Stations.StatName,
+                    CatName = e.Categories.CatName,
+                    EmpTypeName = e.EmpTypes.EmpTypeName,
+                    GradeName = e.Grades.GradeName,
+                    DesgName = e.Designations.DesgName,
+
+                    Location = e.Location
+                })
+                .Single(e => e.EmpUnqId == empUnqId);
+
+            var schedules = _context.ShiftSchedules
+                .Where(s => s.YearMonth == openMonth &&
+                            s.EmpUnqId == empUnqId &&
+                            s.ReleaseStatusCode != ReleaseStatus.ReleaseRejected
+                ).ToList();
+            if (schedules.Count == 0)
+                return BadRequest("No records found.");
+
+            foreach (var schDtl in schedules.Select(sch => _context.ShiftScheduleDetails
+                .Where(s =>
+                    s.YearMonth == sch.YearMonth &&
+                    s.ScheduleId == sch.ScheduleId &&
+                    s.EmpUnqId == sch.EmpUnqId).ToList()))
+            {
+                DataRow dr = outputTable.NewRow();
+                dr["EmpUnqId"] = empUnqId;
+                dr["EmpName"] = employeeDto.EmpName;
+                dr["DeptName"] = employeeDto.DeptName;
+                dr["StatName"] = employeeDto.StatName;
+                dr["Designation"] = employeeDto.DesgName;
+                dr["CatName"] = employeeDto.CatName;
+
+                for (DateTime dt = fromDt; dt <= toDt;)
+                {
+                    string dayStr = dt.Day.ToString("00");   // + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
+
+                    //dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                    dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
+                    dt = dt.AddDays(1);
+                }
+
+                outputTable.Rows.Add(dr);
+            }
+
+            return Ok(outputTable);
+        }
+
         public IHttpActionResult GetSchedule(DateTime fromDate, DateTime toDate, int openMonth)
         {
             try
@@ -757,6 +861,22 @@ namespace ESS.Controllers.Api
 
             // if release code is null, return false, else return tru
             return relCode != null;
+        }
+
+        [HttpPut]
+        public IHttpActionResult ChangeOpenMonth(int yearMonth)
+        {
+            SsOpenMonth currentMonth = _context.SsOpenMonth.First() ?? new SsOpenMonth();
+
+            currentMonth.YearMonth = yearMonth;
+
+            string sql = "UPDATE SsOpenMonths " +
+                         "Set YearMonth = " + currentMonth.YearMonth + ", " +
+                         "PostingEnabled = 1 " ;
+
+            _context.Database.ExecuteSqlCommand(sql);
+
+            return Ok();
         }
     }
 }

@@ -91,5 +91,7 @@ namespace ESS.Models
         //added on 08.06.2020 by Ashish
         [Column(TypeName = "datetime2")] public DateTime? BirthDate { get; set; }
         [StringLength(10)] public string Pan { get; set; }
+
+        [Column(TypeName = "datetime2")] public DateTime? JoinDate { get; set; }
     }
 }

@@ -200,6 +200,7 @@
     <Compile Include="Controllers\Api\MasterUploadController.cs" />
     <Compile Include="Controllers\Api\MedDependentController.cs" />
     <Compile Include="Controllers\Api\MedicalFitnessController.cs" />
+    <Compile Include="Controllers\Api\NoDuesController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReimbursementController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
@@ -248,6 +249,11 @@
     <Compile Include="Dto\MedDependentDto.cs" />
     <Compile Include="Dto\MedEmpUhidDto.cs" />
     <Compile Include="Dto\MedicalFitnessDto.cs" />
+    <Compile Include="Dto\NoDuesDeptDetailsDto.cs" />
+    <Compile Include="Dto\NoDuesDeptDto.cs" />
+    <Compile Include="Dto\NoDuesIt.cs" />
+    <Compile Include="Dto\NoDuesMasterDto.cs" />
+    <Compile Include="Dto\NoDuesReleaseStatusDto.cs" />
     <Compile Include="Dto\PerfAttdDto.cs" />
     <Compile Include="Dto\PerfPunchDto.cs" />
     <Compile Include="Dto\ReimbConvDto.cs" />
@@ -678,6 +684,26 @@
     <Compile Include="Migrations\202010281153237_ChangeInMedDependent.Designer.cs">
       <DependentUpon>202010281153237_ChangeInMedDependent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202011090844157_InitialNoDuesConfig.cs" />
+    <Compile Include="Migrations\202011090844157_InitialNoDuesConfig.Designer.cs">
+      <DependentUpon>202011090844157_InitialNoDuesConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202011181217593_NoDuesDeptDetails.cs" />
+    <Compile Include="Migrations\202011181217593_NoDuesDeptDetails.Designer.cs">
+      <DependentUpon>202011181217593_NoDuesDeptDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202011300536431_NoDuesMasterChanges.cs" />
+    <Compile Include="Migrations\202011300536431_NoDuesMasterChanges.Designer.cs">
+      <DependentUpon>202011300536431_NoDuesMasterChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012010349308_NoDuesUnitHeadRelease.cs" />
+    <Compile Include="Migrations\202012010349308_NoDuesUnitHeadRelease.Designer.cs">
+      <DependentUpon>202012010349308_NoDuesUnitHeadRelease.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012181240097_AddNewFieldInMedDependent.cs" />
+    <Compile Include="Migrations\202012181240097_AddNewFieldInMedDependent.Designer.cs">
+      <DependentUpon>202012181240097_AddNewFieldInMedDependent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -712,6 +738,15 @@
     <Compile Include="Models\MedEmpUhid.cs" />
     <Compile Include="Models\MedicalFitness.cs" />
     <Compile Include="Models\MedPolicy.cs" />
+    <Compile Include="Models\NoDuesCreators.cs" />
+    <Compile Include="Models\NoDuesDept.cs" />
+    <Compile Include="Models\NoDuesDeptDetails.cs" />
+    <Compile Include="Models\NoDuesDeptList.cs" />
+    <Compile Include="Models\NoDuesMaster.cs" />
+    <Compile Include="Models\NoDuesReleasers.cs" />
+    <Compile Include="Models\NoDuesReleaseStatus.cs" />
+    <Compile Include="Models\NoDuesStatus.cs" />
+    <Compile Include="Models\NoDuesUnitHead.cs" />
     <Compile Include="Models\OpenMonth.cs" />
     <Compile Include="Models\ReimbConv.cs" />
     <Compile Include="Models\Reimbursements.cs" />
@@ -1109,6 +1144,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202010281153237_ChangeInMedDependent.resx">
       <DependentUpon>202010281153237_ChangeInMedDependent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011090844157_InitialNoDuesConfig.resx">
+      <DependentUpon>202011090844157_InitialNoDuesConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011181217593_NoDuesDeptDetails.resx">
+      <DependentUpon>202011181217593_NoDuesDeptDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011300536431_NoDuesMasterChanges.resx">
+      <DependentUpon>202011300536431_NoDuesMasterChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012010349308_NoDuesUnitHeadRelease.resx">
+      <DependentUpon>202012010349308_NoDuesUnitHeadRelease.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012181240097_AddNewFieldInMedDependent.resx">
+      <DependentUpon>202012181240097_AddNewFieldInMedDependent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -91,5 +91,9 @@ namespace ESS.Dto
 
         public DateTime? BirthDate { get; set; }
         public string Pan { get; set; }
+
+        public DateTime? JoinDate { get; set; }
+
+        public bool NoDuesFlag { get; set; }
     }
 }

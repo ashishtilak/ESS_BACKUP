@@ -84,12 +84,21 @@ namespace ESS.Models
         public DbSet<SsOpenMonth> SsOpenMonth { get; set; }
         public DbSet<Reimbursements> Reimbursement { get; set; }
         public DbSet<ReimbConv> ReimbConvs { get; set; }
-
         public DbSet<MedPolicy> MedPolicies { get; set; }
         public DbSet<MedDependent> MedDependents { get; set; }
         public DbSet<MedEmpUhid> MedEmpUhids { get; set; }
-
         public DbSet<MedicalFitness> MedicalFitness { get; set; }
+
+        public DbSet<NoDuesMaster> NoDuesMaster { get; set; }
+        public DbSet<NoDuesStatus> NoDuesStatus { get; set; }
+        public DbSet<NoDuesCreators> NoDuesCreator { get; set; }
+        public DbSet<NoDuesReleasers> NoDuesReleaser { get; set; }
+        public DbSet<NoDuesReleaseStatus> NoDuesReleaseStatus { get; set; }
+        public  DbSet<NoDuesDeptList> NoDuesDeptList { get; set; }
+        public  DbSet<NoDuesDept> NoDuesDept { get; set; }
+        public  DbSet<NoDuesDeptDetails> NoDuesDeptDetails { get; set; }
+        public  DbSet<NoDuesUnitHead> NoDuesUnitHead { get; set; }
+
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
