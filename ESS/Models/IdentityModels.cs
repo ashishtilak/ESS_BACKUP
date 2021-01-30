@@ -94,11 +94,14 @@ namespace ESS.Models
         public DbSet<NoDuesCreators> NoDuesCreator { get; set; }
         public DbSet<NoDuesReleasers> NoDuesReleaser { get; set; }
         public DbSet<NoDuesReleaseStatus> NoDuesReleaseStatus { get; set; }
-        public  DbSet<NoDuesDeptList> NoDuesDeptList { get; set; }
-        public  DbSet<NoDuesDept> NoDuesDept { get; set; }
-        public  DbSet<NoDuesDeptDetails> NoDuesDeptDetails { get; set; }
-        public  DbSet<NoDuesUnitHead> NoDuesUnitHead { get; set; }
+        public DbSet<NoDuesDeptList> NoDuesDeptList { get; set; }
+        public DbSet<NoDuesDept> NoDuesDept { get; set; }
+        public DbSet<NoDuesDeptDetails> NoDuesDeptDetails { get; set; }
+        public DbSet<NoDuesUnitHead> NoDuesUnitHead { get; set; }
 
+        public DbSet<Requests> Requests { get; set; }
+        public DbSet<RequestDetails> RequestDetails { get; set; }
+        public DbSet<RequestRelease> RequestReleases { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

@@ -83,6 +83,8 @@ namespace ESS.Controllers.Api
 
             foreach (var emp in employeeDto)
             {
+                emp.NoDuesFlag = _context.NoDuesMaster.Any(e => e.EmpUnqId == emp.EmpUnqId);
+
                 var roleId = _context.RoleUser.FirstOrDefault(e => e.EmpUnqId == emp.EmpUnqId);
                 emp.RoleId = roleId == null ? 1 : roleId.RoleId;
             }

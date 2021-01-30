@@ -204,6 +204,7 @@
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReimbursementController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
+    <Compile Include="Controllers\Api\RequestController.cs" />
     <Compile Include="Controllers\Api\RolesController.cs" />
     <Compile Include="Controllers\Api\SalarySlipController.cs" />
     <Compile Include="Controllers\Api\ShiftScheduleController.cs" />
@@ -260,6 +261,9 @@
     <Compile Include="Dto\ReleaseGroupDto.cs" />
     <Compile Include="Dto\ReleaseStrategyDto.cs" />
     <Compile Include="Dto\ReleaseStrategyLevelDto.cs" />
+    <Compile Include="Dto\RequestDetailsDto.cs" />
+    <Compile Include="Dto\RequestDto.cs" />
+    <Compile Include="Dto\RequestReleaseDto.cs" />
     <Compile Include="Dto\RoleAuthDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
     <Compile Include="Dto\ShiftDto.cs" />
@@ -704,6 +708,10 @@
     <Compile Include="Migrations\202012181240097_AddNewFieldInMedDependent.Designer.cs">
       <DependentUpon>202012181240097_AddNewFieldInMedDependent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202101221110547_RequestForBackDatedSSChange.cs" />
+    <Compile Include="Migrations\202101221110547_RequestForBackDatedSSChange.Designer.cs">
+      <DependentUpon>202101221110547_RequestForBackDatedSSChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -755,6 +763,9 @@
     <Compile Include="Models\ReleaseStatus.cs" />
     <Compile Include="Models\ReleaseStrategies.cs" />
     <Compile Include="Models\ReleaseStrategyLevels.cs" />
+    <Compile Include="Models\RequestDetails.cs" />
+    <Compile Include="Models\RequestRelease.cs" />
+    <Compile Include="Models\Requests.cs" />
     <Compile Include="Models\RoleAuth.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RoleUsers.cs" />
@@ -1159,6 +1170,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202012181240097_AddNewFieldInMedDependent.resx">
       <DependentUpon>202012181240097_AddNewFieldInMedDependent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101221110547_RequestForBackDatedSSChange.resx">
+      <DependentUpon>202101221110547_RequestForBackDatedSSChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

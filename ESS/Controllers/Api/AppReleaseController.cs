@@ -488,7 +488,7 @@ namespace ESS.Controllers.Api
                         .Include(r => r.ReleaseGroup)
                         .Include(rs => rs.RelStrategy)
                         .Where(s => appIds.Contains(s.ScheduleId))
-                        .ToList()
+                        .AsEnumerable()
                         .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>).ToList();
 
                     // now for all gate pass advices,

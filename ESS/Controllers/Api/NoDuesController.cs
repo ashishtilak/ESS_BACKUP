@@ -188,9 +188,21 @@ namespace ESS.Controllers.Api
         }
 
         // get no dues status employee wise:
-        public IHttpActionResult GetNoDuesStatus(string empUnqId)
+        public IHttpActionResult GetNoDuesStatus(string empUnqId="")
         {
-            var status = _context.NoDuesStatus.Where(e => e.EmpUnqId == empUnqId).ToList();
+            List<NoDuesStatus> status;
+            if (empUnqId == "")
+            {
+                var empList = _context.NoDuesMaster
+                    .Where(e => e.ClosedFlag == false)
+                    .Select(e => e.EmpUnqId).ToArray();
+                status = _context.NoDuesStatus.Where(e => empList.Contains(e.EmpUnqId)).ToList();
+            }
+            else
+            {
+                status = _context.NoDuesStatus.Where(e => e.EmpUnqId == empUnqId).ToList();
+            }
+            
             if (status.Count == 0)
                 return BadRequest("No records found!");
 
@@ -406,7 +418,12 @@ namespace ESS.Controllers.Api
                         }
 
                         var deptDtos = noDuesDept.Where(e => e.EmpUnqId == master.EmpUnqId).ToList();
-                        if (deptDtos.Count == 0) continue;
+                        
+                        if (deptDtos.Count == 0)
+                        {
+                            noDuesMasters.Remove(master);
+                            continue;
+                        }
                         else
                         {
                             if (noDuesDept.Any(e => e.EmpUnqId == master.EmpUnqId && e.ApprovalFlag == true))
@@ -573,6 +590,7 @@ namespace ESS.Controllers.Api
                         JoinDate = dto.JoinDate,
                         ResignDate = dto.ResignDate,
                         RelieveDate = dto.RelieveDate,
+                        ModeOfLeaving = dto.ModeOfLeaving,
                         // Nodues process start date should be 4 days prior to relieve date.
                         NoDuesStartDate = noDuesStartDate,
                         AddUser = dto.AddUser,

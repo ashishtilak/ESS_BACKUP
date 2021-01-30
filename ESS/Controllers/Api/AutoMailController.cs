@@ -45,9 +45,12 @@ namespace ESS.Controllers.Api
 
         private bool SendMailShiftSchedule(int id, string releaseCode)
         {
-            ShiftScheduleDto ssDto = _context.ShiftSchedules
-                .Select(Mapper.Map<ShiftSchedules, ShiftScheduleDto>)
-                .FirstOrDefault(s => s.ScheduleId == id);
+            ShiftSchedules ss = _context.ShiftSchedules.FirstOrDefault(
+                s=>s.ScheduleId == id);
+            if (ss==null)
+                throw new Exception("Invalid shift schedule id");
+
+            ShiftScheduleDto ssDto = Mapper.Map<ShiftSchedules, ShiftScheduleDto>(ss);
 
             if (ssDto == null)
                 throw new Exception("Invalid shift schedule id");
@@ -59,7 +62,7 @@ namespace ESS.Controllers.Api
                     l.ApplicationId == ssDto.ScheduleId &&
                     l.ReleaseGroupCode == ssDto.ReleaseGroupCode &&
                     l.ReleaseCode == releaseCode
-                )
+                ).AsEnumerable()
                 .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
                 .FirstOrDefault();
 

@@ -135,6 +135,14 @@ namespace ESS.App_Start
 
             CreateMap<NoDuesDeptDetails, NoDuesDeptDetailsDto>();
             CreateMap<NoDuesDeptDetailsDto, NoDuesDeptDetails>();
+
+            CreateMap<Requests, RequestDto>();
+            CreateMap<RequestDto, Requests>();
+            CreateMap<RequestDetails, RequestDetailsDto>();
+            CreateMap<RequestDetailsDto, RequestDetails>();
+            CreateMap<RequestRelease, RequestReleaseDto>();
+            CreateMap<RequestReleaseDto, RequestRelease>();
+
         }
     }
 }

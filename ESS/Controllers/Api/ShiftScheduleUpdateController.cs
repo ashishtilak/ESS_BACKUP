@@ -172,7 +172,7 @@ namespace ESS.Controllers.Api
                         string dayStr = dt.Day.ToString("00") + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
 
                         // change following line to get current schedule from ATTD
-                        if (attdSchedule == null)
+                        if (attdSchedule.EmpUnqId == null)
                         {
                             dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                         }
@@ -317,7 +317,7 @@ namespace ESS.Controllers.Api
                                     YearMonth = openMonth, ShiftDay = rowIndex
                                 };
 
-                                if (attdSchedule != null)
+                                if (attdSchedule.EmpUnqId != null)
                                     existingLine.ShiftCode = attdSchedule["D" + rowIndex.ToString("00")].ToString();
                                 else
                                     existingLine = existingSch.FirstOrDefault(s => s.ShiftDay == rowIndex);
@@ -339,7 +339,7 @@ namespace ESS.Controllers.Api
                             {
                                 // Check for WO in existing schedule.
 
-                                if (attdSchedule != null)
+                                if (attdSchedule.EmpUnqId != null)
                                 {
                                     // If there's a wo in existing schedule in attendnace,
                                     if (attdSchedule["D" + rowIndex.ToString("00")].ToString() == "WO")
