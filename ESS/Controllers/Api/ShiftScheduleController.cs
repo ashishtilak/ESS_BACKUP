@@ -104,7 +104,10 @@ namespace ESS.Controllers.Api
                 if (relCode.Length == 0) return BadRequest("Employee is not a releaser.");
 
                 var relStrLvl = _context.ReleaseStrategyLevels
-                    .Where(r => relCode.Contains(r.ReleaseCode) && r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
+                    .Where(r =>
+                        relCode.Contains(r.ReleaseCode) &&
+                        r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule
+                    )
                     .Select(r => r.ReleaseStrategy).ToArray();
 
                 var vRelStr = _context.ReleaseStrategy
@@ -191,7 +194,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
-                        .Where(e=>e.EmpUnqId == relStr.ReleaseStrategy)
+                        .Where(e => e.EmpUnqId == relStr.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,
@@ -315,14 +318,14 @@ namespace ESS.Controllers.Api
             DateTime loopDate = fromDt;
             for (int dt = 1; dt <= toDt.Day; dt++)
             {
-                string dayStr = dt.ToString("00") ;
+                string dayStr = dt.ToString("00");
                 outputTable.Columns.Add(dayStr);
                 loopDate = loopDate.AddDays(1);
             }
 
-            
+
             EmployeeDto employeeDto = _context.Employees
-                .Where(e=>e.EmpUnqId == empUnqId)
+                .Where(e => e.EmpUnqId == empUnqId)
                 .Select(e => new EmployeeDto
                 {
                     EmpUnqId = e.EmpUnqId,
@@ -380,7 +383,7 @@ namespace ESS.Controllers.Api
 
                 for (DateTime dt = fromDt; dt <= toDt;)
                 {
-                    string dayStr = dt.Day.ToString("00");   // + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
+                    string dayStr = dt.Day.ToString("00"); // + "_" + dt.DayOfWeek.ToString().Substring(0, 2);
 
                     //dr["D" + dt.Day.ToString("00")] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
                     dr[dayStr] = schDtl.First(s => s.ShiftDay == dt.Day).ShiftCode ?? "";
@@ -409,7 +412,7 @@ namespace ESS.Controllers.Api
                     Convert.ToInt32(openMonth.ToString().Substring(0, 4)),
                     Convert.ToInt32(openMonth.ToString().Substring(4, 2)),
                     1
-                    );
+                );
 
                 //var fromDt = new DateTime(fromDate.Year,
                 //    fromDate.Month, 1);
@@ -450,7 +453,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = sch.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
-                        .Where(e=>e.EmpUnqId == sch.ReleaseStrategy)
+                        .Where(e => e.EmpUnqId == sch.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,
@@ -648,8 +651,8 @@ namespace ESS.Controllers.Api
                             // OUR SHIFT SCHEDULE IS OK TO UPLOAD...
 
                             int maxId = _context.ShiftSchedules
-                                            .Select(s => (int?) s.ScheduleId)
-                                            .Max() ?? 0;
+                                .Select(s => (int?) s.ScheduleId)
+                                .Max() ?? 0;
 
                             maxId++;
 
@@ -872,7 +875,7 @@ namespace ESS.Controllers.Api
 
             string sql = "UPDATE SsOpenMonths " +
                          "Set YearMonth = " + currentMonth.YearMonth + ", " +
-                         "PostingEnabled = 1 " ;
+                         "PostingEnabled = 1 ";
 
             _context.Database.ExecuteSqlCommand(sql);
 

@@ -112,14 +112,14 @@ namespace ESS.Controllers.Api
             try
             {
                 medDependentDto = JsonConvert.DeserializeObject<List<MedDependentDto>>(request.ToString());
-                emp = medDependentDto.FirstOrDefault(e=>e.DepSr == 0)?.EmpUnqId;
+                emp = medDependentDto.FirstOrDefault(e => e.DepSr == 0)?.EmpUnqId;
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
             }
 
-            
+
             try
             {
                 // get current active records of employee
@@ -171,8 +171,8 @@ namespace ESS.Controllers.Api
                             Aadhar = dto.Aadhar,
                             Relation = dto.Relation,
                             BirthCertificateNo = dto.BirthCertificateNo,
-                            AddUser =  dto.AddUser,
-                            AddDate =  DateTime.Now,
+                            AddUser = dto.AddUser,
+                            AddDate = DateTime.Now,
                             IsChanged = true // keep this false, will be true upon approval
                         };
 
@@ -192,7 +192,7 @@ namespace ESS.Controllers.Api
 
         public IHttpActionResult GetRelease(string releaser)
         {
-            var relCode = _context.ReleaseAuth.Where(e => e.EmpUnqId == releaser).Select(r=>r.ReleaseCode).ToArray();
+            var relCode = _context.ReleaseAuth.Where(e => e.EmpUnqId == releaser).Select(r => r.ReleaseCode).ToArray();
             var releasestrategylevels = _context.ReleaseStrategyLevels
                 .Where(r => r.ReleaseGroupCode == ReleaseGroups.Mediclaim &&
                             relCode.Contains(r.ReleaseCode))
@@ -297,7 +297,6 @@ namespace ESS.Controllers.Api
                                 dependent.ReleaseUser = dto.ReleaseUser;
                                 dependent.ReleaseDt = DateTime.Now;
                                 dependent.ReleaseStatusCode = dto.ReleaseStatusCode;
-
                             }
                             else
                             {
@@ -309,7 +308,7 @@ namespace ESS.Controllers.Api
                             }
                         }
 
-                        _context.SaveChanges(); 
+                        _context.SaveChanges();
                     }
 
                     transaction.Commit();
@@ -319,7 +318,7 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest("Error: " + ex);
             }
-            
+
 
             return Ok();
         }

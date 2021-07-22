@@ -9,13 +9,16 @@ namespace ESS.Models
 {
     public class NoDuesDept
     {
-        [Key,Column(Order = 0)] [StringLength(10)] public string EmpUnqId { get; set; }
+        [Key, Column(Order = 0)]
+        [StringLength(10)]
+        public string EmpUnqId { get; set; }
 
         [ForeignKey("EmpUnqId")] public Employees Employee { get; set; }
 
-        [Key,Column(Order = 1)]
-        [StringLength(3)] public string DeptId { get; set; }
-        
+        [Key, Column(Order = 1)]
+        [StringLength(3)]
+        public string DeptId { get; set; }
+
         public bool NoDuesFlag { get; set; }
 
         [StringLength(20)] public string Remarks { get; set; }

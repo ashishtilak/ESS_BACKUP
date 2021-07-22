@@ -40,6 +40,7 @@ namespace ESS.Dto
         public string StatName { get; set; }
         public string CatName { get; set; }
         public string GradeName { get; set; }
+        public string DesgName { get; set; }
 
 
         public string NoticePeriod { get; set; }
@@ -69,5 +70,6 @@ namespace ESS.Dto
         public List<NoDuesReleaseStatusDto> NoDuesReleaseStatus { get; set; }
         public List<NoDuesDeptDto> NoDuesDepts { get; set; }
         public List<NoDuesIt> NoDuesIt { get; set; }
+        public NoDuesStatusDto NoDuesStatus { get; set; }
     }
 }

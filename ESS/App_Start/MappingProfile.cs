@@ -136,6 +136,9 @@ namespace ESS.App_Start
             CreateMap<NoDuesDeptDetails, NoDuesDeptDetailsDto>();
             CreateMap<NoDuesDeptDetailsDto, NoDuesDeptDetails>();
 
+            CreateMap<NoDuesStatus, NoDuesStatusDto>();
+            CreateMap<NoDuesStatusDto, NoDuesStatus>();
+
             CreateMap<Requests, RequestDto>();
             CreateMap<RequestDto, Requests>();
             CreateMap<RequestDetails, RequestDetailsDto>();
@@ -143,6 +146,13 @@ namespace ESS.App_Start
             CreateMap<RequestRelease, RequestReleaseDto>();
             CreateMap<RequestReleaseDto, RequestRelease>();
 
+            CreateMap<EmpSeparation, EmpSeparationDto>();
+            CreateMap<EmpSeparationDto, EmpSeparation>();
+
+            CreateMap<MissedPunch, MissedPunchDto>();
+            CreateMap<MissedPunchDto, MissedPunch>();
+            CreateMap<MissedPunchReleaseStatus, MissedPunchReleaseStatusDto>();
+            CreateMap<MissedPunchReleaseStatusDto, MissedPunchReleaseStatus>();
         }
     }
 }

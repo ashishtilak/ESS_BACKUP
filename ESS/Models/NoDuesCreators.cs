@@ -13,7 +13,7 @@ namespace ESS.Models
         [StringLength(3)]
         public string Dept { get; set; }
 
-        [Key, Column(Order = 1)] 
+        [Key, Column(Order = 1)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
     }

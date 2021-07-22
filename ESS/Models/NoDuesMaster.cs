@@ -27,7 +27,7 @@ namespace ESS.Models
         [StringLength(50)] public string DeptParticulars { get; set; }
         [StringLength(200)] public string DeptRemarks { get; set; }
         public float? DeptAmount { get; set; }
-        
+
         public bool DeptNoDuesFlag { get; set; }
         public bool DeptApprovalFlag { get; set; }
 
@@ -37,9 +37,9 @@ namespace ESS.Models
         // HR NODUES FIELDS:
 
         [StringLength(50)] public string NoticePeriod { get; set; }
-        [StringLength(10)] public string NoticePeriodUnit { get; set; }  // BASIC or CTC
+        [StringLength(10)] public string NoticePeriodUnit { get; set; } // BASIC or CTC
         [Column(TypeName = "datetime2")] public DateTime? LastWorkingDate { get; set; }
-        [StringLength(20)] public string ModeOfLeaving { get; set; }  // Resign/Retire/Absconding/Termination/etc.
+        [StringLength(20)] public string ModeOfLeaving { get; set; } // Resign/Retire/Absconding/Termination/etc.
         public bool? ExitInterviewFlag { get; set; }
 
         [StringLength(10)] public string HrAddUser { get; set; }

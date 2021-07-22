@@ -9,7 +9,9 @@ namespace ESS.Dto
     {
         public int PolicyYear { get; set; }
         public string EmpUnqId { get; set; }
+
         public int DepSr { get; set; }
+
         // public MedDependentDto Dependent { get; set; }
         public string Uhid { get; set; }
         public bool Active { get; set; }

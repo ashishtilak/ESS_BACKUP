@@ -155,6 +155,7 @@ namespace ESS.Controllers.Api
                 noDue.StatName = emp.StatName;
                 noDue.CatName = emp.CatName;
                 noDue.GradeName = emp.GradeName;
+                noDue.DesgName = emp.DesgName;
 
                 // add dept to master
 
@@ -188,25 +189,150 @@ namespace ESS.Controllers.Api
         }
 
         // get no dues status employee wise:
-        public IHttpActionResult GetNoDuesStatus(string empUnqId="")
+        public IHttpActionResult GetNoDuesStatus(string empUnqId = "")
         {
             List<NoDuesStatus> status;
             if (empUnqId == "")
             {
-                var empList = _context.NoDuesMaster
+                string[] empList = _context.NoDuesMaster
                     .Where(e => e.ClosedFlag == false)
                     .Select(e => e.EmpUnqId).ToArray();
                 status = _context.NoDuesStatus.Where(e => empList.Contains(e.EmpUnqId)).ToList();
             }
             else
             {
-                status = _context.NoDuesStatus.Where(e => e.EmpUnqId == empUnqId).ToList();
+                NoDuesMaster noDues = _context.NoDuesMaster
+                    .FirstOrDefault(e => e.EmpUnqId == empUnqId);
+
+                if (noDues == null)
+                    return BadRequest("No records found for employee");
+
+                NoDuesMasterDto noDue = Mapper.Map<NoDuesMaster, NoDuesMasterDto>(noDues);
+
+                var deptDto = _context.NoDuesDept
+                    .Where(e => e.EmpUnqId == empUnqId).AsEnumerable()
+                    .Select(Mapper.Map<NoDuesDept, NoDuesDeptDto>)
+                    .ToList();
+
+                var noDuesDeptDtl = _context.NoDuesDeptDetails
+                    .Where(e => e.EmpUnqId == empUnqId).AsEnumerable()
+                    .Select(Mapper.Map<NoDuesDeptDetails, NoDuesDeptDetailsDto>)
+                    .ToList();
+
+                foreach (NoDuesDeptDto dto in deptDto)
+                {
+                    dto.NoDuesDeptDetails = new List<NoDuesDeptDetailsDto>();
+                    var dtl = noDuesDeptDtl.Where(d => d.DeptId == dto.DeptId).ToList();
+                    dto.NoDuesDeptDetails.AddRange(dtl);
+
+                    // get approver name
+                    string appName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.ApprovedBy)?.EmpName;
+                    dto.ApprovedByName = appName;
+
+                    dto.No = _context.NoDuesDeptList.FirstOrDefault(d => d.DeptId == dto.DeptId)?.Index;
+                    dto.DeptName = _context.NoDuesDeptList.FirstOrDefault(d => d.DeptId == dto.DeptId)?.DeptName;
+                }
+
+                // Get IT no dues from ServiceDesk portal
+                var noDuesIt = Helpers.CustomHelper.GetNoDuesIt(noDue.EmpUnqId);
+
+                noDue.NoDuesIt = new List<NoDuesIt>();
+                noDue.NoDuesIt.AddRange(noDuesIt);
+
+                // get employee
+                var emp = _context.Employees
+                    .Select(e => new EmployeeDto
+                    {
+                        EmpUnqId = e.EmpUnqId,
+                        EmpName = e.EmpName,
+                        FatherName = e.FatherName,
+                        Active = e.Active,
+                        Pass = e.Pass,
+
+                        CompCode = e.CatCode,
+                        WrkGrp = e.WrkGrp,
+                        UnitCode = e.UnitCode,
+                        DeptCode = e.DeptCode,
+                        StatCode = e.StatCode,
+                        CatCode = e.CatCode,
+                        EmpTypeCode = e.EmpTypeCode,
+                        GradeCode = e.GradeCode,
+                        DesgCode = e.DesgCode,
+                        IsHod = e.IsHod,
+
+                        CompName = e.Company.CompName,
+                        WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                        UnitName = e.Units.UnitName,
+                        DeptName = e.Departments.DeptName,
+                        StatName = e.Stations.StatName,
+                        CatName = e.Categories.CatName,
+                        EmpTypeName = e.EmpTypes.EmpTypeName,
+                        GradeName = e.Grades.GradeName,
+                        DesgName = e.Designations.DesgName,
+
+                        Location = e.Location
+                    })
+                    .FirstOrDefault(e => e.EmpUnqId == noDue.EmpUnqId);
+
+
+                noDue.EmpName = emp.EmpName;
+                noDue.UnitName = emp.UnitName;
+                noDue.DeptName = emp.DeptName;
+                noDue.StatName = emp.StatName;
+                noDue.CatName = emp.CatName;
+                noDue.GradeName = emp.GradeName;
+                noDue.DesgName = emp.DesgName;
+
+                noDue.NoDuesDepts = new List<NoDuesDeptDto>();
+                noDue.NoDuesDepts.AddRange(deptDto);
+
+
+                var relStrLvl = _context.NoDuesReleaseStatus
+                    .Where(r => r.ReleaseGroupCode == ReleaseGroups.NoDues &&
+                                r.EmpUnqId == noDue.EmpUnqId).AsEnumerable()
+                    .Select(Mapper.Map<NoDuesReleaseStatus, NoDuesReleaseStatusDto>)
+                    .ToList();
+
+                foreach (NoDuesReleaseStatusDto relLvl in relStrLvl)
+                {
+                    string relName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == relLvl.ReleaseAuth)?.EmpName;
+                    relLvl.ReleaserName = relName;
+                }
+
+                // get names of HR user and approver
+                string hrUser = _context.Employees.FirstOrDefault(e => e.EmpUnqId == noDue.HrAddUser)?.EmpName;
+                string hrApprover = _context.Employees.FirstOrDefault(e => e.EmpUnqId == noDue.HrApprovedBy)?.EmpName;
+
+                noDue.HrAddUserName = hrUser;
+                noDue.HrApprovedByName = hrApprover;
+
+                noDue.NoDuesReleaseStatus = new List<NoDuesReleaseStatusDto>();
+                noDue.NoDuesReleaseStatus.AddRange(relStrLvl);
+
+                var noDueStatus = _context.NoDuesStatus.FirstOrDefault(e => e.EmpUnqId == empUnqId);
+                if (noDueStatus != null)
+                {
+                    noDue.NoDuesStatus = new NoDuesStatusDto();
+                    noDue.NoDuesStatus = Mapper.Map<NoDuesStatus, NoDuesStatusDto>(noDueStatus);
+                }
+
+                return Ok(noDue);
             }
-            
+
             if (status.Count == 0)
                 return BadRequest("No records found!");
 
-            return Ok(status);
+            List<NoDuesStatusDto> statusDto = Mapper.Map<List<NoDuesStatus>, List<NoDuesStatusDto>>(status);
+
+            string[] emps = status.Select(e => e.EmpUnqId).Distinct().ToArray();
+            List<Employees> empName = _context.Employees.Where(e => emps.Contains(e.EmpUnqId)).ToList();
+
+            foreach (NoDuesStatusDto stat in statusDto)
+            {
+                stat.EmpName = empName.First(e => e.EmpUnqId == stat.EmpUnqId).EmpName;
+            }
+
+            return Ok(statusDto);
         }
 
         // get details based on dept/creator-releaser
@@ -311,8 +437,8 @@ namespace ESS.Controllers.Api
                 noDuesMasters = _context.NoDuesMaster
                     .Where(e =>
                         e.UhApprovalFlag == false &&
-                        e.UnitHead == empUnqId && 
-                        (e.RelieveDate <= DateTime.Today || e.ClosedFlag==false) &&
+                        e.UnitHead == empUnqId &&
+                        (e.RelieveDate <= DateTime.Today || e.ClosedFlag == false) &&
                         e.DeptApprovalFlag == true).AsEnumerable()
                     .Select(Mapper.Map<NoDuesMaster, NoDuesMasterDto>)
                     .ToList();
@@ -335,7 +461,7 @@ namespace ESS.Controllers.Api
                 {
                     // Check if this emp requires release from unit head or not
                     Employees empl = _context.Employees.FirstOrDefault(e => e.EmpUnqId == master.EmpUnqId);
-                    if(empl == null) continue;
+                    if (empl == null) continue;
 
                     NoDuesUnitHead empDept = _context.NoDuesUnitHead.FirstOrDefault(
                         e => e.CompCode == empl.CompCode &&
@@ -343,7 +469,7 @@ namespace ESS.Controllers.Api
                              e.UnitCode == empl.UnitCode &&
                              e.DeptCode == empl.DeptCode);
 
-                    if(empDept == null) continue;
+                    if (empDept == null) continue;
 
                     // check if emp belongs to DI LOB
                     if (empDept.DeptLoB == "DI")
@@ -377,12 +503,14 @@ namespace ESS.Controllers.Api
                 // FOR ALL OTHER DEPTS
                 if (releaseFlag == false) //creator
                 {
+                    // check if user is creator
                     var usr = _context.NoDuesCreator
                         .Where(e => e.EmpUnqId == empUnqId && e.Dept == dept)
                         .ToList();
                     if (usr.Count == 0)
                         return BadRequest("User is not authorized for creation");
 
+                    // check how many Masters are pending
                     noDuesMasters = _context.NoDuesMaster
                         .Where(e =>
                             e.ClosedFlag == false &&
@@ -391,16 +519,21 @@ namespace ESS.Controllers.Api
                         .Select(Mapper.Map<NoDuesMaster, NoDuesMasterDto>)
                         .ToList();
 
+                    // array of all emp
                     var emp = noDuesMasters.Select(e => e.EmpUnqId).ToArray();
 
+
+                    // get all nodues dept for specified dept
                     var noDuesDept = _context.NoDuesDept
-                        .Where(e => emp.Contains(e.EmpUnqId) && e.DeptId == dept && e.ApprovalFlag == false)
+                        .Where(e => emp.Contains(e.EmpUnqId) && e.DeptId == dept)
                         .AsEnumerable()
                         .Select(Mapper.Map<NoDuesDept, NoDuesDeptDto>)
                         .ToList();
 
+                    // list of all such emp found in nodues dept
                     emp = noDuesDept.Select(e => e.EmpUnqId).ToArray();
 
+                    // get dept details
                     var noDuesDeptDetails = _context.NoDuesDeptDetails
                         .Where(e => emp.Contains(e.EmpUnqId) &&
                                     e.DeptId == dept).AsEnumerable()
@@ -417,20 +550,13 @@ namespace ESS.Controllers.Api
                                 noDuesMasters.Remove(master);
                         }
 
+                        // search if dept exist for emp
                         var deptDtos = noDuesDept.Where(e => e.EmpUnqId == master.EmpUnqId).ToList();
-                        
-                        if (deptDtos.Count == 0)
+
+                        if (noDuesDept.Any(e => e.EmpUnqId == master.EmpUnqId && e.ApprovalFlag == true))
                         {
                             noDuesMasters.Remove(master);
                             continue;
-                        }
-                        else
-                        {
-                            if (noDuesDept.Any(e => e.EmpUnqId == master.EmpUnqId && e.ApprovalFlag == true))
-                            {
-                                noDuesMasters.Remove(master);
-                                continue;
-                            }
                         }
 
                         foreach (NoDuesDeptDto deptDto in deptDtos)
@@ -764,7 +890,7 @@ namespace ESS.Controllers.Api
 
         private bool CreateNoDuesHod(NoDuesMasterDto dto, bool releaseFlag)
         {
-            if (releaseFlag == false)   //record creation
+            if (releaseFlag == false) //record creation
                 try
                 {
                     NoDuesMaster noDues = _context.NoDuesMaster
@@ -786,7 +912,7 @@ namespace ESS.Controllers.Api
                 {
                     throw new Exception("Error:" + ex);
                 }
-            else                //releasing
+            else //releasing
                 try
                 {
                     using (DbContextTransaction transaction = _context.Database.BeginTransaction())
@@ -821,7 +947,6 @@ namespace ESS.Controllers.Api
                             NoDuesStatus noDuesStatus =
                                 _context.NoDuesStatus.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
                             if (noDuesStatus != null) noDuesStatus.Hod = true;
-
                         }
                         else
                         {

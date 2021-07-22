@@ -41,6 +41,11 @@ namespace ESS.Models
 
         [StringLength(70)] public string PreEmail { get; set; }
 
+        [StringLength(50)] public string HrCity { get; set; }
+        [StringLength(50)] public string HrSociety { get; set; }
+        [StringLength(50)] public string HrRemarks { get; set; }
+
+
         public DateTime UpdDt { get; set; }
 
         public bool HrVerified { get; set; }

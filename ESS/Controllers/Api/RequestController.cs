@@ -70,7 +70,7 @@ namespace ESS.Controllers.Api
             // over
 
             // check if date range overlaps
-            if(dto.RequestDetails.Count > 1)
+            if (dto.RequestDetails.Count > 1)
             {
                 //IEnumerable<RequestDetailsDto> overlaps = dto.RequestDetails.SelectMany(
                 //        x1 => dto.RequestDetails,
@@ -78,9 +78,9 @@ namespace ESS.Controllers.Api
                 //    .Where(t => (t.x1.FromDt <= t.x2.ToDt) && (t.x1.ToDt >= t.x2.FromDt))
                 //    .Select(t => t.x2);
                 bool found = dto.RequestDetails
-                    .Any(r=> dto.RequestDetails
-                        .Where(q=> q!=r)
-                        .Any(q=>q.FromDt <= r.ToDt && q.ToDt >= r.FromDt)
+                    .Any(r => dto.RequestDetails
+                        .Where(q => q != r)
+                        .Any(q => q.FromDt <= r.ToDt && q.ToDt >= r.FromDt)
                     );
 
                 if (found)
@@ -125,7 +125,7 @@ namespace ESS.Controllers.Api
                     FromDt = detail.FromDt,
                     ToDt = detail.ToDt,
                     ShiftCode = detail.ShiftCode,
-                    Reason =  detail.Reason
+                    Reason = detail.Reason
                 };
 
                 request.RequestDetails.Add(newDetail);
@@ -273,9 +273,9 @@ namespace ESS.Controllers.Api
             try
             {
                 Requests request = _context.Requests
-            .Include(r => r.RequestDetails)
-            .Include(r => r.RequestReleases)
-            .FirstOrDefault(r => r.RequestId == requestId);
+                    .Include(r => r.RequestDetails)
+                    .Include(r => r.RequestReleases)
+                    .FirstOrDefault(r => r.RequestId == requestId);
 
                 if (request == null)
                     return BadRequest("Request not found.");
@@ -317,7 +317,8 @@ namespace ESS.Controllers.Api
             Supervisor = 1,
             Releaser = 2,
             Hr = 3,
-            HrFull = 4
+            HrFull = 4,
+            HrTemplate = 5
         }
 
         public IHttpActionResult GetRequest(DateTime fromDt, DateTime toDt, ReportModes mode, string empUnqId = "")
@@ -416,6 +417,7 @@ namespace ESS.Controllers.Api
                     break;
                 // For HR, get all released requests during period
                 case ReportModes.HrFull:
+                case ReportModes.HrTemplate:
                     result = _context.Requests
                         .Include(r => r.RequestDetails)
                         .Include(r => r.RequestReleases)
@@ -438,8 +440,8 @@ namespace ESS.Controllers.Api
             {
                 string[] empList = dto.RequestDetails.Select(e => e.EmpUnqId).Distinct().ToArray();
                 var empName = _context.Employees
-                    .Where(e=>empList.Contains(e.EmpUnqId))
-                    .Select(e=>new
+                    .Where(e => empList.Contains(e.EmpUnqId))
+                    .Select(e => new
                     {
                         empUnqId = e.EmpUnqId,
                         empName = e.EmpName,
@@ -448,15 +450,63 @@ namespace ESS.Controllers.Api
 
                 foreach (RequestDetailsDto detail in dto.RequestDetails)
                 {
-                    detail.EmpName = empName.FirstOrDefault(e=>e.empUnqId == detail.EmpUnqId)?.empName;
+                    detail.EmpName = empName.FirstOrDefault(e => e.empUnqId == detail.EmpUnqId)?.empName;
                 }
 
                 dto.EmpName = empName.First().empName;
                 dto.AddUserName = _context.Employees
-                    .FirstOrDefault(e=>e.EmpUnqId == dto.AddUser)?.EmpName;
+                    .FirstOrDefault(e => e.EmpUnqId == dto.AddUser)?.EmpName;
             }
 
-            return Ok(result);
+            // Return OK if template is not required.
+            if (mode != ReportModes.HrTemplate)
+                return Ok(result);
+
+            // ELSE Generate template and return template
+            var returnData = new List<DataTemplate>();
+
+            foreach (RequestDto requestDto in result)
+            {
+                // get details
+                foreach (RequestDetailsDto dto in requestDto.RequestDetails)
+                {
+                    // loop between date range
+                    for (DateTime? dt = dto.FromDt; dt <= dto.ToDt;)
+                    {
+                        var temp = new DataTemplate
+                        {
+                            EmpUnqId = requestDto.EmpUnqId,
+                            SanDate = dt.Value,
+                            InTime = "",
+                            OutTime = "",
+                            ShiftCode = dto.ShiftCode,
+                            TpaHours = "0",
+                            Reason = dto.Reason
+                        };
+                        returnData.Add(temp);
+                        dt = dt.Value.AddDays(1);
+                    }
+                }
+            }
+
+            return Ok(returnData);
+        }
+
+        private class DataTemplate
+        {
+            public string EmpUnqId { get; set; }
+            public DateTime SanDate { get; set; }
+            public string InTime { get; set; }
+            public string OutTime { get; set; }
+            public string ShiftCode { get; set; }
+            public string TpaHours { get; set; }
+            public string Reason { get; set; }
         }
     }
 }
+
+
+//EmpUnqID	SanDate	InTime	OutTime	ShiftCode	TPAHours	Reason
+//104019	2020-09-26	09:00	18:00			Forgot Both  punch
+//104019	2020-09-26	09:00				Machine problem
+//112244	2020-09-26		20:00			Forgot Out punch

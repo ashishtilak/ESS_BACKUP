@@ -26,5 +26,9 @@ namespace ESS.Dto
         public bool HrVerified { get; set; }
         public bool HrUser { get; set; }
         public DateTime? HrVerificationDate { get; set; }
+
+        public string HrCity { get; set; }
+        public string HrSociety { get; set; }
+        public string HrRemarks { get; set; }
     }
 }

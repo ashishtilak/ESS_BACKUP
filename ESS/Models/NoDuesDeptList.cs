@@ -9,7 +9,9 @@ namespace ESS.Models
 {
     public class NoDuesDeptList
     {
-        [Key, Column(Order = 0), StringLength(3)] public string DeptId { get; set; }
+        [Key, Column(Order = 0), StringLength(3)]
+        public string DeptId { get; set; }
+
         public int Index { get; set; }
         [StringLength(20)] public string DeptName { get; set; }
 

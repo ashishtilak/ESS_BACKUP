@@ -205,6 +205,74 @@ namespace ESS.Controllers.Api
         }
 
 
+        [HttpPut]
+        public IHttpActionResult GetDeptLeaves(DateTime fromDt, DateTime toDt, [FromBody] object requestData)
+        {
+            List<string> deptCodes;
+            try
+            {
+                deptCodes = JsonConvert.DeserializeObject<List<string>>(requestData.ToString());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Invalid object");
+            }
+
+            var leaveIds = _context.LeaveApplicationDetails
+                .Where(d => ((d.FromDt <= toDt && d.ToDt >= fromDt) || (d.FromDt >= toDt && d.ToDt <= fromDt))
+                            && d.IsPosted == LeaveApplicationDetails.FullyPosted
+                )
+                .Select(l => l.LeaveAppId)
+                .ToArray();
+
+            var leaveAppDto = _context.LeaveApplications
+                .Include(e => e.Employee)
+                .Include(c => c.Company)
+                .Include(cat => cat.Categories)
+                .Include(w => w.WorkGroup)
+                .Include(d => d.Departments)
+                .Include(s => s.Stations)
+                .Include(u => u.Units)
+                .Include(r => r.ReleaseGroup)
+                .Include(rs => rs.RelStrategy)
+                .Include(l => l.LeaveApplicationDetails)
+                .Where(l =>
+                    deptCodes.Contains(l.DeptCode) &&
+                    (l.ReleaseStatusCode == ReleaseStatus.FullyReleased &&
+                     l.Cancelled == false &&
+                     leaveIds.Contains(l.LeaveAppId)) ||
+                    (l.ReleaseStatusCode == ReleaseStatus.ReleaseRejected &&
+                     l.Cancelled == false &&
+                     leaveIds.Contains(l.LeaveAppId)
+                    )
+                ).AsEnumerable()
+                .Select(Mapper.Map<LeaveApplications, LeaveApplicationDto>)
+                .ToList();
+
+            foreach (var lApp in leaveAppDto)
+            {
+                var app = _context.ApplReleaseStatus
+                    .Where(l =>
+                        l.YearMonth == lApp.YearMonth &&
+                        l.ReleaseGroupCode == lApp.ReleaseGroupCode &&
+                        l.ApplicationId == lApp.LeaveAppId &&
+                        l.IsFinalRelease
+                    )
+                    .ToList()
+                    .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                foreach (var applReleaseStatusDto in app)
+                {
+                    applReleaseStatusDto.ReleaserName = _context.Employees
+                        .FirstOrDefault(e => e.EmpUnqId == applReleaseStatusDto.ReleaseAuth)?.EmpName;
+                    lApp.ApplReleaseStatus.Add(applReleaseStatusDto);
+                }
+            }
+
+            return Ok(leaveAppDto);
+        }
+
+
         //this will give all leaves for export in excel
         //create a temporary class for data in rows only
 

@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Data.Entity;
 using System.Reflection;
+using System.Web.Mvc;
 using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
@@ -91,7 +92,7 @@ namespace ESS.Controllers.Api
                 .Include(u => u.UlipDetails)
                 .Include(s => s.SukanyaDetails)
                 .Include(r => r.RentDetails)
-                .Where(t => t.YearMonth == yearMonth)
+                .Where(t => t.YearMonth == yearMonth && t.IsSubmitted == true)
                 .Select(Mapper.Map<TaxDeclarations, TaxDeclarationDto>)
                 .ToList();
 
@@ -394,7 +395,7 @@ namespace ESS.Controllers.Api
         /// </summary>
         /// <param name="requestData">Data in form of TaxDeclaration json object </param>
         /// <returns></returns>
-        [HttpPost]
+        [System.Web.Http.HttpPost]
         public IHttpActionResult CreateTaxDeclaration([FromBody] object requestData)
         {
             var config = _context.TaxConfig.FirstOrDefault();
@@ -590,6 +591,8 @@ namespace ESS.Controllers.Api
                         Mapper.Map<TaxDetailsRentDto, TaxDetailsRent>(rentDto));
                 }
             }
+
+            taxDeclaration.IsSubmitted = true;
 
             if (!found)
             {

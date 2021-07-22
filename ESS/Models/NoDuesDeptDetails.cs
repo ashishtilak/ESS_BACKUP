@@ -27,6 +27,5 @@ namespace ESS.Models
 
         [StringLength(10)] public string AddUser { get; set; }
         [Column(TypeName = "datetime2")] public DateTime? AddDate { get; set; }
-
     }
 }

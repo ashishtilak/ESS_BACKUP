@@ -35,8 +35,10 @@ namespace ESS.Models
         [StringLength(2)] public string ReleaseGroupCode { get; set; }
         [ForeignKey("ReleaseGroupCode")] public ReleaseGroups ReleaseGroup { get; set; }
         [StringLength(15)] public string ReleaseStrategy { get; set; }
+
         [ForeignKey("ReleaseGroupCode, ReleaseStrategy")]
         public ReleaseStrategies RelStrategy { get; set; }
+
         [StringLength(1)] public string ReleaseStatusCode { get; set; }
         [ForeignKey("ReleaseStatusCode")] public ReleaseStatus ReleaseStatus { get; set; }
         [Column(TypeName = "datetime2")] public DateTime? ReleaseDt { get; set; }
@@ -47,14 +49,16 @@ namespace ESS.Models
         [StringLength(2)] public string DelReleaseGroupCode { get; set; }
         [ForeignKey("DelReleaseGroupCode")] public ReleaseGroups DelReleaseGroup { get; set; }
         [StringLength(15)] public string DelReleaseStrategy { get; set; }
+
         [ForeignKey("DelReleaseGroupCode, DelReleaseStrategy")]
         public ReleaseStrategies DelRelStrategy { get; set; }
+
         [StringLength(1)] public string DelReleaseStatusCode { get; set; }
         [ForeignKey("DelReleaseStatusCode")] public ReleaseStatus DelReleaseStatus { get; set; }
         [Column(TypeName = "datetime2")] public DateTime? DelReleaseDt { get; set; }
         [StringLength(10)] public string DelReleaseUser { get; set; }
-        
-        
+
+
         public bool Active { get; set; }
 
         [StringLength(10)] public string AddUser { get; set; }

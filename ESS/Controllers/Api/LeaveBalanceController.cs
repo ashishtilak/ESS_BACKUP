@@ -160,10 +160,11 @@ namespace ESS.Controllers.Api
 
             string currentYear = yearMonth.ToString().Substring(0, 4);
 
-            foreach (LeaveApplications app in 
-                from app in leaveAppDtl.ToList() 
-                let tYear = app.YearMonth.ToString().Substring(0, 4) 
-                where tYear != currentYear select app)
+            foreach (LeaveApplications app in
+                from app in leaveAppDtl.ToList()
+                let tYear = app.YearMonth.ToString().Substring(0, 4)
+                where tYear != currentYear
+                select app)
             {
                 leaveAppDtl.Remove(app);
             }

@@ -103,6 +103,11 @@ namespace ESS.Models
         public DbSet<RequestDetails> RequestDetails { get; set; }
         public DbSet<RequestRelease> RequestReleases { get; set; }
 
+        public DbSet<EmpSeparation> EmpSeparations { get; set; }
+
+        public DbSet<MissedPunch> MissedPunches { get; set; }
+        public DbSet<MissedPunchReleaseStatus> MissedPunchReleaseStatus { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

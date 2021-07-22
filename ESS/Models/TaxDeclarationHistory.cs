@@ -136,6 +136,8 @@ namespace ESS.Models
         [StringLength(50)] public string OtherIncomeDesc { get; set; }
         public float OtherIncomeAmount { get; set; }
 
+        public bool IsSubmitted { get; set; }
+
         [StringLength(8)] public string UpdateUserId { get; set; }
         public DateTime UpdateDate { get; set; }
     }

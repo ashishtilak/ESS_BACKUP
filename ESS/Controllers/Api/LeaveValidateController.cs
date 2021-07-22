@@ -150,15 +150,14 @@ namespace ESS.Controllers.Api
 
                 if (existingLeave.Count > 0)
                 {
-                    error.Add(details.LeaveTypeCode + " leave date must not overlap with leave already taken. ");
-                    continue;
+                    if (existingLeave.Any(e => e.LeaveTypeCode != LeaveTypes.OutdoorDuty))
+                    {
+                        error.Add(details.LeaveTypeCode + " leave date must not overlap with leave already taken. ");
+                        continue;
+                    }
                 }
 
                 //check4 over
-
-                //break out of loop in case of LWP                                                                                            
-                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
-                    continue;
 
 
                 // Get holidays between from/to date and add them to off days
@@ -191,6 +190,26 @@ namespace ESS.Controllers.Api
                 offDays += weekOffs.Count;
 
 
+                //break out of loop in case of LWP                                                                                            
+                if (details.LeaveTypeCode == LeaveTypes.LeaveWithoutPay)
+                {
+                    // check for first and last day week off 
+                    // added on 05/02/2021
+
+                    if (weekOffs.Any(fDt => fDt.Equals(details.FromDt)) ||
+                        weekOffs.Any(tDt => tDt.Equals(details.ToDt))
+                    )
+                        error.Add("Cannot start or end LWP on week off day.");
+
+                    if (holidays.Any(fDt => fDt.Equals(details.FromDt)) ||
+                        holidays.Any(tDt => tDt.Equals(details.ToDt))
+                    )
+                        error.Add("Cannot start or end LWP on Holiday.");
+
+
+                    continue;
+                }
+
                 //CHECK6: check leave balance other than CO
 
                 if (details.LeaveTypeCode != LeaveTypes.CompOff)
@@ -221,7 +240,7 @@ namespace ESS.Controllers.Api
                         if (Helpers.CustomHelper.GetWeeklyOff(d, d, leaveApplicationDto.EmpUnqId).Count > 0)
                             strPrevLeave += "WO,";
                         else if (Helpers.CustomHelper.GetHolidays(d, d, leaveApplicationDto.CompCode,
-                                     leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
+                            leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
                             strPrevLeave += "HL,";
                         else
                             strPrevLeave += prevLeave[d] + ",";
@@ -248,7 +267,7 @@ namespace ESS.Controllers.Api
                         if (Helpers.CustomHelper.GetWeeklyOff(d, d, leaveApplicationDto.EmpUnqId).Count > 0)
                             strNextLeave += "WO,";
                         else if (Helpers.CustomHelper.GetHolidays(d, d, leaveApplicationDto.CompCode,
-                                     leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
+                            leaveApplicationDto.WrkGrp, emp.Location).Count > 0)
                             strNextLeave += "HL,";
                         else
                             strNextLeave += nextLeave[d] + ",";
@@ -452,7 +471,7 @@ namespace ESS.Controllers.Api
                 if (start != end)
                 {
                     if (Helpers.CustomHelper.GetHolidays(start, start, leaveApplicationDto.CompCode,
-                            leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
+                        leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
                     {
                         error.Add("Date selected is not Holiday.");
                     }

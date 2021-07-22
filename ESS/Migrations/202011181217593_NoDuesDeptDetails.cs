@@ -2,14 +2,14 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class NoDuesDeptDetails : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.NoDuesDepts",
-                c => new
+                    "dbo.NoDuesDepts",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         DeptId = c.String(nullable: false, maxLength: 3),
@@ -19,13 +19,13 @@ namespace ESS.Migrations
                         ApprovalDate = c.DateTime(precision: 7, storeType: "datetime2"),
                         ApprovedBy = c.String(maxLength: 10),
                     })
-                .PrimaryKey(t => new { t.EmpUnqId, t.DeptId })
+                .PrimaryKey(t => new {t.EmpUnqId, t.DeptId})
                 .ForeignKey("dbo.Employees", t => t.EmpUnqId)
                 .Index(t => t.EmpUnqId);
-            
+
             CreateTable(
-                "dbo.NoDuesDeptDetails",
-                c => new
+                    "dbo.NoDuesDeptDetails",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         DeptId = c.String(nullable: false, maxLength: 3),
@@ -36,28 +36,28 @@ namespace ESS.Migrations
                         AddUser = c.String(maxLength: 10),
                         AddDate = c.DateTime(precision: 7, storeType: "datetime2"),
                     })
-                .PrimaryKey(t => new { t.EmpUnqId, t.DeptId, t.Sr })
+                .PrimaryKey(t => new {t.EmpUnqId, t.DeptId, t.Sr})
                 .ForeignKey("dbo.Employees", t => t.EmpUnqId)
                 .Index(t => t.EmpUnqId);
-            
+
             CreateTable(
-                "dbo.NoDuesDeptLists",
-                c => new
+                    "dbo.NoDuesDeptLists",
+                    c => new
                     {
                         DeptId = c.String(nullable: false, maxLength: 3),
                         Index = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.DeptId);
-            
+
             AddColumn("dbo.NoDuesStatus", "UnitHead", c => c.Boolean(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.NoDuesDeptDetails", "EmpUnqId", "dbo.Employees");
             DropForeignKey("dbo.NoDuesDepts", "EmpUnqId", "dbo.Employees");
-            DropIndex("dbo.NoDuesDeptDetails", new[] { "EmpUnqId" });
-            DropIndex("dbo.NoDuesDepts", new[] { "EmpUnqId" });
+            DropIndex("dbo.NoDuesDeptDetails", new[] {"EmpUnqId"});
+            DropIndex("dbo.NoDuesDepts", new[] {"EmpUnqId"});
             DropColumn("dbo.NoDuesStatus", "UnitHead");
             DropTable("dbo.NoDuesDeptLists");
             DropTable("dbo.NoDuesDeptDetails");

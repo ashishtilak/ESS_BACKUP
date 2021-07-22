@@ -46,8 +46,8 @@ namespace ESS.Controllers.Api
         private bool SendMailShiftSchedule(int id, string releaseCode)
         {
             ShiftSchedules ss = _context.ShiftSchedules.FirstOrDefault(
-                s=>s.ScheduleId == id);
-            if (ss==null)
+                s => s.ScheduleId == id);
+            if (ss == null)
                 throw new Exception("Invalid shift schedule id");
 
             ShiftScheduleDto ssDto = Mapper.Map<ShiftSchedules, ShiftScheduleDto>(ss);
@@ -736,9 +736,9 @@ namespace ESS.Controllers.Api
 
 
             Employees emp = _context.Employees
-                    .Include(e=>e.Departments)
-                    .Include(e=>e.Stations)
-                    .FirstOrDefault(e => e.EmpUnqId == empUnqId);
+                .Include(e => e.Departments)
+                .Include(e => e.Stations)
+                .FirstOrDefault(e => e.EmpUnqId == empUnqId);
 
             if (emp == null)
                 return BadRequest("Employee not found!");
@@ -746,7 +746,7 @@ namespace ESS.Controllers.Api
             NoDuesMaster noDuesMaster = _context.NoDuesMaster
                 .FirstOrDefault(e => e.EmpUnqId == empUnqId);
 
-            if(noDuesMaster == null)
+            if (noDuesMaster == null)
                 return BadRequest("No Dues master not found!");
 
 
@@ -787,7 +787,8 @@ namespace ESS.Controllers.Api
 
             body = header + body;
 
-            body += "The same will be awailable to you from " + noDuesMaster.NoDuesStartDate.Date.ToString(CultureInfo.InvariantCulture);
+            body += "The same will be available to you from " +
+                    noDuesMaster.NoDuesStartDate.Date.ToString("dd/MM/yyyy");
 
             body += "<br/>Kindly review the same in <a href='" + ConfigurationManager.AppSettings["PortalAddress"] +
                     "'>ESS Portal</a>.";
@@ -795,7 +796,6 @@ namespace ESS.Controllers.Api
             body += "</body></html>";
             try
             {
-
                 var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
                 {
                     //Credentials = new System.Net.NetworkCredential("tilaka@jindalsaw.com", "ashish123$$"),
@@ -818,8 +818,25 @@ namespace ESS.Controllers.Api
                 foreach (string email in emails)
                 {
                     mail.To.Add(new MailAddress(email));
+                    if (emp.Location == Locations.Ipu)
+                    {
+                        mail.CC.Add("prakash.nambiar@jindalsaw.com");
+                        mail.CC.Add("raghuvir.jadeja@jindalsaw.com");
+                        mail.Bcc.Add("mohit.parmar@jindalsaw.com");
+                        mail.Bcc.Add("ashish.tilak@jindalsaw.com");
+                    }
+
                     smtpClient.Send(mail);
                     mail.To.Remove(new MailAddress(email));
+                    if (emp.Location == Locations.Ipu)
+                    {
+                        mail.CC.Remove(new MailAddress("prakash.nambiar@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("raghuvir.jadeja@jindalsaw.com"));
+                        mail.Bcc.Remove(new MailAddress("mohit.parmar@jindalsaw.com"));
+                        mail.Bcc.Remove(new MailAddress("ashish.tilak@jindalsaw.com"));
+                    }
+
+                    ;
                 }
             }
             catch (Exception ex)
@@ -830,5 +847,196 @@ namespace ESS.Controllers.Api
             return Ok();
         }
 
+        [HttpGet]
+        public IHttpActionResult SendMailResignation(int id, string furtherReleaser, string empUnqId)
+        {
+            if (furtherReleaser.ToUpper() == "TRUE" && string.IsNullOrEmpty(empUnqId))
+                return BadRequest("Provide further releaser employee id.");
+
+            EmpSeparation resign = _context.EmpSeparations.FirstOrDefault(r => r.Id == id);
+
+            if (resign == null)
+                return BadRequest("Invalid resignation id.");
+
+            if (resign.StatusHr)
+                return BadRequest("Resignation already approved by HR.");
+
+            string empName = _context.Employees.FirstOrDefault(e => e.EmpUnqId == resign.EmpUnqId)?.EmpName;
+            string deptStat = _context.Stations.FirstOrDefault(s => s.CompCode == resign.Employee.CompCode &&
+                                                                    s.WrkGrp == resign.Employee.WrkGrp &&
+                                                                    s.UnitCode == resign.Employee.UnitCode &&
+                                                                    s.DeptCode == resign.Employee.DeptCode &&
+                                                                    s.StatCode == resign.Employee.StatCode)?.StatName;
+
+            const string header = @"
+                <html lang=""en"">
+                    <head>    
+                        <meta content=""text/html; charset=utf-8"" http-equiv=""Content-Type"">
+                        <title>
+                            ESS Portal - Automessage
+                        </title>
+                        <style type=""text/css"">
+                            body { font-family: arial, sans-serif; }
+                            table {
+                                font-family: arial, sans-serif;
+                                border-collapse: collapse;
+                                width: 80%;
+                            }
+
+                            td, th {
+                                border: 1px solid #dddddd;
+                                text-align: left;
+                                padding: 8px;
+                            }
+
+                            tr:nth-child(even) {
+                                background-color: #dddddd;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                ";
+
+            string body = "Dear Sir, <br /><br /> " +
+                          "Following employee resignation requires your attention: <br/> <br />" +
+                          "Employee Code: " + resign.EmpUnqId + " <br/>" +
+                          "Employee Name: " + empName + " <br/>" +
+                          "Dept/Station: " + deptStat + " <br/>" +
+                          "Resign date:" + resign.ApplicationDate.ToString("dd/MM/yyyy") + " <br/>" +
+                          "Relieve date:" + resign.RelieveDate.ToString("dd/MM/yyyy") + "<br/><br/>";
+
+            body = header + body;
+
+            body += "<br/>Kindly review the same in <a href='" + ConfigurationManager.AppSettings["PortalAddress"] +
+                    "'>ESS Portal</a>.";
+
+            body += "</body></html>";
+
+
+            if (furtherReleaser.ToUpper() == "FALSE")
+            {
+                List<ApplReleaseStatus> app = _context.ApplReleaseStatus
+                    .Where(l =>
+                        l.ReleaseGroupCode == ReleaseGroups.NoDues &&
+                        l.ApplicationId == id
+                    ).ToList();
+
+                if (app.Count == 0)
+                    return BadRequest("App release record not found.");
+
+                string[] relcodes = app.Select(r => r.ReleaseCode).ToArray();
+
+                ReleaseAuth relAuth = _context.ReleaseAuth
+                    .SingleOrDefault(r =>
+                        relcodes.Contains(r.ReleaseCode) &&
+                        r.EmpUnqId == empUnqId);
+                if (relAuth == null)
+                    return BadRequest("Release auth not found.");
+
+                var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
+                {
+                    UseDefaultCredentials = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = false
+                };
+
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
+                    Subject = "Notification from ESS Portal for Employee Resignation",
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    IsBodyHtml = true,
+                    Body = body
+                };
+
+                List<ReleaseAuth> releasers = _context.ReleaseAuth
+                    .Where(r => r.ReleaseCode == relAuth.ReleaseCode).ToList();
+
+                //in case of multiple releasers for single release code,
+                foreach (Employees releaser in
+                    releasers.Select(r =>
+                            _context.Employees.SingleOrDefault(e => e.EmpUnqId == r.EmpUnqId))
+                        .Where(releaser => releaser != null)
+                        .Where(releaser => !string.IsNullOrEmpty(releaser.Email)))
+                {
+                    mail.To.Add(new MailAddress(releaser.Email));
+                    smtpClient.Send(mail);
+                    mail.To.Remove(new MailAddress(releaser.Email));
+                }
+
+                return Ok();
+            }
+            else if(furtherReleaser.ToUpper() == "TRUE") // for Further releasers
+            {
+                if (!resign.FurtherReleaseRequired)
+                    return BadRequest("Further release is not required for this resignation.");
+
+                var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
+                {
+                    UseDefaultCredentials = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = false
+                };
+
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
+                    Subject = "Notification from ESS Portal for Employee Resignation",
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    IsBodyHtml = true,
+                    Body = body
+                };
+
+
+                string releaserMail = _context.Employees.FirstOrDefault(e => e.EmpUnqId == empUnqId)?.Email;
+
+                if (string.IsNullOrEmpty(releaserMail)) return BadRequest("Further releaser mail id not found.");
+
+                mail.To.Add(new MailAddress(releaserMail));
+                smtpClient.Send(mail);
+                mail.To.Remove(new MailAddress(releaserMail));
+
+                return Ok();
+            }
+            else if(furtherReleaser.ToUpper() == "HR")
+            {
+                var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["SMTPClient"], 25)
+                {
+                    UseDefaultCredentials = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = false
+                };
+
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(ConfigurationManager.AppSettings["MailAddress"], "ESS Portal"),
+                    Subject = "Notification from ESS Portal for Employee Resignation",
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    IsBodyHtml = true,
+                    Body = body
+                };
+
+                // list of hr mail ids
+                var releaserMail = new []
+                {
+                    //TODO: Change here actual mail recipients
+                    "ashish.tilak@jindalsaw.com",
+                    "mohit.parmar@jindalsaw.com"
+                };
+
+                foreach (string s in releaserMail)
+                {
+                    mail.To.Add(new MailAddress(s));
+                    smtpClient.Send(mail);
+                    mail.To.Remove(new MailAddress(s));
+                }
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Invalid furtherreleaser flag.");
+            }
+        }
     }
 }

@@ -97,6 +97,10 @@ namespace ESS.Controllers.Api
                 dto.HrVerified = empAdd.HrVerified;
                 dto.HrUser = empAdd.HrUser;
                 dto.HrVerificationDate = empAdd.HrVerificationDate;
+                dto.HrCity = empAdd.HrCity;
+                dto.HrSociety = empAdd.HrSociety;
+                dto.HrRemarks = empAdd.HrRemarks;
+
                 dto.UpdDt = empAdd.UpdDt;
 
                 var perAdd = empPerAdd.SingleOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
@@ -168,7 +172,7 @@ namespace ESS.Controllers.Api
 
                         BirthDate = e.BirthDate,
                         Pan = e.Pan,
-                        JoinDate =  e.JoinDate
+                        JoinDate = e.JoinDate
                     }
                 )
                 .ToList();

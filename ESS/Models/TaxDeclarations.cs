@@ -151,5 +151,7 @@ namespace ESS.Models
 
         public bool LockEntry { get; set; }
         public bool FinLock { get; set; }
+
+        public bool IsSubmitted { get; set; }
     }
 }

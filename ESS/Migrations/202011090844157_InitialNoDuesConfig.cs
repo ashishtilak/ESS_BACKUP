@@ -2,23 +2,23 @@ namespace ESS.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class InitialNoDuesConfig : DbMigration
     {
         public override void Up()
         {
             CreateTable(
-                "dbo.NoDuesCreators",
-                c => new
+                    "dbo.NoDuesCreators",
+                    c => new
                     {
                         Dept = c.String(nullable: false, maxLength: 3),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                     })
-                .PrimaryKey(t => new { t.Dept, t.EmpUnqId });
-            
+                .PrimaryKey(t => new {t.Dept, t.EmpUnqId});
+
             CreateTable(
-                "dbo.NoDuesMasters",
-                c => new
+                    "dbo.NoDuesMasters",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         JoinDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
@@ -49,10 +49,10 @@ namespace ESS.Migrations
                 .PrimaryKey(t => t.EmpUnqId)
                 .ForeignKey("dbo.Employees", t => t.EmpUnqId)
                 .Index(t => t.EmpUnqId);
-            
+
             CreateTable(
-                "dbo.NoDuesReleaseStatus",
-                c => new
+                    "dbo.NoDuesReleaseStatus",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         ReleaseGroupCode = c.String(nullable: false, maxLength: 2),
@@ -65,26 +65,26 @@ namespace ESS.Migrations
                         IsFinalRelease = c.Boolean(nullable: false),
                         Remarks = c.String(maxLength: 255),
                     })
-                .PrimaryKey(t => new { t.EmpUnqId, t.ReleaseGroupCode, t.ReleaseStrategy, t.ReleaseStrategyLevel })
+                .PrimaryKey(t => new {t.EmpUnqId, t.ReleaseGroupCode, t.ReleaseStrategy, t.ReleaseStrategyLevel})
                 .ForeignKey("dbo.ReleaseGroups", t => t.ReleaseGroupCode)
                 .ForeignKey("dbo.ReleaseStatus", t => t.ReleaseStatusCode)
                 .ForeignKey("dbo.NoDuesMasters", t => t.EmpUnqId)
                 .Index(t => t.EmpUnqId)
                 .Index(t => t.ReleaseGroupCode)
                 .Index(t => t.ReleaseStatusCode);
-            
+
             CreateTable(
-                "dbo.NoDuesReleasers",
-                c => new
+                    "dbo.NoDuesReleasers",
+                    c => new
                     {
                         Dept = c.String(nullable: false, maxLength: 3),
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                     })
-                .PrimaryKey(t => new { t.Dept, t.EmpUnqId });
-            
+                .PrimaryKey(t => new {t.Dept, t.EmpUnqId});
+
             CreateTable(
-                "dbo.NoDuesStatus",
-                c => new
+                    "dbo.NoDuesStatus",
+                    c => new
                     {
                         EmpUnqId = c.String(nullable: false, maxLength: 10),
                         Hod = c.Boolean(nullable: false),
@@ -104,20 +104,20 @@ namespace ESS.Migrations
                         Er = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.EmpUnqId);
-            
+
             AddColumn("dbo.Employees", "JoinDate", c => c.DateTime(precision: 7, storeType: "datetime2"));
         }
-        
+
         public override void Down()
         {
             DropForeignKey("dbo.NoDuesReleaseStatus", "EmpUnqId", "dbo.NoDuesMasters");
             DropForeignKey("dbo.NoDuesReleaseStatus", "ReleaseStatusCode", "dbo.ReleaseStatus");
             DropForeignKey("dbo.NoDuesReleaseStatus", "ReleaseGroupCode", "dbo.ReleaseGroups");
             DropForeignKey("dbo.NoDuesMasters", "EmpUnqId", "dbo.Employees");
-            DropIndex("dbo.NoDuesReleaseStatus", new[] { "ReleaseStatusCode" });
-            DropIndex("dbo.NoDuesReleaseStatus", new[] { "ReleaseGroupCode" });
-            DropIndex("dbo.NoDuesReleaseStatus", new[] { "EmpUnqId" });
-            DropIndex("dbo.NoDuesMasters", new[] { "EmpUnqId" });
+            DropIndex("dbo.NoDuesReleaseStatus", new[] {"ReleaseStatusCode"});
+            DropIndex("dbo.NoDuesReleaseStatus", new[] {"ReleaseGroupCode"});
+            DropIndex("dbo.NoDuesReleaseStatus", new[] {"EmpUnqId"});
+            DropIndex("dbo.NoDuesMasters", new[] {"EmpUnqId"});
             DropColumn("dbo.Employees", "JoinDate");
             DropTable("dbo.NoDuesStatus");
             DropTable("dbo.NoDuesReleasers");

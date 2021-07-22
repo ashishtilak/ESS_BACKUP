@@ -14,10 +14,10 @@ namespace ESS.Models
         [Key, Column(Order = 1)]
         [StringLength(10)]
         public string EmpUnqId { get; set; }
+
         [ForeignKey("EmpUnqId")] public Employees Employee { get; set; }
 
-        [Required, StringLength(2)]
-        public string ReleaseGroupCode { get; set; }
+        [Required, StringLength(2)] public string ReleaseGroupCode { get; set; }
         [ForeignKey("ReleaseGroupCode")] public ReleaseGroups ReleaseGroup { get; set; }
 
         [Key, Column(Order = 3), StringLength(15)]

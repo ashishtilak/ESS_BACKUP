@@ -82,6 +82,10 @@ namespace ESS.Dto
         public bool HrUser { get; set; }
         public DateTime? HrVerificationDate { get; set; }
 
+        public string HrCity { get; set; }
+        public string HrSociety { get; set; }
+        public string HrRemarks { get; set; }
+
         public string Location { get; set; }
 
         public string SapId { get; set; }
@@ -95,5 +99,7 @@ namespace ESS.Dto
         public DateTime? JoinDate { get; set; }
 
         public bool NoDuesFlag { get; set; }
+
+        public int YearlyCount { get; set; }
     }
 }

@@ -21,6 +21,5 @@ namespace ESS.Dto
         public string DeptName { get; set; }
 
         public List<NoDuesDeptDetailsDto> NoDuesDeptDetails { get; set; }
-
     }
 }

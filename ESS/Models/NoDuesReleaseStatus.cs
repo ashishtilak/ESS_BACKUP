@@ -9,8 +9,9 @@ namespace ESS.Models
 {
     public class NoDuesReleaseStatus
     {
-        [Key, Column(Order = 0)] 
-        [StringLength(10)] public string EmpUnqId { get; set; }
+        [Key, Column(Order = 0)]
+        [StringLength(10)]
+        public string EmpUnqId { get; set; }
 
         [Key, Column(Order = 1)]
         [Required, StringLength(2)]

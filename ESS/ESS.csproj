@@ -183,6 +183,7 @@
     <Compile Include="Controllers\Api\ChangeReleaseController.cs" />
     <Compile Include="Controllers\Api\EmpAddressController.cs" />
     <Compile Include="Controllers\Api\EmployeeController.cs" />
+    <Compile Include="Controllers\Api\EmpSeparationController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
     <Compile Include="Controllers\Api\Form16Controller.cs" />
     <Compile Include="Controllers\Api\GateInOutController.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Controllers\Api\MasterUploadController.cs" />
     <Compile Include="Controllers\Api\MedDependentController.cs" />
     <Compile Include="Controllers\Api\MedicalFitnessController.cs" />
+    <Compile Include="Controllers\Api\MissedPunchController.cs" />
     <Compile Include="Controllers\Api\NoDuesController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
     <Compile Include="Controllers\Api\ReimbursementController.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="Dto\EmpFamilyDto.cs" />
     <Compile Include="Dto\EmployeeDto.cs" />
     <Compile Include="Dto\EmpPunchBlockDto.cs" />
+    <Compile Include="Dto\EmpSeparationDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
     <Compile Include="Dto\GaReleaseStrategyDto.cs" />
@@ -250,11 +253,14 @@
     <Compile Include="Dto\MedDependentDto.cs" />
     <Compile Include="Dto\MedEmpUhidDto.cs" />
     <Compile Include="Dto\MedicalFitnessDto.cs" />
+    <Compile Include="Dto\MissedPunchDto.cs" />
+    <Compile Include="Dto\MissedPunchReleaseStatusDto.cs" />
     <Compile Include="Dto\NoDuesDeptDetailsDto.cs" />
     <Compile Include="Dto\NoDuesDeptDto.cs" />
     <Compile Include="Dto\NoDuesIt.cs" />
     <Compile Include="Dto\NoDuesMasterDto.cs" />
     <Compile Include="Dto\NoDuesReleaseStatusDto.cs" />
+    <Compile Include="Dto\NoDuesStatusDto.cs" />
     <Compile Include="Dto\PerfAttdDto.cs" />
     <Compile Include="Dto\PerfPunchDto.cs" />
     <Compile Include="Dto\ReimbConvDto.cs" />
@@ -712,6 +718,26 @@
     <Compile Include="Migrations\202101221110547_RequestForBackDatedSSChange.Designer.cs">
       <DependentUpon>202101221110547_RequestForBackDatedSSChange.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104190617565_NewAddressFieldsAdded.cs" />
+    <Compile Include="Migrations\202104190617565_NewAddressFieldsAdded.Designer.cs">
+      <DependentUpon>202104190617565_NewAddressFieldsAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104290934011_IsSubmittedAddedInTaxDecl.cs" />
+    <Compile Include="Migrations\202104290934011_IsSubmittedAddedInTaxDecl.Designer.cs">
+      <DependentUpon>202104290934011_IsSubmittedAddedInTaxDecl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105260449262_EmpSeparation.cs" />
+    <Compile Include="Migrations\202105260449262_EmpSeparation.Designer.cs">
+      <DependentUpon>202105260449262_EmpSeparation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106110957254_ChangesInEmpSeparation.cs" />
+    <Compile Include="Migrations\202106110957254_ChangesInEmpSeparation.Designer.cs">
+      <DependentUpon>202106110957254_ChangesInEmpSeparation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202107060425460_MissedPunchModule.cs" />
+    <Compile Include="Migrations\202107060425460_MissedPunchModule.Designer.cs">
+      <DependentUpon>202107060425460_MissedPunchModule.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -723,6 +749,7 @@
     <Compile Include="Models\Designations.cs" />
     <Compile Include="Models\EmpAddress.cs" />
     <Compile Include="Models\Employees.cs" />
+    <Compile Include="Models\EmpSeparation.cs" />
     <Compile Include="Models\EmpTypes.cs" />
     <Compile Include="Models\EmpUniform.cs" />
     <Compile Include="Models\GaReleaseStrategies.cs" />
@@ -746,6 +773,8 @@
     <Compile Include="Models\MedEmpUhid.cs" />
     <Compile Include="Models\MedicalFitness.cs" />
     <Compile Include="Models\MedPolicy.cs" />
+    <Compile Include="Models\MissedPunch.cs" />
+    <Compile Include="Models\MissedPunchReleaseStatus.cs" />
     <Compile Include="Models\NoDuesCreators.cs" />
     <Compile Include="Models\NoDuesDept.cs" />
     <Compile Include="Models\NoDuesDeptDetails.cs" />
@@ -1173,6 +1202,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202101221110547_RequestForBackDatedSSChange.resx">
       <DependentUpon>202101221110547_RequestForBackDatedSSChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104190617565_NewAddressFieldsAdded.resx">
+      <DependentUpon>202104190617565_NewAddressFieldsAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104290934011_IsSubmittedAddedInTaxDecl.resx">
+      <DependentUpon>202104290934011_IsSubmittedAddedInTaxDecl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105260449262_EmpSeparation.resx">
+      <DependentUpon>202105260449262_EmpSeparation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106110957254_ChangesInEmpSeparation.resx">
+      <DependentUpon>202106110957254_ChangesInEmpSeparation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202107060425460_MissedPunchModule.resx">
+      <DependentUpon>202107060425460_MissedPunchModule.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

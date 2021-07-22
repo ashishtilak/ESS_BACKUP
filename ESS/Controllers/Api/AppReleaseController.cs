@@ -221,6 +221,7 @@ namespace ESS.Controllers.Api
                     {
                         app = _context.ApplReleaseStatus
                             .Where(l => rAuth.ReleaseCode == l.ReleaseCode &&
+                                        l.ReleaseGroupCode == ReleaseGroups.GatePass &&
                                         l.ReleaseStatusCode == ReleaseStatus.InRelease)
                             .ToList();
                     }
@@ -230,14 +231,15 @@ namespace ESS.Controllers.Api
                     var gp = _context.GatePass
                         .Include(r => r.ReleaseGroup)
                         .Include(rs => rs.RelStrategy)
-                        .Where(l => appIds.Contains(l.Id))
+                        .Where(l => appIds.Contains(l.Id) && l.GatePassStatus != GatePass.GatePassStatuses.ForceClosed)  
+                        .AsEnumerable()
                         .Select(Mapper.Map<GatePass, GatePassDto>)
                         .ToList();
-
+                    
 
                     foreach (GatePassDto dto in gp)
                     {
-                        var appl = _context.ApplReleaseStatus
+                        var appl = app
                             .Where(l =>
                                 l.YearMonth == dto.YearMonth &&
                                 l.ReleaseGroupCode == dto.ReleaseGroupCode &&
@@ -719,6 +721,119 @@ namespace ESS.Controllers.Api
                 return Ok(resultData);
             }
 
+            if (releaseGroupCode == ReleaseGroups.NoDues)
+            {
+                // find release authorization for given employee
+                var relAuth = _context.ReleaseAuth
+                    .Where(r => r.EmpUnqId == empUnqId)
+                    .ToList();
+
+                // create return data object
+                var resultData = new List<EmpSeparationDto>();
+
+                //for each release auth
+                foreach (ReleaseAuth rAuth in relAuth)
+                {
+                    // get list of all application release status
+                    // which are in release
+
+                    var app = _context.ApplReleaseStatus
+                        .Where(l =>
+                            rAuth.ReleaseCode == l.ReleaseCode &&
+                            l.ReleaseStatusCode == "I" &&
+                            l.ReleaseGroupCode == ReleaseGroups.NoDues
+                        )
+                        .ToList();
+
+                    if (app.Count == 0)
+                        continue;
+
+                    var appIds = app.Select(a => a.ApplicationId).ToArray();
+
+                    // find the resignations related to above list of app release 
+                    var iEmpUnqId = int.Parse(empUnqId);
+
+                    var resignations = _context.EmpSeparations
+                        .Include(r => r.Employee)
+                        .Where(s => appIds.Contains(s.Id))
+                        .AsEnumerable()
+                        .Select(Mapper.Map<EmpSeparation, EmpSeparationDto>).ToList();
+
+                    foreach (EmpSeparationDto dto in resignations)
+                    {
+                        //get relevant app release object 
+                        IEnumerable<ApplReleaseStatusDto> appl = app
+                            .Where(l =>
+                                l.ReleaseGroupCode == ReleaseGroups.NoDues &&
+                                l.ApplicationId == dto.Id &&
+                                l.ReleaseCode == rAuth.ReleaseCode
+                            )
+                            .ToList()
+                            .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>);
+
+                        //for each app release lines
+                        foreach (ApplReleaseStatusDto applReleaseStatusDto in appl)
+                        {
+                            List<ReleaseAuth> relCode = _context.ReleaseAuth
+                                .Where(r => r.ReleaseCode == applReleaseStatusDto.ReleaseCode)
+                                .ToList();
+
+                            foreach (ReleaseAuth unused in relCode.Where(auth => auth.EmpUnqId == empUnqId))
+                            {
+                                applReleaseStatusDto.ReleaseAuth = empUnqId;
+                                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>
+                                {
+                                    applReleaseStatusDto
+                                };
+                            }
+                        }
+
+
+                        EmployeeDto employeeDto = _context.Employees
+                            .Select(e => new EmployeeDto
+                            {
+                                EmpUnqId = e.EmpUnqId,
+                                EmpName = e.EmpName,
+                                FatherName = e.FatherName,
+                                Active = e.Active,
+                                Pass = e.Pass,
+
+                                CompCode = e.CatCode,
+                                WrkGrp = e.WrkGrp,
+                                UnitCode = e.UnitCode,
+                                DeptCode = e.DeptCode,
+                                StatCode = e.StatCode,
+                                CatCode = e.CatCode,
+                                EmpTypeCode = e.EmpTypeCode,
+                                GradeCode = e.GradeCode,
+                                DesgCode = e.DesgCode,
+                                IsHod = e.IsHod,
+
+                                CompName = e.Company.CompName,
+                                WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                                UnitName = e.Units.UnitName,
+                                DeptName = e.Departments.DeptName,
+                                StatName = e.Stations.StatName,
+                                CatName = e.Categories.CatName,
+                                EmpTypeName = e.EmpTypes.EmpTypeName,
+                                GradeName = e.Grades.GradeName,
+                                DesgName = e.Designations.DesgName,
+
+                                Location = e.Location
+                            })
+                            .Single(e => e.EmpUnqId == dto.EmpUnqId);
+
+                        dto.Employee.DeptName = employeeDto.DeptName;
+                        dto.Employee.StatName = employeeDto.StatName;
+                        dto.Employee.EmpName = employeeDto.EmpName;
+
+                        resultData.Add(dto);
+                    } //foreach dto in employee separations
+                } // End for loop for release auth
+
+                return Ok(resultData);
+            }
+
             return BadRequest("Not implemented");
         }
 
@@ -981,7 +1096,119 @@ namespace ESS.Controllers.Api
                     return BadRequest(ex.ToString());
                 }
 
+
+            //For employee resignation
+            if (releaseGroupCode == ReleaseGroups.NoDues)
+                try
+                {
+                    EmpSeparation res = ResignationRelease(requestData, empUnqId, releaseStatusCode);
+                    return Ok(res);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.ToString());
+                }
+
             return BadRequest("Not implemented.");
+        }
+
+        // Resignation release - release group code "ND"
+        private EmpSeparation ResignationRelease(object requestData, string empUnqId, string releaseStatusCode)
+        {
+            var dto = JsonConvert.DeserializeObject<ApplReleaseStatus>(requestData.ToString());
+
+            ApplReleaseStatus appRelease = _context.ApplReleaseStatus
+                .SingleOrDefault(a => a.YearMonth == dto.YearMonth &&
+                                      a.ReleaseGroupCode == dto.ReleaseGroupCode &&
+                                      a.ApplicationId == dto.ApplicationId &&
+                                      a.ReleaseStrategyLevel == dto.ReleaseStrategyLevel);
+            if (appRelease == null)
+                throw new Exception("Invalid app release status details...");
+
+            if (appRelease.ReleaseStatusCode != ReleaseStatus.InRelease)
+                throw new Exception("Application is not in release state...");
+
+            appRelease.Remarks = dto.Remarks;
+
+            //get the release auth
+            ReleaseAuth relAuth = _context.ReleaseAuth.SingleOrDefault(r => r.ReleaseCode == appRelease.ReleaseCode &&
+                                                                            r.EmpUnqId == empUnqId &&
+                                                                            r.Active);
+            if (relAuth == null)
+                throw new Exception("Invalid release code. Check if active");
+
+            //get the release strategy levels
+            string vRelStr = appRelease.ReleaseStrategy;
+            ReleaseStrategyLevels relStrLevel = _context.ReleaseStrategyLevels
+                .SingleOrDefault(r => r.ReleaseGroupCode == appRelease.ReleaseGroupCode &&
+                                      r.ReleaseStrategy == vRelStr &&
+                                      r.ReleaseStrategyLevel == appRelease.ReleaseStrategyLevel &&
+                                      r.ReleaseCode == appRelease.ReleaseCode);
+            if (relStrLevel == null)
+                throw new Exception("Release strategy details not found...");
+
+
+            EmpSeparation resignation = _context.EmpSeparations.SingleOrDefault(
+                r => r.Id == appRelease.ApplicationId);
+
+            if (resignation == null)
+                throw new Exception("Resignation not found!");
+
+            //call transaction to update multiple tables
+            using (DbContextTransaction trnsaction = _context.Database.BeginTransaction())
+            {
+                if (releaseStatusCode == ReleaseStatus.ReleaseRejected)
+                {
+                    appRelease.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                    resignation.ReleaseStatusCode = ReleaseStatus.ReleaseRejected;
+                }
+                else if (releaseStatusCode == ReleaseStatus.FullyReleased)
+                {
+                    //If this level is not the final level, set next level to "I"
+                    if (!appRelease.IsFinalRelease)
+                    {
+                        //get next level releaser from app release
+                        ApplReleaseStatus nextLevel = _context.ApplReleaseStatus.SingleOrDefault(
+                            a => a.YearMonth == appRelease.YearMonth &&
+                                 a.ReleaseGroupCode == appRelease.ReleaseGroupCode &&
+                                 a.ApplicationId == appRelease.ApplicationId &&
+                                 a.ReleaseStrategy == appRelease.ReleaseStrategy &&
+                                 a.ReleaseStrategyLevel == appRelease.ReleaseStrategyLevel + 1
+                        );
+                        if (nextLevel == null)
+                            throw new Exception("This is not final release, and next level not found! Chk app release");
+
+                        nextLevel.ReleaseStatusCode = ReleaseStatus.InRelease;
+                        resignation.ReleaseStatusCode = ReleaseStatus.PartiallyReleased;
+                    }
+                    else
+                    {
+                        //this is final level...
+                        resignation.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                    }
+
+                    //Finally set this application details status to "F"
+                    appRelease.ReleaseStatusCode = ReleaseStatus.FullyReleased;
+                    appRelease.ReleaseDate = DateTime.Now.Date;
+                    appRelease.ReleaseAuth = empUnqId;
+                }
+
+                //update database here...
+                _context.SaveChanges();
+
+                //you'll need to update releasestrategy table manually because keyfield involved.
+                //basically this is why i've to use transaction.
+                string strSql = "update ApplReleaseStatus set ReleaseStrategy = '" + vRelStr + "' " +
+                                "where ReleaseGroupCode = 'ND' " +
+                                "and ApplicationId = " + appRelease.ApplicationId + "";
+
+                _context.Database.ExecuteSqlCommand(strSql);
+
+                //commit changes....
+                trnsaction.Commit();
+            }
+
+            return resignation;
         }
 
         private GatePass GatePassRelease(object requestData, string empUnqId, string releaseStatusCode)

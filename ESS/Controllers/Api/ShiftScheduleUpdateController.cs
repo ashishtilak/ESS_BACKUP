@@ -40,7 +40,9 @@ namespace ESS.Controllers.Api
                 if (relCode.Length == 0) return BadRequest("Employee is not a releaser.");
 
                 var relStrLvl = _context.ReleaseStrategyLevels
-                    .Where(r => relCode.Contains(r.ReleaseCode) && r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
+                    .Where(r =>
+                        relCode.Contains(r.ReleaseCode) &&
+                        r.ReleaseGroupCode == ReleaseGroups.ShiftSchedule)
                     .Select(r => r.ReleaseStrategy).ToArray();
 
                 var vRelStr = _context.ReleaseStrategy
@@ -99,7 +101,7 @@ namespace ESS.Controllers.Api
                     dr["EmpUnqId"] = relStr.ReleaseStrategy;
 
                     EmployeeDto employeeDto = _context.Employees
-                        .Where(e=> e.EmpUnqId == relStr.ReleaseStrategy)
+                        .Where(e => e.EmpUnqId == relStr.ReleaseStrategy)
                         .Select(e => new EmployeeDto
                         {
                             EmpUnqId = e.EmpUnqId,
@@ -198,8 +200,6 @@ namespace ESS.Controllers.Api
         [HttpPost]
         public IHttpActionResult UpldateSchedule(string empUnqId)
         {
-            
-            
             // Get file from Http Context of current request
             HttpContext httpContext = HttpContext.Current;
 
@@ -291,7 +291,7 @@ namespace ESS.Controllers.Api
 
                             int extScheduleId = _context.ShiftSchedules
                                 .Where(s => s.EmpUnqId == tmpEmpId &&
-                                            s.YearMonth == openMonth && 
+                                            s.YearMonth == openMonth &&
                                             s.ReleaseStatusCode == ReleaseStatus.FullyReleased)
                                 .Max(s => s.ScheduleId);
 
@@ -323,7 +323,8 @@ namespace ESS.Controllers.Api
                                     existingLine = existingSch.FirstOrDefault(s => s.ShiftDay == rowIndex);
 
                                 if (existingLine == null)
-                                    return BadRequest($"Error: already uploaded shift schedule not found for {sch.EmpUnqId}");
+                                    return BadRequest(
+                                        $"Error: already uploaded shift schedule not found for {sch.EmpUnqId}");
 
                                 var schLine = new ShiftScheduleDetailDto
                                 {
@@ -402,8 +403,8 @@ namespace ESS.Controllers.Api
                         // OUR SHIFT SCHEDULE IS OK TO UPLOAD...
 
                         int maxId = _context.ShiftSchedules
-                                        .Select(s => (int?) s.ScheduleId)
-                                        .Max() ?? 0;
+                            .Select(s => (int?) s.ScheduleId)
+                            .Max() ?? 0;
 
                         maxId++;
 

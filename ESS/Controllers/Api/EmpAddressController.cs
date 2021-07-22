@@ -149,6 +149,10 @@ namespace ESS.Controllers.Api
             empAdd.UpdDt = DateTime.Now;
             empAdd.HrVerified = true;
 
+            empAdd.HrCity = dto.HrCity;
+            empAdd.HrSociety = dto.HrSociety;
+            empAdd.HrRemarks = dto.HrRemarks;
+
             _context.SaveChanges();
 
             return Ok();

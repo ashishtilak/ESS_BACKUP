@@ -16,6 +16,11 @@ namespace ESS
             settings.Formatting = Formatting.Indented;
 
             config.MapHttpAttributeRoutes();
+            
+            config.Routes.MapHttpRoute(
+                name: "ControllerAndAction",
+                routeTemplate: "api/{controller}/{action}"
+            );
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -26,10 +31,6 @@ namespace ESS
             //controller with actions
             // '/api/employee/updateemail'
 
-            config.Routes.MapHttpRoute(
-                name: "ControllerAndAction",
-                routeTemplate: "api/{controller}/{action}"
-            );
         }
     }
 }
