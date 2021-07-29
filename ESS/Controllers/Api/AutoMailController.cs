@@ -1019,17 +1019,21 @@ namespace ESS.Controllers.Api
                 // list of hr mail ids
                 var releaserMail = new []
                 {
-                    //TODO: Change here actual mail recipients
-                    "ashish.tilak@jindalsaw.com",
-                    "mohit.parmar@jindalsaw.com"
+                    "Prakash.Nambiar@jindalsaw.com",
+                    "er.ipu@jindalsaw.com",
+                    "raghuvir.jadeja@jindalsaw.com"
                 };
 
                 foreach (string s in releaserMail)
                 {
                     mail.To.Add(new MailAddress(s));
-                    smtpClient.Send(mail);
-                    mail.To.Remove(new MailAddress(s));
                 }
+
+                mail.CC.Add(new MailAddress("vinaykumar.singh@jindalsaw.com"));
+                mail.Bcc.Add(new MailAddress("ashish.tilak@jindalsaw.com"));
+                mail.Bcc.Add(new MailAddress("mohit.parmar@jindalsaw.com"));
+                
+                smtpClient.Send(mail);
 
                 return Ok();
             }

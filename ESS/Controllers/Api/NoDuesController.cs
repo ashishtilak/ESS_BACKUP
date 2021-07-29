@@ -1180,6 +1180,7 @@ namespace ESS.Controllers.Api
                     noDuesDept.ApprovalFlag = true;
                     noDuesDept.ApprovedBy = dtoDept.ApprovedBy;
                     noDuesDept.ApprovalDate = DateTime.Now;
+                    noDuesDept.Remarks = dtoDept.Remarks;
 
                     NoDuesStatus status = _context.NoDuesStatus.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
                     if (status == null)
