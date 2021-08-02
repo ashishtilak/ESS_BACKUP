@@ -82,7 +82,9 @@ namespace ESS.Controllers.Api
 
             if (form16.FormNumber == "16")
                 path += "\\form16\\" + pan + ".pdf";
-            else
+            else if(form16.FormNumber == "16B")
+                path += "\\form16B\\" + pan + ".pdf";
+            else if(form16.FormNumber == "12")
                 path += "\\form12\\" + pan + ".pdf";
 
             return new FileResult(path, "application/pdf");
