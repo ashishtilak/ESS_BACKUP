@@ -54,6 +54,18 @@ namespace ESS.Controllers.Api
             dto.Employee.GradeName = emp.Grades.GradeName;
             dto.Employee.DesgName = emp.Designations.DesgName;
 
+
+            List<ApplReleaseStatusDto> appRelease = _context.ApplReleaseStatus
+                .Where(a => a.ReleaseGroupCode == ReleaseGroups.NoDues && a.ApplicationId == dto.Id).AsEnumerable()
+                .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
+                .ToList();
+            foreach (ApplReleaseStatusDto relDto in appRelease)
+            {
+                relDto.ReleaserName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == relDto.ReleaseAuth)?.EmpName;
+            }
+            dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+            dto.ApplReleaseStatus = appRelease;
+
             return Ok(dto);
         }
 
@@ -93,6 +105,19 @@ namespace ESS.Controllers.Api
                 dto.Employee.CatName = emp.Categories.CatName;
                 dto.Employee.GradeName = emp.Grades.GradeName;
                 dto.Employee.DesgName = emp.Designations.DesgName;
+
+                List<ApplReleaseStatusDto> appRelease = _context.ApplReleaseStatus
+                    .Where(a => a.ReleaseGroupCode == ReleaseGroups.NoDues && a.ApplicationId == dto.Id).AsEnumerable()
+                    .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
+                    .ToList();
+
+                foreach (ApplReleaseStatusDto relDto in appRelease)
+                {
+                    relDto.ReleaserName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == relDto.ReleaseAuth)?.EmpName;
+                }
+                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+                dto.ApplReleaseStatus = appRelease;
+
             }
 
             return Ok(resignations);
