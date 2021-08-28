@@ -185,6 +185,7 @@
     <Compile Include="Controllers\Api\EmployeeController.cs" />
     <Compile Include="Controllers\Api\EmpSeparationController.cs" />
     <Compile Include="Controllers\Api\EmpUniformController.cs" />
+    <Compile Include="Controllers\Api\FandFController.cs" />
     <Compile Include="Controllers\Api\Form16Controller.cs" />
     <Compile Include="Controllers\Api\GateInOutController.cs" />
     <Compile Include="Controllers\Api\GatePassController.cs" />
@@ -201,6 +202,7 @@
     <Compile Include="Controllers\Api\MasterUploadController.cs" />
     <Compile Include="Controllers\Api\MedDependentController.cs" />
     <Compile Include="Controllers\Api\MedicalFitnessController.cs" />
+    <Compile Include="Controllers\Api\MedIntimationController.cs" />
     <Compile Include="Controllers\Api\MissedPunchController.cs" />
     <Compile Include="Controllers\Api\NoDuesController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="Dto\EmpSeparationDto.cs" />
     <Compile Include="Dto\EmpTypeDto.cs" />
     <Compile Include="Dto\EmpUniformDto.cs" />
+    <Compile Include="Dto\FullAndFinalDto.cs" />
     <Compile Include="Dto\GaReleaseStrategyDto.cs" />
     <Compile Include="Dto\GaReleaseStrategyLevelDto.cs" />
     <Compile Include="Dto\GatePassDto.cs" />
@@ -253,6 +256,7 @@
     <Compile Include="Dto\MedDependentDto.cs" />
     <Compile Include="Dto\MedEmpUhidDto.cs" />
     <Compile Include="Dto\MedicalFitnessDto.cs" />
+    <Compile Include="Dto\MedIntimationDto.cs" />
     <Compile Include="Dto\MissedPunchDto.cs" />
     <Compile Include="Dto\MissedPunchReleaseStatusDto.cs" />
     <Compile Include="Dto\NoDuesDeptDetailsDto.cs" />
@@ -738,6 +742,14 @@
     <Compile Include="Migrations\202107060425460_MissedPunchModule.Designer.cs">
       <DependentUpon>202107060425460_MissedPunchModule.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202108110900565_MediclaimIntimation.cs" />
+    <Compile Include="Migrations\202108110900565_MediclaimIntimation.Designer.cs">
+      <DependentUpon>202108110900565_MediclaimIntimation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202108260859370_FullAndFinal.cs" />
+    <Compile Include="Migrations\202108260859370_FullAndFinal.Designer.cs">
+      <DependentUpon>202108260859370_FullAndFinal.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -760,6 +772,7 @@
     <Compile Include="Models\GpReleaseStrategies.cs" />
     <Compile Include="Models\GpReleaseStrategyLevels.cs" />
     <Compile Include="Models\Grades.cs" />
+    <Compile Include="Models\FullAndFinal.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LeaveApplicationDetails.cs" />
     <Compile Include="Models\LeaveApplications.cs" />
@@ -772,6 +785,7 @@
     <Compile Include="Models\MedDependent.cs" />
     <Compile Include="Models\MedEmpUhid.cs" />
     <Compile Include="Models\MedicalFitness.cs" />
+    <Compile Include="Models\MedIntimation.cs" />
     <Compile Include="Models\MedPolicy.cs" />
     <Compile Include="Models\MissedPunch.cs" />
     <Compile Include="Models\MissedPunchReleaseStatus.cs" />
@@ -1217,6 +1231,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202107060425460_MissedPunchModule.resx">
       <DependentUpon>202107060425460_MissedPunchModule.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108110900565_MediclaimIntimation.resx">
+      <DependentUpon>202108110900565_MediclaimIntimation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108260859370_FullAndFinal.resx">
+      <DependentUpon>202108260859370_FullAndFinal.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

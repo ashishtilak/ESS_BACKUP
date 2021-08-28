@@ -258,7 +258,15 @@ namespace ESS.Controllers.Api
                                                      e.UnitCode == vEmp.UnitCode &&
                                                      e.DeptCode == vEmp.DeptCode &&
                                                      e.StatCode == vEmp.StatCode);
-                            if (vRelStr == null) continue;
+                            if (vRelStr == null)
+                            {
+                                // changed on 16/08/2021
+                                // if vRelStr is null, then get the rel strategy from appRelease dto
+                                vRelStr = _context.GpReleaseStrategy.FirstOrDefault(e=>e.GpReleaseStrategy == applReleaseStatusDto.ReleaseStrategy);
+                                if(vRelStr == null )  continue;
+                            }
+
+
 
                             var vRelStrLvl = _context.GpReleaseStrategyLevels
                                 .Where(g => g.GpReleaseStrategy == vRelStr.GpReleaseStrategy);
@@ -465,6 +473,12 @@ namespace ESS.Controllers.Api
                     .Where(r => r.EmpUnqId == empUnqId)
                     .ToList();
 
+                // added on 2021-08-19 to decrease query execution time
+                relAuth.RemoveAll(r=>r.ReleaseCode.StartsWith("GP_"));
+                
+                if(relAuth.Count ==0)
+                    return BadRequest("No release auth found for this employee.");
+
                 // create return data object
                 var resultData = new List<ScheduleData>();
 
@@ -476,11 +490,13 @@ namespace ESS.Controllers.Api
 
                     var app = _context.ApplReleaseStatus
                         .Where(l =>
+                            l.ReleaseGroupCode == ReleaseGroups.ShiftSchedule &&
                             rAuth.ReleaseCode == l.ReleaseCode &&
-                            l.ReleaseStatusCode == "I" &&
-                            l.ReleaseGroupCode == ReleaseGroups.ShiftSchedule
+                            l.ReleaseStatusCode == "I"
                         )
                         .ToList();
+
+                    if(app.Count == 0) continue;
 
                     var appIds = app.Select(a => a.ApplicationId).ToArray();
 

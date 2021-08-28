@@ -183,7 +183,20 @@ namespace ESS.Controllers.Api
             foreach (EmployeeDto employeeDto in employee)
             {
                 employeeDto.NoDuesFlag = _context.NoDuesMaster.Any(e => e.EmpUnqId == employeeDto.EmpUnqId);
+
+                var empAdd = _context.EmpAddress
+                    .OrderByDescending(e => e.Counter)
+                    .FirstOrDefault(e => e.EmpUnqId == empUnqId);
+
+                if(empAdd !=null)
+                {
+                    employeeDto.PrePhone = empAdd.PrePhone;
+                    employeeDto.PreResPhone = empAdd.PreResPhone;
+                    employeeDto.PreEmail = empAdd.PreEmail;
+                }
             }
+
+
 
             return Ok(employee);
         }

@@ -153,6 +153,12 @@ namespace ESS.App_Start
             CreateMap<MissedPunchDto, MissedPunch>();
             CreateMap<MissedPunchReleaseStatus, MissedPunchReleaseStatusDto>();
             CreateMap<MissedPunchReleaseStatusDto, MissedPunchReleaseStatus>();
+
+            CreateMap<MedIntimation,MedIntimationDto>();
+            CreateMap<MedIntimationDto,MedIntimation>();
+
+            CreateMap<FullAndFinal, FullAndFinalDto>();
+            CreateMap<FullAndFinalDto, FullAndFinal>();
         }
     }
 }

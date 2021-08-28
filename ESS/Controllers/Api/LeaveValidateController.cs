@@ -385,6 +385,19 @@ namespace ESS.Controllers.Api
             }
 
 
+            // added on 21/08/2021 by ashish
+            //if there are multiple leaves and if OL is clubbed with SL, throw error
+            if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.OptionalLeave)
+                && leaveApplicationDto.LeaveApplicationDetails.Count > 1)
+            {
+                var leaves =
+                    leaveApplicationDto.LeaveApplicationDetails.Where(x => x.LeaveTypeCode == LeaveTypes.SickLeave);
+
+                if (leaves.Any())
+                    error.Add("OL(RH) cannot be clubbed with Sick leave.");
+            }
+
+
             foreach (var leaveType in leaveApplicationDto.LeaveApplicationDetails.Select(l => l.LeaveTypeCode)
                 .Distinct())
             {

@@ -88,6 +88,7 @@ namespace ESS.Models
         public DbSet<MedDependent> MedDependents { get; set; }
         public DbSet<MedEmpUhid> MedEmpUhids { get; set; }
         public DbSet<MedicalFitness> MedicalFitness { get; set; }
+        public DbSet<MedIntimation> MedIntimations { get; set; }
 
         public DbSet<NoDuesMaster> NoDuesMaster { get; set; }
         public DbSet<NoDuesStatus> NoDuesStatus { get; set; }
@@ -107,6 +108,8 @@ namespace ESS.Models
 
         public DbSet<MissedPunch> MissedPunches { get; set; }
         public DbSet<MissedPunchReleaseStatus> MissedPunchReleaseStatus { get; set; }
+
+        public DbSet<FullAndFinal> FullAndFinals { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

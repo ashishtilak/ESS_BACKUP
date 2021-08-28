@@ -23,57 +23,68 @@ namespace ESS.Controllers.Api
 
         public IHttpActionResult GetResignation(string empUnqId)
         {
-            var resignation = _context.EmpSeparations
-                .FirstOrDefault(e => e.EmpUnqId == empUnqId);
-            if (resignation == null)
+            var resignations = _context.EmpSeparations
+                .Include(e => e.Employee)
+                .Where(e => e.EmpUnqId == empUnqId
+                    ).AsEnumerable()
+                .Select(Mapper.Map<EmpSeparation, EmpSeparationDto>)
+                .ToList();
+
+            if (!resignations.Any())
                 return BadRequest("No entries found.");
 
-            var emp = _context.Employees
-                .Include(e => e.Company)
-                .Include(e => e.WorkGroup)
-                .Include(e => e.Units)
-                .Include(e => e.Departments)
-                .Include(e => e.Stations)
-                .Include(e => e.Categories)
-                .Include(e => e.Grades)
-                .Include(e => e.Designations)
-                .FirstOrDefault(e => e.EmpUnqId == empUnqId);
-
-            if (emp == null)
-                return BadRequest("Employee details not found.");
-
-            EmpSeparationDto dto = Mapper.Map<EmpSeparation, EmpSeparationDto>(resignation);
-
-            dto.Employee.UnitName = emp.Units.UnitName;
-            dto.Employee.CompName = emp.Company.CompName;
-            dto.Employee.WrkGrpDesc = emp.WorkGroup.WrkGrpDesc;
-            dto.Employee.UnitName = emp.Units.UnitName;
-            dto.Employee.DeptName = emp.Departments.DeptName;
-            dto.Employee.StatName = emp.Stations.StatName;
-            dto.Employee.CatName = emp.Categories.CatName;
-            dto.Employee.GradeName = emp.Grades.GradeName;
-            dto.Employee.DesgName = emp.Designations.DesgName;
-
-
-            List<ApplReleaseStatusDto> appRelease = _context.ApplReleaseStatus
-                .Where(a => a.ReleaseGroupCode == ReleaseGroups.NoDues && a.ApplicationId == dto.Id).AsEnumerable()
-                .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
-                .ToList();
-            foreach (ApplReleaseStatusDto relDto in appRelease)
+            foreach (EmpSeparationDto dto in resignations)
             {
-                relDto.ReleaserName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == relDto.ReleaseAuth)?.EmpName;
-            }
-            dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
-            dto.ApplReleaseStatus = appRelease;
+                Employees emp = _context.Employees
+                    .Include(e => e.Company)
+                    .Include(e => e.WorkGroup)
+                    .Include(e => e.Units)
+                    .Include(e => e.Departments)
+                    .Include(e => e.Stations)
+                    .Include(e => e.Categories)
+                    .Include(e => e.Grades)
+                    .Include(e => e.Designations)
+                    .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
-            return Ok(dto);
+                if (emp == null)
+                    continue;
+
+                dto.Employee.UnitName = emp.Units.UnitName;
+                dto.Employee.CompName = emp.Company.CompName;
+                dto.Employee.WrkGrpDesc = emp.WorkGroup.WrkGrpDesc;
+                dto.Employee.UnitName = emp.Units.UnitName;
+                dto.Employee.DeptName = emp.Departments.DeptName;
+                dto.Employee.StatName = emp.Stations.StatName;
+                dto.Employee.CatName = emp.Categories.CatName;
+                dto.Employee.GradeName = emp.Grades.GradeName;
+                dto.Employee.DesgName = emp.Designations.DesgName;
+
+                List<ApplReleaseStatusDto> appRelease = _context.ApplReleaseStatus
+                    .Where(a => a.ReleaseGroupCode == ReleaseGroups.NoDues && a.ApplicationId == dto.Id).AsEnumerable()
+                    .Select(Mapper.Map<ApplReleaseStatus, ApplReleaseStatusDto>)
+                    .ToList();
+
+                foreach (ApplReleaseStatusDto relDto in appRelease)
+                {
+                    relDto.ReleaserName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == relDto.ReleaseAuth)?.EmpName;
+                }
+                dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
+                dto.ApplReleaseStatus = appRelease;
+                dto.FurtherReleaserName =
+                    _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.FurtherReleaser)?.EmpName;
+            }
+
+            return Ok(resignations);
         }
 
         public IHttpActionResult GetResignations(DateTime fromDt, DateTime toDt)
         {
             var resignations = _context.EmpSeparations
                 .Include(e => e.Employee)
-                .Where(e => e.ApplicationDate >= fromDt && e.ApplicationDate <= toDt).AsEnumerable()
+                .Where(e => 
+                    e.ApplicationDate >= fromDt && e.ApplicationDate <= toDt &&
+                    e.ReleaseStatusCode != ReleaseStatus.ReleaseRejected
+                    ).AsEnumerable()
                 .Select(Mapper.Map<EmpSeparation, EmpSeparationDto>)
                 .ToList();
 
@@ -118,6 +129,8 @@ namespace ESS.Controllers.Api
                 dto.ApplReleaseStatus = new List<ApplReleaseStatusDto>();
                 dto.ApplReleaseStatus = appRelease;
 
+                dto.FurtherReleaserName =
+                    _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.FurtherReleaser)?.EmpName;
             }
 
             return Ok(resignations);
@@ -207,6 +220,9 @@ namespace ESS.Controllers.Api
                 dto.Employee.CatName = emp.Categories.CatName;
                 dto.Employee.GradeName = emp.Grades.GradeName;
                 dto.Employee.DesgName = emp.Designations.DesgName;
+
+                dto.FurtherReleaserName =
+                    _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.FurtherReleaser)?.EmpName;
             }
 
             return Ok(resignations);
