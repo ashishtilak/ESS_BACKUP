@@ -33,6 +33,8 @@ namespace ESS.Dto
         public DateTime? DelReleaseDt { get; set; }
         public string DelReleaseUser { get; set; }
 
+        public string Remarks { get; set; }
+
         public bool Active { get; set; }
 
         public string AddUser { get; set; }

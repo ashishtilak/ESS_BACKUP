@@ -51,10 +51,10 @@ namespace ESS.Controllers.Api
                 {
                     var relCode = levelDto.ReleaseCode;
                     var releser = _context.ReleaseAuth
-                        .FirstOrDefault(r => r.ReleaseCode == relCode);
+                        .FirstOrDefault(r => r.ReleaseCode == relCode && r.Active);
 
                     if (releser == null)
-                        return BadRequest("No one is authorized to release!");
+                        continue;
 
                     var emp = _context.Employees
                         .Select(e => new EmployeeDto
@@ -143,7 +143,7 @@ namespace ESS.Controllers.Api
                 {
                     var relCode = levelDto.ReleaseCode;
                     var releser = _context.ReleaseAuth
-                        .Where(r => r.ReleaseCode == relCode)
+                        .Where(r => r.ReleaseCode == relCode && r.Active)
                         .ToList();
 
                     if (releser.Count != 0)
@@ -213,7 +213,7 @@ namespace ESS.Controllers.Api
                 {
                     var relCode = levelDto.ReleaseCode;
                     var releser = _context.ReleaseAuth
-                        .FirstOrDefault(r => r.ReleaseCode == relCode);
+                        .FirstOrDefault(r => r.ReleaseCode == relCode && r.Active);
 
                     if (releser == null)
                         return BadRequest("No one is authorized to release!");

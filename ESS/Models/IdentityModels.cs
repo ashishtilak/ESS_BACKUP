@@ -111,6 +111,9 @@ namespace ESS.Models
 
         public DbSet<FullAndFinal> FullAndFinals { get; set; }
 
+        public DbSet<TpaSanction> TpaSanctions { get; set; }
+        public DbSet<TpaRelease> TpaReleases { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

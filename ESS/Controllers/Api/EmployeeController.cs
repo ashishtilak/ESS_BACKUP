@@ -22,7 +22,7 @@ namespace ESS.Controllers.Api
         public IHttpActionResult GetEmployees(string location)
         {
             var employeeDto = _context.Employees
-                .Where(e => e.Active && e.WrkGrp == "COMP")
+                .Where(e => e.Active && (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE"))
                 .Select(
                     e => new EmployeeDto
                     {
@@ -261,7 +261,7 @@ namespace ESS.Controllers.Api
                 .Include(d => d.Departments)
                 .Include(s => s.Stations)
                 //.Include(e => e.Sections)
-                .Where(e => e.Active && e.WrkGrp == "COMP")
+                .Where(e => e.Active && (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE") )
                 .ToList();
 
             List<EmpRelease> result = new List<EmpRelease>();

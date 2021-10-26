@@ -18,6 +18,7 @@ namespace ESS.Models
         [StringLength(15)] public string InsuredMobileNo { get; set; }
         [StringLength(50)] public string PatientName { get; set; }
         [StringLength(10)] public string Relation { get; set; }
+        [StringLength(10)] public string IntimatorEmpUnqId { get; set; }
         [StringLength(50)] public string IntimatorName { get; set; }
         [StringLength(15)] public string IntimatorMobileNo { get; set; }
         [Column(TypeName = "datetime2")] public DateTime AdmissionDate { get; set; }

@@ -29,6 +29,7 @@ namespace ESS.Controllers.Api
 
             IQueryable<MissedPunch> missedPunchList = _context.MissedPunches
                 .Include(e => e.Employee)
+                .Include(a => a.MissedPunchReleaseStatus)
                 .Where(m => m.AddDate >= fromDt && m.AddDate <= toDt);
 
             if (empUnqId != "")
@@ -89,6 +90,22 @@ namespace ESS.Controllers.Api
             foreach (MissedPunchDto missedPunchDto in missedPunch)
             {
                 missedPunchDto.Employee = employeeDto.FirstOrDefault(e => e.EmpUnqId == missedPunchDto.EmpUnqId);
+                IEnumerable<MissedPunchReleaseStatusDto> appl = _context.MissedPunchReleaseStatus
+                    .Where(l => l.ApplicationId == missedPunchDto.Id)
+                    .ToList()
+                    .Select(Mapper.Map<MissedPunchReleaseStatus, MissedPunchReleaseStatusDto>);
+
+                foreach (MissedPunchReleaseStatusDto releaseStatusDto in appl)
+                {
+                    List<ReleaseAuth> relCode = _context.ReleaseAuth
+                        .Where(r => r.ReleaseCode == releaseStatusDto.ReleaseCode)
+                        .ToList();
+
+                    foreach (ReleaseAuth unused in relCode.Where(auth => auth.EmpUnqId == empUnqId))
+                        releaseStatusDto.ReleaseAuth = empUnqId;
+
+                    missedPunchDto.MissedPunchReleaseStatus.Add(releaseStatusDto);
+                }
             }
 
             return Ok(missedPunch);

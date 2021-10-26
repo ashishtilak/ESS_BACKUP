@@ -140,8 +140,9 @@ namespace ESS.Controllers.Api
         {
             try
             {
-                //TODO: Remove hard coded "COMP"
-                var emps = _context.Employees.Where(e => e.WrkGrp == "COMP" && e.Active == false)
+                //TODO: Remove hard coded "COMP" 
+                var emps = _context.Employees
+                    .Where(e => (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE") && e.Active == false)
                     .Select(e => e.EmpUnqId).ToArray();
                 var releaseStrategies = _context.ReleaseStrategy
                     .Where(r => emps.Contains(r.ReleaseStrategy) && r.Active)

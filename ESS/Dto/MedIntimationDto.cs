@@ -16,6 +16,7 @@ namespace ESS.Dto
         public string InsuredMobileNo { get; set; }
         public string PatientName { get; set; }
         public string Relation { get; set; }
+        public string IntimatorEmpUnqId { get; set; }
         public string IntimatorName { get; set; }
         public string IntimatorMobileNo { get; set; }
         public DateTime AdmissionDate { get; set; }

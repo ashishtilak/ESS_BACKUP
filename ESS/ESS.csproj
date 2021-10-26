@@ -216,6 +216,7 @@
     <Compile Include="Controllers\Api\ShortLeaveController.cs" />
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
+    <Compile Include="Controllers\Api\TpaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ReimbursementDto.cs" />
@@ -290,6 +291,9 @@
     <Compile Include="Dto\TaxDetailsNscDto.cs" />
     <Compile Include="Dto\TaxDetailsPpfDto.cs" />
     <Compile Include="Dto\TaxDetailsUlipDto.cs" />
+    <Compile Include="Dto\TpaAttdDto.cs" />
+    <Compile Include="Dto\TpaReleaseDto.cs" />
+    <Compile Include="Dto\TpaSanctionDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
     <Compile Include="Dto\VendorDto.cs" />
     <Compile Include="Dto\WorkGroupDto.cs" />
@@ -750,6 +754,18 @@
     <Compile Include="Migrations\202108260859370_FullAndFinal.Designer.cs">
       <DependentUpon>202108260859370_FullAndFinal.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109041056241_IntimatorEmpId.cs" />
+    <Compile Include="Migrations\202109041056241_IntimatorEmpId.Designer.cs">
+      <DependentUpon>202109041056241_IntimatorEmpId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202109070715366_AddRemarksInMedDependent.cs" />
+    <Compile Include="Migrations\202109070715366_AddRemarksInMedDependent.Designer.cs">
+      <DependentUpon>202109070715366_AddRemarksInMedDependent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202110040958569_TpaSanction.cs" />
+    <Compile Include="Migrations\202110040958569_TpaSanction.Designer.cs">
+      <DependentUpon>202110040958569_TpaSanction.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -829,6 +845,8 @@
     <Compile Include="Models\TaxDetailsRent.cs" />
     <Compile Include="Models\TaxDetailsSukanya.cs" />
     <Compile Include="Models\TaxDetailsUlip.cs" />
+    <Compile Include="Models\TpaRelease.cs" />
+    <Compile Include="Models\TpaSanction.cs" />
     <Compile Include="Models\Units.cs" />
     <Compile Include="Models\Vendors.cs" />
     <Compile Include="Models\WorkGroups.cs" />
@@ -1237,6 +1255,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202108260859370_FullAndFinal.resx">
       <DependentUpon>202108260859370_FullAndFinal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109041056241_IntimatorEmpId.resx">
+      <DependentUpon>202109041056241_IntimatorEmpId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109070715366_AddRemarksInMedDependent.resx">
+      <DependentUpon>202109070715366_AddRemarksInMedDependent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202110040958569_TpaSanction.resx">
+      <DependentUpon>202110040958569_TpaSanction.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

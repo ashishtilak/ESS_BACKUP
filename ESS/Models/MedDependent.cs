@@ -58,6 +58,7 @@ namespace ESS.Models
         [Column(TypeName = "datetime2")] public DateTime? DelReleaseDt { get; set; }
         [StringLength(10)] public string DelReleaseUser { get; set; }
 
+        [StringLength(255)] public string Remarks { get; set; }
 
         public bool Active { get; set; }
 

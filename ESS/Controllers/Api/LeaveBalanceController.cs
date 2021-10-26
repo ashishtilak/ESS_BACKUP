@@ -23,7 +23,8 @@ namespace ESS.Controllers.Api
 
         public IHttpActionResult GetLeaveBalance(int yearMonth)
         {
-            var employees = _context.Employees.Where(e => e.Active == true && e.WrkGrp == "COMP")
+            var employees = _context.Employees
+                .Where(e => e.Active == true && (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE"))
                 .Select(e => e.EmpUnqId)
                 .ToList();
 

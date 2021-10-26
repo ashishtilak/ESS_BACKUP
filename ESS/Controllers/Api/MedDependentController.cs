@@ -26,6 +26,7 @@ namespace ESS.Controllers.Api
             _context = new ApplicationDbContext();
         }
 
+        [HttpGet, ActionName("getdependents")]
         public IHttpActionResult GetDependents(bool mode, int policyYear, string empUnqId = null)
         {
             // MODE will be true if all records of all employees are requested
@@ -99,6 +100,47 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest(ex.ToString());
             }
+        }
+
+        [HttpGet, ActionName("getreleased")]
+        public IHttpActionResult GetReleasedList(DateTime fromDt, DateTime toDt)
+        {
+            // list of dependents who are added or deleted
+            // and released between given date range
+
+            List<MedDependentDto> dep = _context.MedDependents
+                .Where(d => (d.ReleaseStatusCode == ReleaseStatus.FullyReleased ||
+                             d.DelReleaseStatusCode == ReleaseStatus.FullyReleased) &&
+                            ((d.ReleaseDt >= fromDt && d.ReleaseDt <= toDt) ||
+                             (d.DelReleaseDt >= fromDt && d.DelReleaseDt <= toDt))
+                )
+                .AsEnumerable()
+                .Select(Mapper.Map<MedDependent, MedDependentDto>)
+                .ToList();
+
+            if (dep.Count == 0)
+                return BadRequest("No records found.");
+
+            // get all corresponding UhIds for provided year
+
+            var empList = dep.Select(d => d.EmpUnqId).ToArray();
+
+            List<MedEmpUhidDto> uhids = _context.MedEmpUhids
+                .Where(e => empList.Contains(e.EmpUnqId)
+                            && e.Active)
+                .AsEnumerable()
+                .Select(Mapper.Map<MedEmpUhid, MedEmpUhidDto>)
+                .ToList();
+
+            foreach (MedDependentDto dto in dep)
+            {
+                MedEmpUhidDto uhid = uhids.FirstOrDefault(u => u.EmpUnqId == dto.EmpUnqId && u.DepSr == dto.DepSr);
+                if (dto.UhIds == null)
+                    dto.UhIds = new MedEmpUhidDto();
+                dto.UhIds = uhid;
+            }
+
+            return Ok(dep);
         }
 
         [HttpPost]
@@ -277,6 +319,7 @@ namespace ESS.Controllers.Api
                                 dependent.DelReleaseUser = dto.DelReleaseUser;
                                 dependent.DelReleaseDt = DateTime.Now;
                                 dependent.DelReleaseStatusCode = dto.DelReleaseStatusCode;
+                                dependent.Remarks = dto.Remarks;
                             }
                             else
                             {
@@ -285,6 +328,7 @@ namespace ESS.Controllers.Api
                                 dependent.DelReleaseUser = dto.DelReleaseUser;
                                 dependent.DelReleaseDt = DateTime.Now;
                                 dependent.DelReleaseStatusCode = dto.DelReleaseStatusCode;
+                                dependent.Remarks = dto.Remarks;
                             }
                         }
                         else
@@ -297,6 +341,7 @@ namespace ESS.Controllers.Api
                                 dependent.ReleaseUser = dto.ReleaseUser;
                                 dependent.ReleaseDt = DateTime.Now;
                                 dependent.ReleaseStatusCode = dto.ReleaseStatusCode;
+                                dependent.Remarks = dto.Remarks;
                             }
                             else
                             {
@@ -305,6 +350,7 @@ namespace ESS.Controllers.Api
                                 dependent.ReleaseUser = dto.ReleaseUser;
                                 dependent.ReleaseDt = DateTime.Now;
                                 dependent.ReleaseStatusCode = dto.ReleaseStatusCode;
+                                dependent.Remarks = dto.Remarks;
                             }
                         }
 

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Http;
 using Antlr.Runtime.Misc;
@@ -99,9 +100,11 @@ namespace ESS.Controllers.Api
                 var relCode = _context.ReleaseAuth
                     .Where(e => e.EmpUnqId == empUnqId)
                     .Select(e => e.ReleaseCode)
-                    .ToArray();
+                    .ToList();
 
-                if (relCode.Length == 0) return BadRequest("Employee is not a releaser.");
+                relCode.RemoveAll(r => r.StartsWith("GP_"));
+
+                if (relCode.Count == 0) return BadRequest("Employee is not a releaser.");
 
                 var relStrLvl = _context.ReleaseStrategyLevels
                     .Where(r =>
@@ -836,6 +839,59 @@ namespace ESS.Controllers.Api
                 int countWo = dto.ShiftScheduleDetails.Count(e => e.ShiftCode == "WO");
                 if (countWo > 5)
                     errors.Add("Emp:" + dto.EmpUnqId + ": Week off more than 5");
+
+                var prevYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4));
+                var prevMonth = int.Parse(dto.YearMonth.ToString().Substring(3, 2));
+                var dt = new DateTime(prevYear, prevMonth, 1).AddDays(-1);
+                var prevYearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
+
+                var prevWeekOff = _context.ShiftScheduleDetails
+                    .FirstOrDefault(s => s.YearMonth == prevYearMonth &&
+                                         s.EmpUnqId == dto.EmpUnqId &&
+                                         s.ShiftCode == "WO");
+
+
+                var prevWoDay = DayOfWeek.Sunday;
+
+                if (prevWeekOff != null)
+                {
+                    var prevDate = new DateTime(dt.Year, dt.Month, prevWeekOff.ShiftDay);
+                    prevWoDay = prevDate.DayOfWeek;
+                }
+
+
+                // Check for week off gaps
+                List<ShiftScheduleDetailDto> weekOffs =
+                    dto.ShiftScheduleDetails.Where(s => s.ShiftCode == "WO").ToList();
+
+                var prevDay = 0;
+
+                var thisYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4));
+                var thisMonth = int.Parse(dto.YearMonth.ToString().Substring(3, 2));
+
+
+                foreach (ShiftScheduleDetailDto wo in weekOffs)
+                {
+
+                    if (prevDay !=0 && wo.ShiftDay - prevDay != 7)
+                    {
+                        errors.Add("WO must be on same week days. Check week off on " + wo.ShiftDay);
+                        break;
+                    }
+
+                    var thisWoDay = new DateTime(thisYear, thisMonth, wo.ShiftDay).DayOfWeek;
+
+                    if(prevWeekOff != null)
+                    {
+                        if(thisWoDay != prevWoDay)
+                        {
+                            errors.Add("WO must be on same week day as previous schedule. Check week off of "+ dto.EmpUnqId + " on " + wo.ShiftDay);
+                            break;
+                        }
+                    }
+
+                    prevDay = wo.ShiftDay;
+                }
             }
 
             return errors;

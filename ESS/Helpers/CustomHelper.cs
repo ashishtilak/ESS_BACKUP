@@ -1618,7 +1618,7 @@ namespace ESS.Helpers
 
             string sql = "SELECT [EmpUnqID]" +
                          ",[PERADD1],[PERADd2],[PERADD3],[PERADD4],[PERDistrict],[PERCITY],[PERSTATE],[PERPIN],[PERPHONE],[PERPOLICEST]" +
-                         " FROM [MastEmp] where WRKGRP = 'COMP' and Active= 1 ";
+                         " FROM [MastEmp] where (WRKGRP = 'COMP' or WRKGRP='OUTSOURCE') and Active= 1 ";
 
             string strRemoteServer = GetRemoteServer(location);
 
@@ -1797,6 +1797,71 @@ namespace ESS.Helpers
             }
 
             return noDuesIt;
+        }
+
+        public static List<TpaAttdDto> GetTpa(DateTime? fromDate, DateTime? toDate, string empUnqIds, string location)
+        {
+            var result = new List<TpaAttdDto>();
+
+            //var context = new ApplicationDbContext();
+
+            string strRemoteServer = GetRemoteServer(location);
+
+
+            using (var cn = new SqlConnection(strRemoteServer))
+            {
+                cn.Open();
+
+                DateTime fromDt = fromDate ?? DateTime.Now.AddDays(-30);
+                DateTime toDt = toDate ?? DateTime.Now;
+
+
+                string sql = "SELECT [tYear],[tDate],[EmpUnqID],[ScheDuleShift],[ConsShift],[ConsIN],[ConsOut]," +
+                             "[ConsWrkHrs],[ConsOverTime],[Status],[HalfDay],[LeaveTyp],[LeaveHalf]," +
+                             "[ShiftDesc],[ShiftHrs],[CalcOverTime],[Earlycome],[EarlyGoing],[LateCome] " +
+                             "FROM [v_AttdData_ESS] " +
+                             "where tyear in (" + fromDt.ToString("yyyy") + ", " + toDt.ToString("yyyy") + ") " +
+                             //"and compcode = '01' " +
+                             "and empunqid in(" + empUnqIds + ") " +
+                             "and tdate between '" + fromDt.ToString("yyyy-MM-dd 00:00:00") + "' and '" +
+                             toDt.ToString("yyyy-MM-dd 23:59:59") + "'";
+
+                var cmd = new SqlCommand(sql, cn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    var res = new TpaAttdDto
+                    {
+                        AttdDate = Convert.ToDateTime(dr["tDate"]),
+                        EmpUnqId = dr["EmpUnqId"].ToString(),
+                        ScheDuleShift = dr["ScheDuleShift"].ToString(),
+                        ConsShift = dr["ConsShift"].ToString(),
+                        ConsIn = dr.IsDBNull(dr.GetOrdinal("ConsIn"))
+                            ? (DateTime?) null
+                            : Convert.ToDateTime(dr["ConsIn"]),
+                        ConsOut = dr.IsDBNull(dr.GetOrdinal("ConsOut"))
+                            ? (DateTime?) null
+                            : Convert.ToDateTime(dr["ConsOut"]),
+                        ConsWrkHrs = float.Parse(dr["ConsWrkHrs"].ToString()),
+                        ShiftHrs = float.Parse(dr["ShiftHrs"].ToString()),
+                        ConsOverTime = float.Parse(dr["ConsOverTime"].ToString()),
+                        CalcOverTime = float.Parse(dr["CalcOverTime"].ToString()),
+                        Status = dr["Status"].ToString(),
+                        HalfDay = Convert.ToBoolean(dr["HalfDay"]),
+                        LeaveType = dr["LeaveTyp"].ToString(),
+                        LeaveHalf = Convert.ToBoolean(dr["LeaveHalf"]),
+                        Earlycome = dr["Earlycome"].ToString(),
+                        EarlyGoing = dr["EarlyGoing"].ToString(),
+                        LateCome = dr["LateCome"].ToString()
+                    };
+
+
+                    result.Add(res);
+                }
+            }
+
+            return result;
         }
     }
 }

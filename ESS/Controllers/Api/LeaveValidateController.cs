@@ -490,10 +490,15 @@ namespace ESS.Controllers.Api
                     }
                     else
                     {
+                        if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count == 1)
+                        {
+                            error.Add("Comp. Off cannot be taken against a Week Off day.");
+                        }
+
                         // Check if CO date is <= 7 days from WO day
                         if (emp.Location == Locations.Ipu)
                         {
-                            if (end.Subtract(start).TotalDays > 7)
+                            if (end.Subtract(start).TotalDays > 30)
                                 error.Add("Comp. Off can be taken within 7 days.");
                         }
                         else if (emp.Location == Locations.Jfl)
