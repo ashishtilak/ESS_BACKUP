@@ -841,7 +841,7 @@ namespace ESS.Controllers.Api
                     errors.Add("Emp:" + dto.EmpUnqId + ": Week off more than 5");
 
                 var prevYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4));
-                var prevMonth = int.Parse(dto.YearMonth.ToString().Substring(3, 2));
+                var prevMonth = int.Parse(dto.YearMonth.ToString().Substring(4, 2));
                 var dt = new DateTime(prevYear, prevMonth, 1).AddDays(-1);
                 var prevYearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
 
@@ -867,7 +867,7 @@ namespace ESS.Controllers.Api
                 var prevDay = 0;
 
                 var thisYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4));
-                var thisMonth = int.Parse(dto.YearMonth.ToString().Substring(3, 2));
+                var thisMonth = int.Parse(dto.YearMonth.ToString().Substring(4, 2));
 
 
                 foreach (ShiftScheduleDetailDto wo in weekOffs)

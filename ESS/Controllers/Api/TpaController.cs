@@ -75,10 +75,24 @@ namespace ESS.Controllers.Api
                     };
 
                     var yearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
-                    newTpa.TpaShiftCode = _context.ShiftScheduleDetails
-                        .FirstOrDefault(e => e.YearMonth == yearMonth
-                                             && e.ShiftDay == dt.Day && e.EmpUnqId == emp)
-                        ?.ShiftCode;
+
+
+                    var lastSchedule = _context.ShiftSchedules
+                        .Where(e => e.YearMonth == yearMonth  && e.EmpUnqId == emp &&
+                        e.ReleaseStatusCode == ReleaseStatus.FullyReleased)
+                        .OrderByDescending(e=>e.ScheduleId)
+                        .FirstOrDefault();
+
+                    if (lastSchedule == null)
+                    {
+                        newTpa.TpaShiftCode = "";
+                    }
+                    else
+                    {
+                        newTpa.TpaShiftCode = _context.ShiftScheduleDetails
+                            .FirstOrDefault(e => e.YearMonth == yearMonth && e.ScheduleId == lastSchedule.ScheduleId)
+                            ?.ShiftCode;
+                    }
 
                     EmployeeDto employeeDto = _context.Employees
                         .Select(e => new EmployeeDto
