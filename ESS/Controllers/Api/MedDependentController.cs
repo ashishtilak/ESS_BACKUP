@@ -190,6 +190,8 @@ namespace ESS.Controllers.Api
                         currentRec.DelReleaseStrategy = DelReleaseStrategy;
                         currentRec.DelReleaseStatusCode = ReleaseStatus.InRelease;
                         currentRec.IsChanged = true;
+                        currentRec.AddDate = dto.AddDate;
+                        currentRec.AddUser = dto.AddUser;
                     }
                     else
                     {

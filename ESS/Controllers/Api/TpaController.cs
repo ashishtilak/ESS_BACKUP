@@ -28,14 +28,14 @@ namespace ESS.Controllers.Api
         [HttpGet, ActionName("getpretpa")]
         public IHttpActionResult GetTpa(DateTime fromDate, DateTime toDate, string empUnqId)
         {
-            var relAuth = _context.ReleaseAuth
+            List<ReleaseAuth> relAuth = _context.ReleaseAuth
                 .Where(r => r.EmpUnqId == empUnqId && r.Active)
                 .ToList();
 
             relAuth.RemoveAll(r => r.ReleaseCode.StartsWith("GP_"));
 
             IEnumerable<string> relCodes = relAuth.Select(r => r.ReleaseCode).ToList();
-            var relStrLvl = _context.ReleaseStrategyLevels
+            List<ReleaseStrategyLevels> relStrLvl = _context.ReleaseStrategyLevels
                 .Where(r =>
                     r.ReleaseGroupCode == ReleaseGroups.Tpa &&
                     relCodes.Contains(r.ReleaseCode))
@@ -44,25 +44,22 @@ namespace ESS.Controllers.Api
             if (!relStrLvl.Any())
                 return BadRequest("No records found.");
 
-            var emps = relStrLvl.Select(r => r.ReleaseStrategy).Distinct().ToList();
+            List<string> emps = relStrLvl.Select(r => r.ReleaseStrategy).Distinct().ToList();
 
 
-            var alreadyTpaEntry = _context.TpaSanctions.Where(
+            List<TpaSanction> alreadyTpaEntries = _context.TpaSanctions.Where(
                     t => emps.Contains(t.EmpUnqId) &&
                          t.TpaDate >= fromDate && t.TpaDate <= toDate &&
                          t.PreReleaseStatusCode != ReleaseStatus.ReleaseRejected)
-                .Select(t => t.EmpUnqId)
-                .ToArray();
-
-            emps.RemoveAll(e => alreadyTpaEntry.Contains(e));
+                .ToList();
 
             var result = new List<TpaSanctionDto>();
 
             foreach (string emp in emps)
             {
                 // get total year months between date range
-                var fromYearMonth = int.Parse(fromDate.Year.ToString("0000") + fromDate.Month.ToString("00"));
-                var toYearMonth = int.Parse(toDate.Year.ToString("0000") + toDate.Month.ToString("00"));
+                int fromYearMonth = int.Parse(fromDate.Year.ToString("0000") + fromDate.Month.ToString("00"));
+                int toYearMonth = int.Parse(toDate.Year.ToString("0000") + toDate.Month.ToString("00"));
 
 
                 // get all fully released schedules 
@@ -80,9 +77,9 @@ namespace ESS.Controllers.Api
                         })
                         .ToList();
 
-                var scheduleIds = lastSchedule.Select(s => s.ScheduleId).ToArray();
+                int[] scheduleIds = lastSchedule.Select(s => s.ScheduleId).ToArray();
 
-                var lastScheduleDetails = _context.ShiftScheduleDetails
+                IQueryable<ShiftScheduleDetails> lastScheduleDetails = _context.ShiftScheduleDetails
                     .Where(e =>
                         (e.YearMonth >= fromYearMonth && e.YearMonth <= toYearMonth) &&
                         scheduleIds.Contains(e.ScheduleId) &&
@@ -137,7 +134,17 @@ namespace ESS.Controllers.Api
                         ReleaseStrategy = emp,
                     };
 
-                    var yearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
+                    TpaSanction already = alreadyTpaEntries.FirstOrDefault(t => t.TpaDate == dt &&
+                        t.EmpUnqId == emp);
+                    if (already != null)
+                    {
+                        newTpa.Id = already.Id;
+                        newTpa.RequiredHours = already.RequiredHours;
+                        newTpa.PreReleaseStatusCode = already.PreReleaseStatusCode;
+                        newTpa.PreRemarks = already.PreRemarks;
+                    }
+
+                    int yearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
 
                     if (!lastSchedule.Any())
                     {
@@ -146,7 +153,7 @@ namespace ESS.Controllers.Api
                     else
                     {
                         var schedule = lastSchedule.FirstOrDefault(s => s.YearMonth == yearMonth && s.EmpUnqId == emp);
-                        var scheduleId = 0;
+                        int scheduleId;
                         if (schedule == null)
                         {
                             newTpa.TpaShiftCode = "";
@@ -165,12 +172,15 @@ namespace ESS.Controllers.Api
                         }
                     }
 
-                    newTpa.EmpName = employeeDto.EmpName;
-                    newTpa.CatName = employeeDto.CatName;
-                    newTpa.DeptName = employeeDto.DeptName;
-                    newTpa.StatName = employeeDto.StatName;
-                    newTpa.GradeName = employeeDto.GradeName;
-                    newTpa.DesgName = employeeDto.DesgName;
+                    if (employeeDto != null)
+                    {
+                        newTpa.EmpName = employeeDto.EmpName;
+                        newTpa.CatName = employeeDto.CatName;
+                        newTpa.DeptName = employeeDto.DeptName;
+                        newTpa.StatName = employeeDto.StatName;
+                        newTpa.GradeName = employeeDto.GradeName;
+                        newTpa.DesgName = employeeDto.DesgName;
+                    }
 
                     result.Add(newTpa);
 
@@ -202,7 +212,6 @@ namespace ESS.Controllers.Api
 
                 using (DbContextTransaction transaction = _context.Database.BeginTransaction())
                 {
-
                     foreach (TpaSanctionDto dto in tpaSanctionDto)
                     {
                         var tpaSanction = new TpaSanction
@@ -267,7 +276,7 @@ namespace ESS.Controllers.Api
 
                     if (errors.Count > 0)
                         return Content(HttpStatusCode.BadRequest, errors);
-                    
+
                     //_context.SaveChanges();
                     transaction.Commit();
                 }
@@ -289,8 +298,8 @@ namespace ESS.Controllers.Api
                 .ToList();
 
             relAuthList.RemoveAll(r => r.ReleaseCode.StartsWith("GP_"));
-            string[] relAuth = relAuthList.Select(r=>r.ReleaseCode).ToArray();
-            
+            string[] relAuth = relAuthList.Select(r => r.ReleaseCode).ToArray();
+
             List<TpaReleaseDto> tpaReleaseDtos = _context.TpaReleases
                 .Where(l =>
                     relAuth.Contains(l.ReleaseCode) &&
@@ -947,6 +956,35 @@ namespace ESS.Controllers.Api
             }
 
             return Ok();
+        }
+
+        [HttpGet, ActionName("sanctionreport")]
+        public IHttpActionResult SanctionReport(DateTime fromDate, DateTime toDate)
+        {
+            var result = _context.TpaSanctions
+                .Where(t=>t.TpaDate >= fromDate && t.TpaDate<= toDate &&
+                          t.PostReleaseStatusCode == ReleaseStatus.FullyReleased)
+                .Select(t=> new
+                {
+                    t.EmpUnqId,
+                    t.TpaDate,
+                    t.SanctionTpa,
+                    t.PreJustification,
+                    t.PostJustification
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+
+        [HttpGet, ActionName("tpareport")]
+        public IHttpActionResult TpaReport(DateTime fromDate, DateTime toDate, string empUnqId)
+        {
+            var result = _context.TpaSanctions
+                .Where(t=>t.TpaDate >= fromDate && t.TpaDate <= toDate).AsEnumerable()
+                .Select(Mapper.Map<TpaSanction, TpaSanctionDto>)
+                .ToList();
+            return Ok(result);
         }
     }
 }
