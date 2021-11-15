@@ -16,6 +16,17 @@ namespace ESS.Helpers
         private static readonly string ThisServer = System.Configuration.ConfigurationManager
             .ConnectionStrings["DefaultConnection"].ConnectionString;
 
+        public static string RemoveSpecialCharacters(string str)
+        {
+            var sb = new StringBuilder();
+            foreach (char c in str.Where(c =>
+                (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '.' || c == ' '))
+            {
+                sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
 
         public static string GetAttendanceServerApi(string location)
         {

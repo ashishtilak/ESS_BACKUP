@@ -270,7 +270,10 @@ namespace ESS.Controllers.Api
                             // the employee of current row
                             string tmpEmpId = row[0];
 
-                            if (row[6].Trim() == "")
+                            string remarks = row[6].Trim();
+                            remarks = Helpers.CustomHelper.RemoveSpecialCharacters(remarks);
+
+                            if (remarks == "")
                                 return BadRequest("Remarks column is mandatory for all employees for schedule change.");
 
                             var sch = new ShiftScheduleDto
@@ -282,7 +285,7 @@ namespace ESS.Controllers.Api
                                 ReleaseStatusCode = ReleaseStatus.PartiallyReleased,
                                 AddDt = DateTime.Now,
                                 AddUser = empUnqId,
-                                Remarks = row[6],
+                                Remarks = remarks,
                                 ShiftScheduleDetails = new List<ShiftScheduleDetailDto>()
                             };
 
