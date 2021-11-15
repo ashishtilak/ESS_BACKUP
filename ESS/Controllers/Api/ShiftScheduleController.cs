@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
@@ -796,21 +797,27 @@ namespace ESS.Controllers.Api
                     errors.Add("Duplicated records found in file.");
             }
 
+            var empCodes = schedule.Select(e => e.EmpUnqId).Distinct().ToArray();
+
+            var emps = _context.Employees.Where(
+                    e => empCodes.Contains(e.EmpUnqId))
+                .ToList();
+
+
             foreach (ShiftScheduleDto dto in schedule)
             {
                 // Check if employee exist
-                Employees emp = _context.Employees.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+                Employees emp = emps.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
 
                 if (emp == null)
                 {
                     errors.Add("Emp: " + dto.EmpUnqId + " does not exist.");
+                    continue;
                 }
-                else
-                {
-                    // see if employee is under his release...
-                    if (!CheckReleaser(dto.EmpUnqId, empUnqId))
-                        errors.Add("Emp:" + dto.EmpUnqId + ": Not under release of " + empUnqId);
-                }
+
+                // see if employee is under his release...
+                if (!CheckReleaser(dto.EmpUnqId, empUnqId))
+                    errors.Add("Emp:" + dto.EmpUnqId + ": Not under release of " + empUnqId);
 
                 // Now check that each Shift of this is not blank and is valid
 
@@ -840,22 +847,41 @@ namespace ESS.Controllers.Api
                 if (countWo > 5)
                     errors.Add("Emp:" + dto.EmpUnqId + ": Week off more than 5");
 
-                var prevYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4));
-                var prevMonth = int.Parse(dto.YearMonth.ToString().Substring(4, 2));
-                var dt = new DateTime(prevYear, prevMonth, 1).AddDays(-1);
-                var prevYearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00"));
 
-                var prevWeekOff = _context.ShiftScheduleDetails
-                    .FirstOrDefault(s => s.YearMonth == prevYearMonth &&
-                                         s.EmpUnqId == dto.EmpUnqId &&
-                                         s.ShiftCode == "WO");
+                // GET previous month week off
 
+                var prevYear = int.Parse(dto.YearMonth.ToString().Substring(0, 4)); // previous year
+                var prevMonth = int.Parse(dto.YearMonth.ToString().Substring(4, 2)); // previous month
+                var dt = new DateTime(prevYear, prevMonth, 1).AddDays(-1); // construct date
+                var prevYearMonth = int.Parse(dt.Year.ToString("0000") + dt.Month.ToString("00")); // previous yearmonth
+
+                //var prevWeekOff = _context.ShiftScheduleDetails
+                //    .FirstOrDefault(s => s.YearMonth == prevYearMonth &&
+                //                         s.EmpUnqId == dto.EmpUnqId &&
+                //                         s.ShiftCode == "WO");
+
+
+                //if (prevWeekOff != null)
+                //{
+                //    var prevDate = new DateTime(dt.Year, dt.Month, prevWeekOff.ShiftDay);
+                //    prevWoDay = prevDate.DayOfWeek;
+                //}
 
                 var prevWoDay = DayOfWeek.Sunday;
 
-                if (prevWeekOff != null)
+                // Get schedule from ATTD
+                AttdShiftScheduleDto attdSchedule = Helpers.CustomHelper
+                    .GetattdShiftSchedule(prevYearMonth, dto.EmpUnqId, emp.Location);
+
+                foreach (PropertyInfo field in attdSchedule.GetType().GetProperties())
                 {
-                    var prevDate = new DateTime(dt.Year, dt.Month, prevWeekOff.ShiftDay);
+                    if(field.Name.ToUpper() == "ITEM") break;
+
+                    var value = field.GetValue(attdSchedule).ToString();
+                    if (value != "WO") continue;
+
+                    int day = int.Parse(field.Name.Substring(1, 2));
+                    var prevDate = new DateTime(dt.Year, dt.Month, day);
                     prevWoDay = prevDate.DayOfWeek;
                 }
 
@@ -872,8 +898,7 @@ namespace ESS.Controllers.Api
 
                 foreach (ShiftScheduleDetailDto wo in weekOffs)
                 {
-
-                    if (prevDay !=0 && wo.ShiftDay - prevDay != 7)
+                    if (prevDay != 0 && wo.ShiftDay - prevDay != 7)
                     {
                         errors.Add("WO must be on same week days. Check week off on " + wo.ShiftDay);
                         break;
@@ -881,13 +906,11 @@ namespace ESS.Controllers.Api
 
                     var thisWoDay = new DateTime(thisYear, thisMonth, wo.ShiftDay).DayOfWeek;
 
-                    if(prevWeekOff != null)
+                    if (thisWoDay != prevWoDay)
                     {
-                        if(thisWoDay != prevWoDay)
-                        {
-                            errors.Add("WO must be on same week day as previous schedule. Check week off of "+ dto.EmpUnqId + " on " + wo.ShiftDay);
-                            break;
-                        }
+                        errors.Add("WO must be on same week day as previous schedule. Check week off of " +
+                                   dto.EmpUnqId + " on " + wo.ShiftDay);
+                        break;
                     }
 
                     prevDay = wo.ShiftDay;
