@@ -968,16 +968,88 @@ namespace ESS.Controllers.Api
         {
             var result = _context.TpaSanctions
                 .Where(t => t.TpaDate >= fromDate && t.TpaDate <= toDate &&
-                            t.PostReleaseStatusCode == ReleaseStatus.FullyReleased)
-                .Select(t => new
+                            t.PostReleaseStatusCode == ReleaseStatus.FullyReleased).AsEnumerable()
+                .Select(Mapper.Map<TpaSanction, TpaSanctionDto>)
+                .ToList();
+
+            if(result.Count == 0)
+                return BadRequest("No records found.");
+
+            var empUnqIds = result.Select(e=>e.EmpUnqId).Distinct();
+            var employees = _context.Employees
+                .Where(e=> empUnqIds.Contains(e.EmpUnqId))
+                .Select(e => new EmployeeDto
                 {
-                    t.EmpUnqId,
-                    t.TpaDate,
-                    t.SanctionTpa,
-                    t.PreJustification,
-                    t.PostJustification
+                    EmpUnqId = e.EmpUnqId,
+                    EmpName = e.EmpName,
+                    FatherName = e.FatherName,
+                    Active = e.Active,
+                    Pass = e.Pass,
+
+                    CompCode = e.CatCode,
+                    WrkGrp = e.WrkGrp,
+                    UnitCode = e.UnitCode,
+                    DeptCode = e.DeptCode,
+                    StatCode = e.StatCode,
+                    CatCode = e.CatCode,
+                    EmpTypeCode = e.EmpTypeCode,
+                    GradeCode = e.GradeCode,
+                    DesgCode = e.DesgCode,
+                    IsHod = e.IsHod,
+
+                    CompName = e.Company.CompName,
+                    WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                    UnitName = e.Units.UnitName,
+                    DeptName = e.Departments.DeptName,
+                    StatName = e.Stations.StatName,
+                    CatName = e.Categories.CatName,
+                    EmpTypeName = e.EmpTypes.EmpTypeName,
+                    GradeName = e.Grades.GradeName,
+                    DesgName = e.Designations.DesgName,
+
+                    Location = e.Location
                 })
                 .ToList();
+                
+            if(employees.Count ==0)
+                return BadRequest("No emp found");
+
+            string emps = "'" + string.Join("','", empUnqIds) + "'";
+
+            var attdRecords = Helpers.CustomHelper.GetTpa(fromDate, toDate, emps, employees.First().Location);
+
+
+            var sanctionIds = result.Select(t=>t.Id).Distinct().ToArray();
+
+            var tpaReleases = _context.TpaReleases
+                .Where(t=>sanctionIds.Contains(t.TpaSanctionId)).AsEnumerable()
+                .Select(Mapper.Map<TpaRelease, TpaReleaseDto>)
+                .ToList();
+
+            foreach (TpaSanctionDto dto in result)
+            {
+                var releaseReco = tpaReleases.Where(t=>t.TpaSanctionId == dto.Id).ToList();
+                dto.TpaReleaseStatus = new List<TpaReleaseDto>();
+                dto.TpaReleaseStatus.AddRange(releaseReco);
+                
+                var attdDto = attdRecords.FirstOrDefault(a=> a.EmpUnqId == dto.EmpUnqId && a.AttdDate == dto.TpaDate);
+                if(attdDto == null) continue;
+                
+                dto.WrkHours = attdDto.ConsWrkHrs;
+                dto.ActShiftCode = attdDto.ConsShift;
+                dto.CalcOverTime = attdDto.CalcOverTime;
+                dto.SanctionTpa = attdDto.CalcOverTime;
+                dto.ConsIn = attdDto.ConsIn;
+                dto.ConsOut = attdDto.ConsOut;
+                dto.ConsWrkHrs = attdDto.ConsWrkHrs;
+                dto.Status = attdDto.Status;
+                dto.HalfDay = attdDto.HalfDay;
+                dto.LeaveType = attdDto.LeaveType;
+                dto.LeaveHalf = attdDto.LeaveHalf;
+                dto.Earlycome = attdDto.Earlycome;
+                dto.EarlyGoing = attdDto.EarlyGoing;
+                dto.LateCome = attdDto.LateCome;
+            }
 
             return Ok(result);
         }
