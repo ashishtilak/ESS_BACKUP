@@ -1035,6 +1035,19 @@ namespace ESS.Controllers.Api
                 var attdDto = attdRecords.FirstOrDefault(a=> a.EmpUnqId == dto.EmpUnqId && a.AttdDate == dto.TpaDate);
                 if(attdDto == null) continue;
                 
+
+                var d = employees.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+                
+                if(d!=null)
+                {
+                    dto.EmpName = d.EmpName;
+                    dto.CatName = d.CatName;
+                    dto.DeptName = d.DeptName;
+                    dto.StatName = d.StatName;
+                    dto.GradeName = d.GradeName;
+                    dto.DesgName = d.DesgName;
+                }
+
                 dto.WrkHours = attdDto.ConsWrkHrs;
                 dto.ActShiftCode = attdDto.ConsShift;
                 dto.CalcOverTime = attdDto.CalcOverTime;

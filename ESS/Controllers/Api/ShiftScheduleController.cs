@@ -873,18 +873,20 @@ namespace ESS.Controllers.Api
                 AttdShiftScheduleDto attdSchedule = Helpers.CustomHelper
                     .GetattdShiftSchedule(prevYearMonth, dto.EmpUnqId, emp.Location);
 
-                foreach (PropertyInfo field in attdSchedule.GetType().GetProperties())
+                if (attdSchedule.EmpUnqId != null)
                 {
-                    if(field.Name.ToUpper() == "ITEM") break;
+                    foreach (PropertyInfo field in attdSchedule.GetType().GetProperties())
+                    {
+                        if (field.Name.ToUpper() == "ITEM") break;
 
-                    var value = field.GetValue(attdSchedule).ToString();
-                    if (value != "WO") continue;
+                        var value = field.GetValue(attdSchedule).ToString();
+                        if (value != "WO") continue;
 
-                    int day = int.Parse(field.Name.Substring(1, 2));
-                    var prevDate = new DateTime(dt.Year, dt.Month, day);
-                    prevWoDay = prevDate.DayOfWeek;
+                        int day = int.Parse(field.Name.Substring(1, 2));
+                        var prevDate = new DateTime(dt.Year, dt.Month, day);
+                        prevWoDay = prevDate.DayOfWeek;
+                    }
                 }
-
 
                 // Check for week off gaps
                 List<ShiftScheduleDetailDto> weekOffs =
@@ -906,11 +908,14 @@ namespace ESS.Controllers.Api
 
                     var thisWoDay = new DateTime(thisYear, thisMonth, wo.ShiftDay).DayOfWeek;
 
-                    if (thisWoDay != prevWoDay)
+                    if (attdSchedule.EmpUnqId != null)
                     {
-                        errors.Add("WO must be on same week day as previous schedule. Check week off of " +
-                                   dto.EmpUnqId + " on " + wo.ShiftDay);
-                        break;
+                        if (thisWoDay != prevWoDay)
+                        {
+                            errors.Add("WO must be on same week day as previous schedule. Check week off of " +
+                                       dto.EmpUnqId + " on " + wo.ShiftDay);
+                            break;
+                        }
                     }
 
                     prevDay = wo.ShiftDay;
