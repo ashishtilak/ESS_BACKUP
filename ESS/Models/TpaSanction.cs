@@ -56,6 +56,7 @@ namespace ESS.Models
         [ForeignKey("HrReleaseStatusCode")] public ReleaseStatus HrReleaseStatus { get; set; }
         [StringLength(255)] public string HrPostRemarks { get; set; }
         [StringLength(10)] public string HrUser { get; set; }
+        public DateTime? HrReleaseDate { get; set; }
 
     }
 }

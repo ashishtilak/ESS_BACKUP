@@ -62,6 +62,7 @@ namespace ESS.Dto
         public string HrPostRemarks { get; set; }
         public string HrUser { get; set; }
         public string HrUserName { get; set; }
+        public DateTime? HrReleaseDate { get; set; }
 
         public List<TpaReleaseDto> TpaReleaseStatus { get; set; }
     }

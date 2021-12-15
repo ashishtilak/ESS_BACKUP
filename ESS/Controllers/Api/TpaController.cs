@@ -935,13 +935,15 @@ namespace ESS.Controllers.Api
 
                                 nextRelease.PostReleaseStatusCode = ReleaseStatus.InRelease;
                                 tpaSanction.PostReleaseStatusCode = ReleaseStatus.PartiallyReleased;
-
-                                if (tpaSanction.HrReleaseStatusCode == ReleaseStatus.NotReleased)
-                                    tpaSanction.HrReleaseStatusCode = ReleaseStatus.InRelease;
                             }
                             else
                             {
+                                // final release
                                 tpaSanction.PostReleaseStatusCode = ReleaseStatus.FullyReleased;
+
+                                // set status for hr release if eligible
+                                if (tpaSanction.HrReleaseStatusCode == ReleaseStatus.NotReleased)
+                                    tpaSanction.HrReleaseStatusCode = ReleaseStatus.InRelease;
                             }
 
                             tpaRelease.PostReleaseStatusCode = ReleaseStatus.FullyReleased;
@@ -972,12 +974,12 @@ namespace ESS.Controllers.Api
                 .Select(Mapper.Map<TpaSanction, TpaSanctionDto>)
                 .ToList();
 
-            if(result.Count == 0)
+            if (result.Count == 0)
                 return BadRequest("No records found.");
 
-            var empUnqIds = result.Select(e=>e.EmpUnqId).Distinct();
+            var empUnqIds = result.Select(e => e.EmpUnqId).Distinct();
             var employees = _context.Employees
-                .Where(e=> empUnqIds.Contains(e.EmpUnqId))
+                .Where(e => empUnqIds.Contains(e.EmpUnqId))
                 .Select(e => new EmployeeDto
                 {
                     EmpUnqId = e.EmpUnqId,
@@ -1010,8 +1012,8 @@ namespace ESS.Controllers.Api
                     Location = e.Location
                 })
                 .ToList();
-                
-            if(employees.Count ==0)
+
+            if (employees.Count == 0)
                 return BadRequest("No emp found");
 
             string emps = "'" + string.Join("','", empUnqIds) + "'";
@@ -1019,26 +1021,26 @@ namespace ESS.Controllers.Api
             var attdRecords = Helpers.CustomHelper.GetTpa(fromDate, toDate, emps, employees.First().Location);
 
 
-            var sanctionIds = result.Select(t=>t.Id).Distinct().ToArray();
+            var sanctionIds = result.Select(t => t.Id).Distinct().ToArray();
 
             var tpaReleases = _context.TpaReleases
-                .Where(t=>sanctionIds.Contains(t.TpaSanctionId)).AsEnumerable()
+                .Where(t => sanctionIds.Contains(t.TpaSanctionId)).AsEnumerable()
                 .Select(Mapper.Map<TpaRelease, TpaReleaseDto>)
                 .ToList();
 
             foreach (TpaSanctionDto dto in result)
             {
-                var releaseReco = tpaReleases.Where(t=>t.TpaSanctionId == dto.Id).ToList();
+                var releaseReco = tpaReleases.Where(t => t.TpaSanctionId == dto.Id).ToList();
                 dto.TpaReleaseStatus = new List<TpaReleaseDto>();
                 dto.TpaReleaseStatus.AddRange(releaseReco);
-                
-                var attdDto = attdRecords.FirstOrDefault(a=> a.EmpUnqId == dto.EmpUnqId && a.AttdDate == dto.TpaDate);
-                if(attdDto == null) continue;
-                
+
+                var attdDto = attdRecords.FirstOrDefault(a => a.EmpUnqId == dto.EmpUnqId && a.AttdDate == dto.TpaDate);
+                if (attdDto == null) continue;
+
 
                 var d = employees.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
-                
-                if(d!=null)
+
+                if (d != null)
                 {
                     dto.EmpName = d.EmpName;
                     dto.CatName = d.CatName;
@@ -1176,7 +1178,133 @@ namespace ESS.Controllers.Api
             {
                 return BadRequest("Error: " + ex);
             }
+        }
 
+        [HttpGet, ActionName("gethrlist")]
+        public IHttpActionResult GetHrRelease()
+        {
+            List<TpaSanctionDto> tpaSanctionList = _context.TpaSanctions
+                .Include(e => e.Employee)
+                .Include(r => r.ReleaseGroup)
+                .Include(rs => rs.RelStrategy)
+                .Where(l => l.HrReleaseStatusCode == ReleaseStatus.InRelease).ToList()
+                .Select(Mapper.Map<TpaSanction, TpaSanctionDto>)
+                .ToList();
+
+            int[] ids = tpaSanctionList.Select(t => t.Id).Distinct().ToArray();
+
+            List<TpaReleaseDto> tpaReleaseDtos = _context.TpaReleases
+                .Where(t => ids.Contains(t.TpaSanctionId)).AsEnumerable()
+                .Select(Mapper.Map<TpaRelease, TpaReleaseDto>)
+                .ToList();
+
+            foreach (TpaSanctionDto dto in tpaSanctionList)
+            {
+                List<TpaReleaseDto> apps = tpaReleaseDtos.Where(t => t.TpaSanctionId == dto.Id).ToList();
+
+                dto.TpaReleaseStatus = new List<TpaReleaseDto>();
+
+                foreach (TpaReleaseDto app in
+                    from app in apps
+                    let relCode = _context.ReleaseAuth
+                        .Where(r => r.ReleaseCode == app.ReleaseCode)
+                        .ToList()
+                    select app)
+                {
+                    dto.TpaReleaseStatus.Add(app);
+                }
+
+                EmployeeDto employeeDto = _context.Employees
+                    .Select(e => new EmployeeDto
+                    {
+                        EmpUnqId = e.EmpUnqId,
+                        EmpName = e.EmpName,
+                        FatherName = e.FatherName,
+                        Active = e.Active,
+                        Pass = e.Pass,
+
+                        CompCode = e.CatCode,
+                        WrkGrp = e.WrkGrp,
+                        UnitCode = e.UnitCode,
+                        DeptCode = e.DeptCode,
+                        StatCode = e.StatCode,
+                        CatCode = e.CatCode,
+                        EmpTypeCode = e.EmpTypeCode,
+                        GradeCode = e.GradeCode,
+                        DesgCode = e.DesgCode,
+                        IsHod = e.IsHod,
+
+                        CompName = e.Company.CompName,
+                        WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                        UnitName = e.Units.UnitName,
+                        DeptName = e.Departments.DeptName,
+                        StatName = e.Stations.StatName,
+                        CatName = e.Categories.CatName,
+                        EmpTypeName = e.EmpTypes.EmpTypeName,
+                        GradeName = e.Grades.GradeName,
+                        DesgName = e.Designations.DesgName,
+
+                        Location = e.Location
+                    })
+                    .Single(e => e.EmpUnqId == dto.EmpUnqId);
+
+                dto.EmpName = employeeDto.EmpName;
+                dto.CatName = employeeDto.CatName;
+                dto.DeptName = employeeDto.DeptName;
+                dto.StatName = employeeDto.StatName;
+                dto.GradeName = employeeDto.GradeName;
+                dto.DesgName = employeeDto.DesgName;
+            }
+
+            return Ok(tpaSanctionList);
+        }
+
+        [HttpPost, ActionName("posthr")]
+        public IHttpActionResult PostHrRelease([FromBody] object requestData)
+        {
+            try
+            {
+                var tpaSanctionDtos = JsonConvert.DeserializeObject<List<TpaSanctionDto>>(requestData.ToString());
+
+                string[] hrUserList = tpaSanctionDtos.Select(e => e.HrUser).Distinct().ToArray();
+
+                foreach (string user in hrUserList)
+                {
+                    if (!_context.ReleaseStrategy
+                        .Any(r =>
+                            r.ReleaseGroupCode == ReleaseGroups.Tpa &&
+                            r.ReleaseStrategy == user &&
+                            r.IsHod == true))
+                        return BadRequest("Employee " + user + " not authorized to release.");
+                }
+
+                int[] ids = tpaSanctionDtos.Select(t => t.Id).Distinct().ToArray();
+
+                using (DbContextTransaction transaction = _context.Database.BeginTransaction())
+                {
+                    List<TpaSanction> tpaSanctions = _context.TpaSanctions.Where(t => ids.Contains(t.Id)).ToList();
+
+                    foreach (TpaSanction sanction in tpaSanctions)
+                    {
+                        TpaSanctionDto dto = tpaSanctionDtos.FirstOrDefault(t => t.Id == sanction.Id);
+                        if (dto == null) continue;
+
+                        sanction.HrReleaseStatusCode = dto.HrReleaseStatusCode;
+                        sanction.HrPostRemarks = dto.HrPostRemarks;
+                        sanction.HrUser = dto.HrUser;
+                        sanction.HrReleaseDate = DateTime.Now;
+                    }
+
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error: " + ex);
+            }
+
+            return Ok();
         }
     }
 }
