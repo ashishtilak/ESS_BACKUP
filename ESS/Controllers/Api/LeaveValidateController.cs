@@ -481,44 +481,132 @@ namespace ESS.Controllers.Api
             // check if start date is a Holiday
             if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
-                if (start != end)
+                if (emp.Location == Locations.Nashik)
                 {
-                    if (Helpers.CustomHelper.GetHolidays(start, start, leaveApplicationDto.CompCode,
-                        leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
-                    {
-                        error.Add("Date selected is not Holiday.");
-                    }
-                    else
-                    {
-                        if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count == 1)
-                        {
-                            error.Add("Comp. Off cannot be taken against a Week Off day.");
-                        }
+                    // W - weekoff, H - holiday
 
-                        // Check if CO date is <= 7 days from WO day
-                        if (emp.Location == Locations.Ipu)
+                    var coDate = (DateTime) leaveApplicationDto.LeaveApplicationDetails[0].CoDate1;
+
+                    var tpa = Helpers.CustomHelper.GetPerfAttd(emp.EmpUnqId, coDate, coDate);
+
+                    if (leaveApplicationDto.LeaveApplicationDetails[0].CoMode == "H")
+                    {
+                        if (Helpers.CustomHelper.GetHolidays(coDate, coDate, leaveApplicationDto.CompCode,
+                            leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
                         {
-                            if (end.Subtract(start).TotalDays > 30)
-                                error.Add("Comp. Off can be taken within 7 days.");
-                        }
-                        else if (emp.Location == Locations.Jfl)
-                        {
-                            if (end.Subtract(start).TotalDays > 30)
-                                error.Add("Comp. Off can be taken within 30 days.");
+                            error.Add("Date selected is not Holiday.");
                         }
                         else
                         {
-                            if (end.Subtract(start).TotalDays > 90)
-                                error.Add("Comp. Off can be taken within 90 days.");
+                            if(tpa[0].ConsWrkHrs < 8)
+                            {
+                                error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
+                            }
+
+                            if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count ==
+                                1)
+                            {
+                                error.Add("Comp. Off cannot be taken on a Week Off day.");
+                            }
+
+                            // Check if CO date is <= 7 days from WO day
+                            if (emp.Location == Locations.Ipu)
+                            {
+                                if (end.Subtract(start).TotalDays > 30)
+                                    error.Add("Comp. Off can be taken within 30 days.");
+                            }
+                            else if (emp.Location == Locations.Jfl)
+                            {
+                                if (end.Subtract(start).TotalDays > 30)
+                                    error.Add("Comp. Off can be taken within 30 days.");
+                            }
+                            else
+                            {
+                                if (end.Subtract(start).TotalDays > 90)
+                                    error.Add("Comp. Off can be taken within 90 days.");
+                            }
                         }
                     }
-
-                    if (Helpers.CustomHelper.GetWeeklyOff(end, end, leaveApplicationDto.EmpUnqId).Count == 1)
+                    else if (leaveApplicationDto.LeaveApplicationDetails[0].CoMode == "W")
                     {
-                        error.Add("Comp. Off cannot be taken on Week Off day.");
+                        if (tpa[0].LeaveType != "WO")
+                        {
+                            error.Add("Date selected is not Week Off day.");
+                        }
+                        else
+                        {
+                            if(tpa[0].ConsWrkHrs < 8)
+                            {
+                                error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
+                            }
+
+                            if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count ==
+                                1)
+                            {
+                                error.Add("Comp. Off cannot be taken on a Week Off day.");
+                            }
+
+                            // Check if CO date is <= 7 days from WO day
+                            if (emp.Location == Locations.Ipu)
+                            {
+                                if (end.Subtract(start).TotalDays > 3)
+                                    error.Add("Comp. Off can be taken within 3 days.");
+                            }
+                            else if (emp.Location == Locations.Jfl)
+                            {
+                                if (end.Subtract(start).TotalDays > 3)
+                                    error.Add("Comp. Off can be taken within 3 days.");
+                            }
+                            else
+                            {
+                                if (end.Subtract(start).TotalDays > 3)
+                                    error.Add("Comp. Off can be taken within 3 days.");
+                            }
+                        }
                     }
                 }
-            }
+                else
+                {
+                    if (start != end)
+                    {
+                        if (Helpers.CustomHelper.GetHolidays(start, start, leaveApplicationDto.CompCode,
+                            leaveApplicationDto.WrkGrp, emp.Location).Count != 1)
+                        {
+                            error.Add("Date selected is not Holiday.");
+                        }
+                        else
+                        {
+                            if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count ==
+                                1)
+                            {
+                                error.Add("Comp. Off cannot be taken against a Week Off day.");
+                            }
+
+                            // Check if CO date is <= 7 days from WO day
+                            if (emp.Location == Locations.Ipu)
+                            {
+                                if (end.Subtract(start).TotalDays > 30)
+                                    error.Add("Comp. Off can be taken within 7 days.");
+                            }
+                            else if (emp.Location == Locations.Jfl)
+                            {
+                                if (end.Subtract(start).TotalDays > 30)
+                                    error.Add("Comp. Off can be taken within 30 days.");
+                            }
+                            else
+                            {
+                                if (end.Subtract(start).TotalDays > 90)
+                                    error.Add("Comp. Off can be taken within 90 days.");
+                            }
+                        }
+
+                        if (Helpers.CustomHelper.GetWeeklyOff(end, end, leaveApplicationDto.EmpUnqId).Count == 1)
+                        {
+                            error.Add("Comp. Off cannot be taken on Week Off day.");
+                        }
+                    }
+                }
+            } //  COMP OFF CHECKS
 
             // DONE. If there's no error, return success
             if (error.Count == 0)

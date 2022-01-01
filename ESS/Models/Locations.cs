@@ -24,5 +24,6 @@ namespace ESS.Models
         public static readonly string Kjqtl = "KJQTL";
         public static readonly string Bellary = "BEL";
         public static readonly string Jfl = "JFL";
+        public static readonly string Nashik = "NSK";
     }
 }
