@@ -39,6 +39,7 @@ namespace ESS.Dto
         public DateTime? AttdGpInTime { get; set; }
 
         public string EmpName { get; set; }
+        public string UnitName { get; set; }
         public string DeptName { get; set; }
         public string StatName { get; set; }
         public string ModeName { get; set; }

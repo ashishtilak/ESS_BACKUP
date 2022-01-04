@@ -385,6 +385,7 @@ namespace ESS.Controllers.Api
             foreach (var dto in gatepass)
             {
                 var emp = _context.Employees
+                    .Include(u => u.Units)
                     .Include(d => d.Departments)
                     .Include(s => s.Stations)
                     .Include(c => c.Categories)
@@ -394,6 +395,7 @@ namespace ESS.Controllers.Api
                 if (emp == null) continue;
 
                 dto.EmpName = emp.EmpName;
+                dto.UnitName = emp.Units == null ? "" : emp.Units.UnitName.Trim();
                 dto.DeptName = emp.Departments == null ? "" : emp.Departments.DeptName.Trim();
                 dto.StatName = emp.Stations == null ? "" : emp.Stations.StatName;
                 dto.WrkGrp = emp.WrkGrp;
