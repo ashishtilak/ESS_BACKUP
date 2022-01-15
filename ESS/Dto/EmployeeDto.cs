@@ -101,5 +101,7 @@ namespace ESS.Dto
         public bool NoDuesFlag { get; set; }
 
         public int YearlyCount { get; set; }
+
+        public bool PlCheck { get; set; }
     }
 }

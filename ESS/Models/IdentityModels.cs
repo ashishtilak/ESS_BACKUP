@@ -114,6 +114,8 @@ namespace ESS.Models
         public DbSet<TpaSanction> TpaSanctions { get; set; }
         public DbSet<TpaRelease> TpaReleases { get; set; }
 
+        public DbSet<Vaccination> Vaccinations { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

@@ -277,5 +277,18 @@ namespace ESS.Controllers.Api
             return Created(new Uri(Request.RequestUri + "?leaveAppId=" + leaveApplicationDto.LeaveAppId),
                 leaveApplicationDto);
         }
+
+        [HttpPut]
+        public IHttpActionResult TogglePlFlag()
+        {
+            Locations loc = _context.Location.FirstOrDefault();
+            
+            if(loc == null)
+                return BadRequest("Location table not found.");
+
+            loc.PlCheck = loc.PlCheck != true;
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }

@@ -16,6 +16,7 @@ namespace ESS.Models
         public string SmtpClient { get; set; }
         public string PortalAddress { get; set; }
         public string PaySlipFolder { get; set; }
+        public bool PlCheck { get; set; }
 
 
         public static readonly string Ipu = "IPU";

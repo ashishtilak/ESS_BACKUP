@@ -57,6 +57,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -217,6 +218,7 @@
     <Compile Include="Controllers\Api\SyncController.cs" />
     <Compile Include="Controllers\Api\TaxDeclarationController.cs" />
     <Compile Include="Controllers\Api\TpaController.cs" />
+    <Compile Include="Controllers\Api\VaccinationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ReimbursementDto.cs" />
@@ -295,6 +297,7 @@
     <Compile Include="Dto\TpaReleaseDto.cs" />
     <Compile Include="Dto\TpaSanctionDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
+    <Compile Include="Dto\VaccinationDto.cs" />
     <Compile Include="Dto\VendorDto.cs" />
     <Compile Include="Dto\WorkGroupDto.cs" />
     <Compile Include="Global.asax.cs">
@@ -770,6 +773,14 @@
     <Compile Include="Migrations\202112080924002_TpaSanctionHrRelDate.Designer.cs">
       <DependentUpon>202112080924002_TpaSanctionHrRelDate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202201100449485_AddPlCheckInLocation.cs" />
+    <Compile Include="Migrations\202201100449485_AddPlCheckInLocation.Designer.cs">
+      <DependentUpon>202201100449485_AddPlCheckInLocation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202201110639201_VaccinationDetails.cs" />
+    <Compile Include="Migrations\202201110639201_VaccinationDetails.Designer.cs">
+      <DependentUpon>202201110639201_VaccinationDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -852,6 +863,7 @@
     <Compile Include="Models\TpaRelease.cs" />
     <Compile Include="Models\TpaSanction.cs" />
     <Compile Include="Models\Units.cs" />
+    <Compile Include="Models\Vaccination.cs" />
     <Compile Include="Models\Vendors.cs" />
     <Compile Include="Models\WorkGroups.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1271,6 +1283,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202112080924002_TpaSanctionHrRelDate.resx">
       <DependentUpon>202112080924002_TpaSanctionHrRelDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201100449485_AddPlCheckInLocation.resx">
+      <DependentUpon>202201100449485_AddPlCheckInLocation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201110639201_VaccinationDetails.resx">
+      <DependentUpon>202201110639201_VaccinationDetails.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

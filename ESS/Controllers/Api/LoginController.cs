@@ -32,7 +32,7 @@ namespace ESS.Controllers.Api
             if (string.IsNullOrEmpty(loginDto.EmpUnqId)) return BadRequest("User ID???");
             if (string.IsNullOrEmpty(loginDto.Pass)) return BadRequest("User ID???");
 
-            var employeeDto = _context.Employees
+            List<EmployeeDto> employeeDto = _context.Employees
                 .Select(
                     e => new EmployeeDto
                     {
@@ -81,12 +81,17 @@ namespace ESS.Controllers.Api
             if (employeeDto.Count == 0)
                 return BadRequest("Incorrect password/employee code.");
 
-            foreach (var emp in employeeDto)
+
+            foreach (EmployeeDto emp in employeeDto)
             {
                 emp.NoDuesFlag = _context.NoDuesMaster.Any(e => e.EmpUnqId == emp.EmpUnqId);
 
-                var roleId = _context.RoleUser.FirstOrDefault(e => e.EmpUnqId == emp.EmpUnqId);
-                emp.RoleId = roleId == null ? 1 : roleId.RoleId;
+                RoleUsers roleId = _context.RoleUser.FirstOrDefault(e => e.EmpUnqId == emp.EmpUnqId);
+                emp.RoleId = roleId?.RoleId ?? 1;
+
+                bool? plChk = _context.Location.FirstOrDefault()?.PlCheck;
+
+                emp.PlCheck = plChk ?? false;
             }
 
             return Ok(employeeDto);

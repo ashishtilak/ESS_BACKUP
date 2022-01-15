@@ -164,6 +164,9 @@ namespace ESS.App_Start
             CreateMap<TpaSanctionDto, TpaSanction>();
             CreateMap<TpaRelease, TpaReleaseDto>();
             CreateMap<TpaReleaseDto, TpaRelease>();
+
+            CreateMap<Vaccination, VaccinationDto>();
+            CreateMap<VaccinationDto, Vaccination>();
         }
     }
 }

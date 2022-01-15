@@ -88,6 +88,19 @@ namespace ESS.Controllers.Api
                     continue;
                 }
 
+                // check for PL date < 15 
+                // by pass if location table flag is on
+
+
+                if (emp.Location == Locations.Nashik && _context.Location.FirstOrDefault().PlCheck == true)
+                {
+                    if ((DateTime.Today - details.FromDt).Days < 15)
+                    {
+                        error.Add("Apply for EL before 15 days.");
+                        continue;
+                    }
+                }
+
                 //check2: check if leave type is there in balance table
                 bool leaveExist = leaveBalDto.Any(l => l.LeaveTypeCode == details.LeaveTypeCode);
 
@@ -498,7 +511,7 @@ namespace ESS.Controllers.Api
                         }
                         else
                         {
-                            if(tpa[0].ConsWrkHrs < 8)
+                            if (tpa[0].ConsWrkHrs < 8)
                             {
                                 error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
                             }
@@ -535,7 +548,7 @@ namespace ESS.Controllers.Api
                         }
                         else
                         {
-                            if(tpa[0].ConsWrkHrs < 8)
+                            if (tpa[0].ConsWrkHrs < 8)
                             {
                                 error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
                             }
