@@ -781,6 +781,10 @@
     <Compile Include="Migrations\202201110639201_VaccinationDetails.Designer.cs">
       <DependentUpon>202201110639201_VaccinationDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202201201054297_PlCheckLog.cs" />
+    <Compile Include="Migrations\202201201054297_PlCheckLog.Designer.cs">
+      <DependentUpon>202201201054297_PlCheckLog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -830,6 +834,7 @@
     <Compile Include="Models\NoDuesStatus.cs" />
     <Compile Include="Models\NoDuesUnitHead.cs" />
     <Compile Include="Models\OpenMonth.cs" />
+    <Compile Include="Models\PlCheckLog.cs" />
     <Compile Include="Models\ReimbConv.cs" />
     <Compile Include="Models\Reimbursements.cs" />
     <Compile Include="Models\ReleaseAuth.cs" />
@@ -1289,6 +1294,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202201110639201_VaccinationDetails.resx">
       <DependentUpon>202201110639201_VaccinationDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201201054297_PlCheckLog.resx">
+      <DependentUpon>202201201054297_PlCheckLog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

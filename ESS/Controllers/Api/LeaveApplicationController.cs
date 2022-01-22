@@ -279,15 +279,31 @@ namespace ESS.Controllers.Api
         }
 
         [HttpPut]
-        public IHttpActionResult TogglePlFlag()
+        public IHttpActionResult TogglePlFlag(string empUnqId)
         {
-            Locations loc = _context.Location.FirstOrDefault();
+            using(DbContextTransaction transaction = _context.Database.BeginTransaction())
+            {
+                Locations loc = _context.Location.FirstOrDefault();
             
-            if(loc == null)
-                return BadRequest("Location table not found.");
+                if(loc == null)
+                    return BadRequest("Location table not found.");
 
-            loc.PlCheck = loc.PlCheck != true;
-            _context.SaveChanges();
+                var plCheckLog = new PlCheckLog
+                {
+                    EmpUnqId = empUnqId, 
+                    UpdateDate = DateTime.Now,
+                    OldValue = loc.PlCheck,
+                    NewValue =  loc.PlCheck != true
+                };
+
+                loc.PlCheck = loc.PlCheck != true;
+
+                _context.PlCheckLogs.Add(plCheckLog);
+
+                _context.SaveChanges();
+                
+                transaction.Commit();
+            }
             return Ok();
         }
     }

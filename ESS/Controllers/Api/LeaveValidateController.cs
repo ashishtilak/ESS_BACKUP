@@ -92,12 +92,15 @@ namespace ESS.Controllers.Api
                 // by pass if location table flag is on
 
 
-                if (emp.Location == Locations.Nashik && _context.Location.FirstOrDefault().PlCheck == true)
+                if (details.LeaveTypeCode == LeaveTypes.PaidLeave)
                 {
-                    if ((DateTime.Today - details.FromDt).Days < 15)
+                    if (emp.Location == Locations.Nashik && _context.Location.FirstOrDefault().PlCheck == true)
                     {
-                        error.Add("Apply for EL before 15 days.");
-                        continue;
+                        if ((details.FromDt - DateTime.Today).Days < 15)
+                        {
+                            error.Add("Apply for EL before 15 days.");
+                            continue;
+                        }
                     }
                 }
 
@@ -502,6 +505,13 @@ namespace ESS.Controllers.Api
 
                     var tpa = Helpers.CustomHelper.GetPerfAttd(emp.EmpUnqId, coDate, coDate);
 
+                    double hours = tpa[0].ConsShift == "CC" ? 7.5 : 8.0;
+
+                    if (tpa[0].ConsWrkHrs < hours)
+                    {
+                        error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
+                    }
+
                     if (leaveApplicationDto.LeaveApplicationDetails[0].CoMode == "H")
                     {
                         if (Helpers.CustomHelper.GetHolidays(coDate, coDate, leaveApplicationDto.CompCode,
@@ -511,11 +521,6 @@ namespace ESS.Controllers.Api
                         }
                         else
                         {
-                            if (tpa[0].ConsWrkHrs < 8)
-                            {
-                                error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
-                            }
-
                             if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count ==
                                 1)
                             {
@@ -548,11 +553,6 @@ namespace ESS.Controllers.Api
                         }
                         else
                         {
-                            if (tpa[0].ConsWrkHrs < 8)
-                            {
-                                error.Add("Work hours are less than 8 hours. Comp. Off cannot be availed.");
-                            }
-
                             if (Helpers.CustomHelper.GetWeeklyOff(start, start, leaveApplicationDto.EmpUnqId).Count ==
                                 1)
                             {
