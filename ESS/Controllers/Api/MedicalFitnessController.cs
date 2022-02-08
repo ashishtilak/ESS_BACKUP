@@ -150,6 +150,16 @@ namespace ESS.Controllers.Api
             dto.GradeName = emp.Grades.GradeName;
             dto.DesgName = emp.Designations.DesgName;
 
+
+            VaccinationDto vacc = Mapper.Map<Vaccination, VaccinationDto>(
+                _context.Vaccinations.FirstOrDefault(e => e.EmpUnqId == empUnqId));
+
+            if (vacc == null) return Ok(dto);
+
+            dto.FirstDoseDate = vacc.FirstDoseDate;
+            dto.SecondDoseDate = vacc.SecondDoseDate;
+            dto.ThirdDoseDate = vacc.ThirdDoseDate;
+
             return Ok(dto);
         }
 

@@ -18,5 +18,6 @@ namespace ESS.Models
         public static readonly string Mediclaim = "MC";
         public static readonly string NoDues = "ND";
         public static readonly string Tpa = "OT";
+        public static readonly string ProgressReview = "PR";
     }
 }

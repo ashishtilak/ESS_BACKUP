@@ -115,7 +115,12 @@ namespace ESS.Models
         public DbSet<TpaRelease> TpaReleases { get; set; }
 
         public DbSet<Vaccination> Vaccinations { get; set; }
+
         public DbSet<PlCheckLog> PlCheckLogs { get; set; }
+
+        public DbSet<GradeReviews> GradeReviews { get; set; }
+        public DbSet<Reviews> Reviews { get; set; }
+        public DbSet<ReviewDetails> ReviewDetails { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

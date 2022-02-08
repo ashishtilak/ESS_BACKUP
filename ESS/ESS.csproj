@@ -207,6 +207,7 @@
     <Compile Include="Controllers\Api\MissedPunchController.cs" />
     <Compile Include="Controllers\Api\NoDuesController.cs" />
     <Compile Include="Controllers\Api\OpenMonthController.cs" />
+    <Compile Include="Controllers\Api\ProgressReviewController.cs" />
     <Compile Include="Controllers\Api\ReimbursementController.cs" />
     <Compile Include="Controllers\Api\ReleaseStrategyController.cs" />
     <Compile Include="Controllers\Api\RequestController.cs" />
@@ -277,6 +278,8 @@
     <Compile Include="Dto\RequestDetailsDto.cs" />
     <Compile Include="Dto\RequestDto.cs" />
     <Compile Include="Dto\RequestReleaseDto.cs" />
+    <Compile Include="Dto\ReviewDetailDto.cs" />
+    <Compile Include="Dto\ReviewDto.cs" />
     <Compile Include="Dto\RoleAuthDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
     <Compile Include="Dto\ShiftDto.cs" />
@@ -785,6 +788,10 @@
     <Compile Include="Migrations\202201201054297_PlCheckLog.Designer.cs">
       <DependentUpon>202201201054297_PlCheckLog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202201241231515_ProgressReview.cs" />
+    <Compile Include="Migrations\202201241231515_ProgressReview.Designer.cs">
+      <DependentUpon>202201241231515_ProgressReview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -806,6 +813,7 @@
     <Compile Include="Models\GpAdvices.cs" />
     <Compile Include="Models\GpReleaseStrategies.cs" />
     <Compile Include="Models\GpReleaseStrategyLevels.cs" />
+    <Compile Include="Models\GradeReviews.cs" />
     <Compile Include="Models\Grades.cs" />
     <Compile Include="Models\FullAndFinal.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -845,6 +853,8 @@
     <Compile Include="Models\RequestDetails.cs" />
     <Compile Include="Models\RequestRelease.cs" />
     <Compile Include="Models\Requests.cs" />
+    <Compile Include="Models\ReviewDetails.cs" />
+    <Compile Include="Models\Reviews.cs" />
     <Compile Include="Models\RoleAuth.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RoleUsers.cs" />
@@ -1297,6 +1307,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202201201054297_PlCheckLog.resx">
       <DependentUpon>202201201054297_PlCheckLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202201241231515_ProgressReview.resx">
+      <DependentUpon>202201241231515_ProgressReview.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

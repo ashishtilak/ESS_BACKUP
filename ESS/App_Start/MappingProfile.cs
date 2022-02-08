@@ -167,6 +167,11 @@ namespace ESS.App_Start
 
             CreateMap<Vaccination, VaccinationDto>();
             CreateMap<VaccinationDto, Vaccination>();
+
+            CreateMap<Reviews, ReviewDto>();
+            CreateMap<ReviewDto, Reviews>();
+            CreateMap<ReviewDetails, ReviewDetailDto>();
+            CreateMap<ReviewDetailDto, ReviewDetails>();
         }
     }
 }

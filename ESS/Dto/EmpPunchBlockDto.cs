@@ -25,5 +25,9 @@ namespace ESS.Dto
         public string GradeName { get; set; }
         public string DesgName { get; set; }
         public string EmpName { get; set; }
+
+        public DateTime? FirstDoseDate { get; set; }
+        public DateTime? SecondDoseDate { get; set; }
+        public DateTime? ThirdDoseDate { get; set; }
     }
 }
