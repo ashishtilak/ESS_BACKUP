@@ -30,8 +30,8 @@ namespace ESS.Controllers.Api
 
             // if pending only is true only return pending  reviews (not confirmation)
 
-            if (pendingOnly)
-                qry = qry.Where(p => p.Recommendation == ReviewDetails.NotProcessed);
+            if (!pendingOnly)
+                qry = qry.Where(p => p.HrReleaseStatusCode == ReleaseStatus.FullyReleased);
 
             List<ReviewDetailDto> reviewDtls = qry.AsEnumerable()
                 .Select(Mapper.Map<ReviewDetails, ReviewDetailDto>)
@@ -39,6 +39,44 @@ namespace ESS.Controllers.Api
 
             if (reviewDtls.Count == 0)
                 return BadRequest("No records found!");
+
+            foreach (ReviewDetailDto dto in reviewDtls)
+            {
+                EmployeeDto employeeDto = _context.Employees
+                    .Select(e => new EmployeeDto
+                    {
+                        EmpUnqId = e.EmpUnqId,
+                        EmpName = e.EmpName,
+                        FatherName = e.FatherName,
+                        Active = e.Active,
+                        Pass = e.Pass,
+
+                        CompCode = e.CatCode,
+                        WrkGrp = e.WrkGrp,
+                        UnitCode = e.UnitCode,
+                        DeptCode = e.DeptCode,
+                        StatCode = e.StatCode,
+                        CatCode = e.CatCode,
+                        EmpTypeCode = e.EmpTypeCode,
+                        GradeCode = e.GradeCode,
+                        DesgCode = e.DesgCode,
+                        IsHod = e.IsHod,
+
+                        CompName = e.Company.CompName,
+                        WrkGrpDesc = e.WorkGroup.WrkGrpDesc,
+                        UnitName = e.Units.UnitName,
+                        DeptName = e.Departments.DeptName,
+                        StatName = e.Stations.StatName,
+                        CatName = e.Categories.CatName,
+                        EmpTypeName = e.EmpTypes.EmpTypeName,
+                        GradeName = e.Grades.GradeName,
+                        DesgName = e.Designations.DesgName,
+                        JoinDate = e.JoinDate,
+                        Location = e.Location
+                    })
+                    .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+                dto.Employee = employeeDto;
+            }
 
             return Ok(reviewDtls);
         }

@@ -820,7 +820,12 @@ namespace ESS.Controllers.Api
                     mail.To.Add(new MailAddress(email));
                     if (emp.Location == Locations.Ipu)
                     {
-                        mail.CC.Add("prakash.nambiar@jindalsaw.com");
+                        mail.CC.Add("vallabh.r@jindalsaw.com");
+                        mail.CC.Add("mandeep.singh@jindalsaw.com");
+                        mail.CC.Add("vibhor.mathur@jindalsaw.com");
+                        mail.CC.Add("vinaykumar.singh@jindalsaw.com");
+                        mail.CC.Add("careers.ipu@jindalsaw.com");
+                        mail.CC.Add("akhand.singh@jindalsaw.com");
                         mail.CC.Add("raghuvir.jadeja@jindalsaw.com");
                         mail.Bcc.Add("mohit.parmar@jindalsaw.com");
                         mail.Bcc.Add("ashish.tilak@jindalsaw.com");
@@ -830,7 +835,12 @@ namespace ESS.Controllers.Api
                     mail.To.Remove(new MailAddress(email));
                     if (emp.Location == Locations.Ipu)
                     {
-                        mail.CC.Remove(new MailAddress("prakash.nambiar@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("vallabh.r@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("mandeep.singh@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("vibhor.mathur@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("vinaykumar.singh@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("careers.ipu@jindalsaw.com"));
+                        mail.CC.Remove(new MailAddress("akhand.singh@jindalsaw.com"));
                         mail.CC.Remove(new MailAddress("raghuvir.jadeja@jindalsaw.com"));
                         mail.Bcc.Remove(new MailAddress("mohit.parmar@jindalsaw.com"));
                         mail.Bcc.Remove(new MailAddress("ashish.tilak@jindalsaw.com"));
@@ -1019,7 +1029,11 @@ namespace ESS.Controllers.Api
                 // list of hr mail ids
                 var releaserMail = new []
                 {
-                    "Prakash.Nambiar@jindalsaw.com",
+                    "vallabh.r@jindalsaw.com",
+                    "mandeep.singh@jindalsaw.com",
+                    "vibhor.mathur@jindalsaw.com",
+                    "careers.ipu@jindalsaw.com",
+                    "akhand.singh@jindalsaw.com",
                     "er.ipu@jindalsaw.com",
                     "raghuvir.jadeja@jindalsaw.com"
                 };

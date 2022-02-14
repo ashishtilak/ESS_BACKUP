@@ -497,7 +497,7 @@ namespace ESS.Controllers.Api
             // check if start date is a Holiday
             if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
-                if (emp.Location == Locations.Nashik)
+                if (emp.Location == Locations.Nashik || emp.Location == Locations.Ipu)
                 {
                     // W - weekoff, H - holiday
 
@@ -506,6 +506,9 @@ namespace ESS.Controllers.Api
                     var tpa = Helpers.CustomHelper.GetPerfAttd(emp.EmpUnqId, coDate, coDate);
 
                     double hours = tpa[0].ConsShift == "CC" ? 7.5 : 8.0;
+
+                    if(emp.Location == Locations.Ipu && hours == 7.5)
+                        hours = 8.0;
 
                     if (tpa[0].ConsWrkHrs < hours)
                     {
