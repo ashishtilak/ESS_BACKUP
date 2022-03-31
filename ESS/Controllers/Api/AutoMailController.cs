@@ -845,8 +845,7 @@ namespace ESS.Controllers.Api
                         mail.Bcc.Remove(new MailAddress("mohit.parmar@jindalsaw.com"));
                         mail.Bcc.Remove(new MailAddress("ashish.tilak@jindalsaw.com"));
                     }
-
-                    ;
+                    
                 }
             }
             catch (Exception ex)

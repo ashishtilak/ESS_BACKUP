@@ -14,7 +14,7 @@ namespace ESS.Controllers.Api
 {
     public class EmpSeparationController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public EmpSeparationController()
         {

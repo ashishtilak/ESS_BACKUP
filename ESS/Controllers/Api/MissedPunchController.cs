@@ -211,6 +211,10 @@ namespace ESS.Controllers.Api
             dto.ReleaseStatusCode = ReleaseStatus.NotReleased;
 
             MissedPunch missPunch = Mapper.Map<MissedPunchDto, MissedPunch>(dto);
+            if (!string.IsNullOrEmpty(missPunch.InTimeUser))
+                missPunch.InTime = DateTime.Now;
+            else if(!string.IsNullOrEmpty(missPunch.OutTimeUser))
+                missPunch.OutTime = DateTime.Now;
 
             _context.MissedPunches.Add(missPunch);
             _context.SaveChanges();

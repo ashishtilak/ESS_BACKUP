@@ -44,9 +44,13 @@ namespace ESS.Controllers.Api
             if (!relStrLvl.Any())
                 return BadRequest("No records found.");
 
-            List<string> emps = relStrLvl.Select(r => r.ReleaseStrategy).Distinct().ToList();
+            List<string> allEmps = relStrLvl.Select(r => r.ReleaseStrategy).Distinct().ToList();
 
+            List<string> inActiveEmp = _context.Employees.Where(
+                    e=> allEmps.Contains(e.EmpUnqId) && e.Active == false).Select(e=>e.EmpUnqId).ToList();
 
+            List<string> emps = allEmps.Except(inActiveEmp).ToList();
+            
             List<TpaSanction> alreadyTpaEntries = _context.TpaSanctions.Where(
                     t => emps.Contains(t.EmpUnqId) &&
                          t.TpaDate >= fromDate && t.TpaDate <= toDate &&

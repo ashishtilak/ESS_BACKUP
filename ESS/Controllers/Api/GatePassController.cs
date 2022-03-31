@@ -14,7 +14,7 @@ namespace ESS.Controllers.Api
 {
     public class GatePassController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private const int TIME_LIMIT = 5;
 
         public GatePassController()

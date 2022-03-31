@@ -668,6 +668,11 @@ namespace ESS.Controllers.Api
                 dto.StatName = dtoEmp.StatName;
                 dto.CatName = dtoEmp.CatName;
                 dto.GradeName = dtoEmp.GradeName;
+
+                NoDuesStatus noDuesStatusDto = _context.NoDuesStatus.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+                if (noDuesStatusDto == null) continue;
+                dto.NoDuesStatus = new NoDuesStatusDto();
+                dto.NoDuesStatus = Mapper.Map<NoDuesStatus, NoDuesStatusDto>(noDuesStatusDto);
             }
 
             return Ok(noDuesMasters);

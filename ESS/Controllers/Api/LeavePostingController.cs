@@ -639,6 +639,9 @@ namespace ESS.Controllers.Api
                                                             Location = emp.Location
                                                         };
 
+                                                    if (attdLeaveObj.LeaveTyp == LeaveTypes.OtCOff)
+                                                        attdLeaveObj.LeaveTyp = LeaveTypes.CompOff;
+
                                                     attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location,
                                                         out var result);
 
@@ -840,6 +843,8 @@ namespace ESS.Controllers.Api
                                         attdLeaveObj.FromDate = attdLeaveObj.ToDate;
                                     }
 
+                                    if (attdLeaveObj.LeaveTyp == LeaveTypes.OtCOff)
+                                        attdLeaveObj.LeaveTyp = LeaveTypes.CompOff;
 
                                     attdLeaveObj = AttdPostLeave(attdLeaveObj, emp.Location, out var result);
 

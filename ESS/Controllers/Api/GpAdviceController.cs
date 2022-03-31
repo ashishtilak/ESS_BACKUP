@@ -12,7 +12,7 @@ namespace ESS.Controllers.Api
 {
     public class GpAdviceController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public GpAdviceController()
         {

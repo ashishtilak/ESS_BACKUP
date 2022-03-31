@@ -91,17 +91,10 @@ namespace ESS.Controllers.Api
                 // check for PL date < 15 
                 // by pass if location table flag is on
 
-
-                if (details.LeaveTypeCode == LeaveTypes.PaidLeave)
+                if (!IsPlDateValid(details, emp.Location))
                 {
-                    if (emp.Location == Locations.Nashik && _context.Location.FirstOrDefault().PlCheck == true)
-                    {
-                        if ((details.FromDt - DateTime.Today).Days < 15)
-                        {
-                            error.Add("Apply for EL before 15 days.");
-                            continue;
-                        }
-                    }
+                    error.Add("Apply for EL before 15 days.");
+                    continue;
                 }
 
                 //check2: check if leave type is there in balance table
@@ -110,6 +103,7 @@ namespace ESS.Controllers.Api
                 if (!leaveExist &&
                     (details.LeaveTypeCode != LeaveTypes.LeaveWithoutPay &&
                      details.LeaveTypeCode != LeaveTypes.CompOff &&
+                     details.LeaveTypeCode != LeaveTypes.OtCOff &&
                      details.LeaveTypeCode != LeaveTypes.OutdoorDuty &&
                      details.LeaveTypeCode != LeaveTypes.WeekOff &&
                      details.LeaveTypeCode != LeaveTypes.Lockdown
@@ -144,7 +138,8 @@ namespace ESS.Controllers.Api
                 // start date will be Week Off date,
                 // End date will be date of CO.
 
-                if (details.LeaveTypeCode == LeaveTypes.CompOff)
+                if (details.LeaveTypeCode == LeaveTypes.CompOff ||
+                    details.LeaveTypeCode == LeaveTypes.OtCOff)
                     details.TotalDays = 1;
 
                 // allow half CO in case of JFL tembhurni
@@ -152,6 +147,9 @@ namespace ESS.Controllers.Api
                     details.LeaveTypeCode == LeaveTypes.CompOff && details.HalfDayFlag == true)
                     details.TotalDays = 0.5f;
 
+                if (emp.Location == Locations.Ipu &&
+                    details.LeaveTypeCode == LeaveTypes.OtCOff && details.HalfDayFlag == true)
+                    details.TotalDays = 0.5f;
 
                 //check4 that the date should not overlap with existing leave taken
                 var existingLeave = _context.LeaveApplicationDetails
@@ -228,7 +226,8 @@ namespace ESS.Controllers.Api
 
                 //CHECK6: check leave balance other than CO
 
-                if (details.LeaveTypeCode != LeaveTypes.CompOff)
+                if (details.LeaveTypeCode != LeaveTypes.CompOff &&
+                    details.LeaveTypeCode != LeaveTypes.OtCOff)
                 {
                     LeaveBalanceDto lb = leaveBalDto.Single(l => l.LeaveTypeCode == details.LeaveTypeCode);
                     float bal = lb.Opening - lb.Availed - lb.Encashed;
@@ -303,7 +302,6 @@ namespace ESS.Controllers.Api
                     .FirstOrDefault(l =>
                         strNextLeave.StartsWith(l.LeaveRule) && details.LeaveTypeCode == l.LeaveTypeCode);
 
-
                 // *****************************************
                 //  LEAVE TYPE WISE CHECKS................
                 // *****************************************
@@ -357,7 +355,6 @@ namespace ESS.Controllers.Api
                             error.Add("Cannot take this SL. Check leaves taken on next days.");
                 }
 
-
                 if (details.LeaveTypeCode == LeaveTypes.OptionalLeave)
                 {
                     if (details.TotalDays > 1)
@@ -378,6 +375,19 @@ namespace ESS.Controllers.Api
                     if (nextLeaveRules != null && nextLeaveRules.Active)
                         if (details.TotalDays > nextLeaveRules.DaysAllowed || !nextLeaveRules.LeaveAllowed)
                             error.Add("Cannot take this OL. Check leaves taken on next days.");
+                }
+
+                //CHECKS FOR OC
+                if (details.LeaveTypeCode == LeaveTypes.OtCOff)
+                {
+                    // If some leave rule is found for prev/next leaves, check it here...
+                    if (prevLeaveRules != null && prevLeaveRules.Active)
+                        if (details.TotalDays > prevLeaveRules.DaysAllowed)
+                            error.Add("Cannot take this OT Coff. Check leaves taken on previous days.");
+
+                    if (nextLeaveRules != null && nextLeaveRules.Active)
+                        if (details.TotalDays > nextLeaveRules.DaysAllowed)
+                            error.Add("Cannot take this OT Coff. Check leaves taken on next days.");
                 }
             }
 
@@ -491,7 +501,6 @@ namespace ESS.Controllers.Api
                     error.Add("Date ranges must be consicutive, should not overlap.");
             }
 
-
             // CHECKS FOR COMP OFF ( CO )
 
             // check if start date is a Holiday
@@ -507,7 +516,7 @@ namespace ESS.Controllers.Api
 
                     double hours = tpa[0].ConsShift == "CC" ? 7.5 : 8.0;
 
-                    if(emp.Location == Locations.Ipu && hours == 7.5)
+                    if (emp.Location == Locations.Ipu && hours == 7.5)
                         hours = 8.0;
 
                     if (tpa[0].ConsWrkHrs < hours)
@@ -624,12 +633,88 @@ namespace ESS.Controllers.Api
                 }
             } //  COMP OFF CHECKS
 
+            if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.OtCOff))
+            {
+                foreach (LeaveApplicationDetailDto detail in leaveApplicationDto.LeaveApplicationDetails)
+                {
+                    float otHours1 = 0;
+                    float otHours2 = 0;
+                    if (detail.CoDate1 != null)
+                    {
+                        if ((detail.FromDt - detail.CoDate1.Value).TotalDays > 180)
+                            error.Add("Sanction OT not found on date " + detail.CoDate1);
+
+
+                        var otDate1 = _context.TpaSanctions.FirstOrDefault(
+                            e => e.EmpUnqId == emp.EmpUnqId &&
+                                 e.TpaDate == detail.CoDate1 &&
+                                 e.PostReleaseStatusCode == ReleaseStatus.FullyReleased);
+                        if (otDate1 == null)
+                            error.Add("Sanction OT not found on date " + detail.CoDate1);
+
+                        otHours1 = otDate1.SanctionTpa;
+                    }
+
+                    if (detail.CoDate2 != null)
+                    {
+                        if ((detail.FromDt - detail.CoDate2.Value).TotalDays > 180)
+                            error.Add("Sanction OT not found on date " + detail.CoDate1);
+
+                        var otDate2 = _context.TpaSanctions.FirstOrDefault(
+                            e => e.EmpUnqId == emp.EmpUnqId &&
+                                 e.TpaDate == detail.CoDate2 &&
+                                 e.PostReleaseStatusCode == ReleaseStatus.FullyReleased);
+                        if (otDate2 == null)
+                            error.Add("Sanction OT not found on date " + detail.CoDate2);
+                        otHours2 = otDate2.SanctionTpa;
+                    }
+
+                    if (detail.TotalDays == 1.0)
+                    {
+                        if (otHours1 >= 8) continue;
+
+                        if (otHours1 < 4)
+                        {
+                            if (detail.CoDate1 != null)
+                                error.Add("Sanctioned OT on " + detail.CoDate1.Value.ToString("dd/MM/yyyy") +
+                                          " should be at least 4 hours.");
+                        }
+                        else if (otHours2 < 4)
+                        {
+                            if (detail.CoDate2 != null)
+                                error.Add("Sanctioned OT on " + detail.CoDate2.Value.ToString("dd/MM/yyyy") +
+                                          " should be at least 4 hours.");
+                        }
+                    }
+                    else if (detail.TotalDays == 0.5 && otHours1 < 4)
+                    {
+                        if (detail.CoDate1 != null)
+                            error.Add("Sanctioned OT on " + detail.CoDate1.Value.ToString("dd/MM/yyyy") +
+                                      " should be at least 4 hours.");
+                    }
+                }
+            }
+
             // DONE. If there's no error, return success
             if (error.Count == 0)
                 return Ok(leaveApplicationDto);
 
 
             return Content(HttpStatusCode.BadRequest, error);
+        }
+
+        // PL application before 15 days check.
+        private bool IsPlDateValid(LeaveApplicationDetailDto details, string location)
+        {
+            if (details.LeaveTypeCode != LeaveTypes.PaidLeave)
+                return true;
+
+            bool? plChk = _context.Location.FirstOrDefault()?.PlCheck ?? true;
+
+            if (location != Locations.Nashik || plChk != true)
+                return true;
+
+            return (details.FromDt - DateTime.Today).Days >= 15;
         }
 
         private string GetLeaveOnDate(DateTime dt, string empUnqId)

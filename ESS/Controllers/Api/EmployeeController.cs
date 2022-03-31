@@ -11,7 +11,7 @@ namespace ESS.Controllers.Api
 {
     public class EmployeeController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public EmployeeController()
         {

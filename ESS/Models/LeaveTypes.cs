@@ -49,6 +49,7 @@ namespace ESS.Models
         public static readonly string OutdoorDuty = "OD";
         public static readonly string WeekOff = "WO";
         public static readonly string Lockdown = "LD";
+        public static readonly string OtCOff = "OC" ;
 
         //public static string NewType { get { return ConfigurationManager.AppSettings["PaidLeave"]; } }
     }

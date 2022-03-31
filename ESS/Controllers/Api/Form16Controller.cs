@@ -16,7 +16,7 @@ namespace ESS.Controllers.Api
 {
     public class Form16Controller : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public Form16Controller()
         {
