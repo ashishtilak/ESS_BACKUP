@@ -172,6 +172,9 @@ namespace ESS.App_Start
             CreateMap<ReviewDto, Reviews>();
             CreateMap<ReviewDetails, ReviewDetailDto>();
             CreateMap<ReviewDetailDto, ReviewDetails>();
+
+            CreateMap<SapUserIds, SapUserIdDto>();
+            CreateMap<SapUserIdDto, SapUserIds>();
         }
     }
 }

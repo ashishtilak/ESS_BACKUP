@@ -281,6 +281,7 @@
     <Compile Include="Dto\ReviewDetailDto.cs" />
     <Compile Include="Dto\ReviewDto.cs" />
     <Compile Include="Dto\RoleAuthDto.cs" />
+    <Compile Include="Dto\SapUserIdDto.cs" />
     <Compile Include="Dto\SectionDto.cs" />
     <Compile Include="Dto\ShiftDto.cs" />
     <Compile Include="Dto\ShiftScheduleDetailDto.cs" />
@@ -792,6 +793,10 @@
     <Compile Include="Migrations\202201241231515_ProgressReview.Designer.cs">
       <DependentUpon>202201241231515_ProgressReview.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204051047370_SapUserId.cs" />
+    <Compile Include="Migrations\202204051047370_SapUserId.Designer.cs">
+      <DependentUpon>202204051047370_SapUserId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplReleaseStatus.cs" />
@@ -858,6 +863,7 @@
     <Compile Include="Models\RoleAuth.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\RoleUsers.cs" />
+    <Compile Include="Models\SapUserIds.cs" />
     <Compile Include="Models\Sections.cs" />
     <Compile Include="Models\Shifts.cs" />
     <Compile Include="Models\ShiftScheduleDetails.cs" />
@@ -1310,6 +1316,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202201241231515_ProgressReview.resx">
       <DependentUpon>202201241231515_ProgressReview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204051047370_SapUserId.resx">
+      <DependentUpon>202204051047370_SapUserId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

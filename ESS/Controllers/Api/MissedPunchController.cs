@@ -283,11 +283,11 @@ namespace ESS.Controllers.Api
                 switch (inOut.ToUpper())
                 {
                     case "I":
-                        missedpunch.InTime = punchTime;
+                        missedpunch.InTime = DateTime.Now;
                         missedpunch.InTimeUser = empUnqId;
                         break;
                     case "O":
-                        missedpunch.OutTime = punchTime;
+                        missedpunch.OutTime = DateTime.Now;
                         missedpunch.OutTimeUser = empUnqId;
                         break;
                 }

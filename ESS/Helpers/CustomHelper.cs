@@ -1309,10 +1309,7 @@ namespace ESS.Helpers
                         sql = "merge into Shifts as target " +
                               "using #tmpShifts as Source " +
                               "on " +
-                              "Target.ShiftCode = Source.ShiftCode and " +
-                              "Target.ShiftDesc = Source.ShiftDesc and " +
-                              "Target.ShiftStart = Source.ShiftStart and " +
-                              "Target.ShiftEnd = Source.ShiftEnd " +
+                              "Target.ShiftCode = Source.ShiftCode " +
                               "when matched then " +
                               "update set Target.ShiftDesc = Source.ShiftDesc, " +
                               "Target.ShiftStart = Source.ShiftStart, " +

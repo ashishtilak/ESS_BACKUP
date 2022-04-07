@@ -76,6 +76,10 @@ namespace ESS.Controllers.Api
                     })
                     .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
                 dto.Employee = employeeDto;
+                dto.ReleaseEmpName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == dto.ReleaseCode)?.EmpName;
+                dto.AddEmpName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == dto.AddUser)?.EmpName;
+                dto.HrEmpName = _context.Employees.FirstOrDefault(e=>e.EmpUnqId == dto.HrUser)?.EmpName;
+
             }
 
             return Ok(reviewDtls);
@@ -304,7 +308,7 @@ namespace ESS.Controllers.Api
 
             reviewDtl.Recommendation = dto.Recommendation;
             reviewDtl.Rating = dto.Rating;
-            reviewDtl.ReleaseCode = rel.ReleaseCode;
+            reviewDtl.ReleaseCode = dto.ReleaseCode;
             reviewDtl.ReleaseDate = DateTime.Now;
             reviewDtl.ReleaseStatusCode = dto.ReleaseStatusCode;
             reviewDtl.HrReleaseStatusCode = ReleaseStatus.InRelease;

@@ -32,6 +32,7 @@ namespace ESS.Dto
         public DateTime? AddDt { get; set; }
         public string AddReleaseCode { get; set; }
         public string AddUser { get; set; }
+        public string AddEmpName { get; set; }
         public string AddReleaseStatusCode { get; set; }
 
         public string ReleaseGroupCode { get; set; }
@@ -39,11 +40,13 @@ namespace ESS.Dto
 
         // STORE ONLY SECOND LEVEL RELEASER DETAILS
         public string ReleaseCode { get; set; }
+        public string ReleaseEmpName { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public string ReleaseStatusCode { get; set; }
         public string HodRemarks { get; set; }
 
         public string HrUser { get; set; }
+        public string HrEmpName { get; set; }
         public DateTime? HrReleaseDate { get; set; }
         public string HrReleaseStatusCode { get; set; }
         public string HrRemarks { get; set; }

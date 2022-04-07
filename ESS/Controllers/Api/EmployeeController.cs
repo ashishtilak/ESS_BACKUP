@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
 using System.Web.Http;
+using AutoMapper;
 using ESS.Dto;
 using ESS.Models;
+using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 
 namespace ESS.Controllers.Api
@@ -188,14 +190,13 @@ namespace ESS.Controllers.Api
                     .OrderByDescending(e => e.Counter)
                     .FirstOrDefault(e => e.EmpUnqId == empUnqId);
 
-                if(empAdd !=null)
+                if (empAdd != null)
                 {
                     employeeDto.PrePhone = empAdd.PrePhone;
                     employeeDto.PreResPhone = empAdd.PreResPhone;
                     employeeDto.PreEmail = empAdd.PreEmail;
                 }
             }
-
 
 
             return Ok(employee);
@@ -261,7 +262,7 @@ namespace ESS.Controllers.Api
                 .Include(d => d.Departments)
                 .Include(s => s.Stations)
                 //.Include(e => e.Sections)
-                .Where(e => e.Active && (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE") )
+                .Where(e => e.Active && (e.WrkGrp == "COMP" || e.WrkGrp == "OUTSOURCE"))
                 .ToList();
 
             List<EmpRelease> result = new List<EmpRelease>();
@@ -424,6 +425,46 @@ namespace ESS.Controllers.Api
             _context.SaveChanges();
 
             return Ok();
+        }
+
+
+        [HttpGet]
+        [ActionName("getsapid")]
+        public IHttpActionResult GetSapId()
+        {
+            List<SapUserIdDto> result = _context.SapUserIds.Select(Mapper.Map<SapUserIds, SapUserIdDto>).ToList();
+            foreach (SapUserIdDto dto in result)
+            {
+                Employees emp = _context.Employees
+                    .Include(c => c.Company)
+                    .Include(w => w.WorkGroup)
+                    .Include(u => u.Units)
+                    .Include(d => d.Departments)
+                    .Include(s => s.Stations)
+                    .Include(g => g.Grades)
+                    .FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+
+                if (emp == null) continue;
+                
+                dto.EmpName = emp.EmpName;
+                dto.Active = emp.Active;
+                dto.CompName = emp.Company?.CompName;
+                dto.WrkGrpDesc = emp.WorkGroup?.WrkGrpDesc;
+                dto.UnitName = emp.Units?.UnitName;
+                dto.Dept = emp.Departments?.DeptName;
+                dto.StatName = emp.Stations?.StatName;
+                dto.GradeName = emp.Grades?.GradeName;
+                dto.JoinDate = emp.JoinDate;
+
+                NoDuesMaster nodues = _context.NoDuesMaster.FirstOrDefault(e => e.EmpUnqId == dto.EmpUnqId);
+
+                if (nodues == null) continue;
+                dto.NoDuesFlag = nodues.ClosedFlag;
+                dto.ResignDate = nodues.ResignDate;
+                dto.RelieveDate = nodues.RelieveDate;
+            }
+
+            return Ok(result);
         }
     }
 }

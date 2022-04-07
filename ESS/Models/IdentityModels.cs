@@ -122,6 +122,8 @@ namespace ESS.Models
         public DbSet<Reviews> Reviews { get; set; }
         public DbSet<ReviewDetails> ReviewDetails { get; set; }
 
+        public DbSet<SapUserIds> SapUserIds { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
