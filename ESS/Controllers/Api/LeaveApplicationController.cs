@@ -12,7 +12,7 @@ namespace ESS.Controllers.Api
 {
     public class LeaveApplicationController : ApiController
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public LeaveApplicationController()
         {
@@ -188,6 +188,9 @@ namespace ESS.Controllers.Api
             //also fill id in leave application details
 
             //Checks for leave application are here
+
+            if (leaveApplicationDto.LeaveApplicationDetails.Count == 0)
+                return BadRequest("Leave application details not found!");
 
             foreach (LeaveApplicationDetailDto leaveApplicationDetailDto in leaveApplicationDto.LeaveApplicationDetails)
             {

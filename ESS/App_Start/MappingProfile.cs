@@ -175,6 +175,9 @@ namespace ESS.App_Start
 
             CreateMap<SapUserIds, SapUserIdDto>();
             CreateMap<SapUserIdDto, SapUserIds>();
+
+            CreateMap<AddressProof, AddressProofDto>();
+            CreateMap<AddressProofDto, AddressProof>();
         }
     }
 }

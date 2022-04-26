@@ -1064,6 +1064,25 @@ namespace ESS.Controllers.Api
 
                     status.Hr = true;
 
+                    if (status.Admin &&
+                        status.Cafeteria &&
+                        status.EandI &&
+                        status.Finance &&
+                        status.Hod &&
+                        status.Ohc &&
+                        status.PrgHr &&
+                        status.Safety &&
+                        status.School &&
+                        status.Security &&
+                        status.Stores &&
+                        status.Township &&
+                        status.It &&
+                        status.Er &&
+                        status.Hr)
+
+                        // update if all flags are set.
+                        noDues.ClosedFlag = true;
+
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

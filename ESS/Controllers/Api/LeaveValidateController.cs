@@ -506,7 +506,7 @@ namespace ESS.Controllers.Api
             // check if start date is a Holiday
             if (leaveApplicationDto.LeaveApplicationDetails.Any(x => x.LeaveTypeCode == LeaveTypes.CompOff))
             {
-                if (emp.Location == Locations.Nashik || emp.Location == Locations.Ipu)
+                if (emp.Location == Locations.Nashik || emp.Location == Locations.Ipu || emp.Location == Locations.Bellary)
                 {
                     // W - weekoff, H - holiday
 

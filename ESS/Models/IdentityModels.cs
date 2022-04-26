@@ -124,6 +124,8 @@ namespace ESS.Models
 
         public DbSet<SapUserIds> SapUserIds { get; set; }
 
+        public DbSet<AddressProof> AddressProofs { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
